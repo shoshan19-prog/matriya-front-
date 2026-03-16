@@ -46,13 +46,24 @@ function buildFileTree(files) {
         }
         node.files.push({ ...f, _basename: fileSegment });
     }
-    root.children.sort((a, b) => (a.pathSegment || '').localeCompare(b.pathSegment || ''));
+    if (root.files.length > 0) {
+        root.children.push({ type: 'folder', pathFull: '\0', pathSegment: 'ללא תיקייה', children: [], files: root.files });
+        root.files = [];
+    }
+    root.children.sort((a, b) => (a.pathFull === '\0' ? -1 : b.pathFull === '\0' ? 1 : (a.pathSegment || '').localeCompare(b.pathSegment || '')));
     function sortNode(n) {
-        n.children.sort((a, b) => (a.pathSegment || '').localeCompare(b.pathSegment || ''));
+        n.children.sort((a, b) => (a.pathFull === '\0' ? -1 : b.pathFull === '\0' ? 1 : (a.pathSegment || '').localeCompare(b.pathSegment || '')));
         n.children.forEach(sortNode);
     }
     sortNode(root);
     return root;
+}
+
+function collectFolderPathFulls(node) {
+    const out = [];
+    if (node.pathFull !== undefined && node.pathFull !== '') out.push(node.pathFull);
+    (node.children || []).forEach(c => out.push(...collectFolderPathFulls(c)));
+    return out;
 }
 
 function UploadTab() {
@@ -65,6 +76,11 @@ function UploadTab() {
     const [previewLoading, setPreviewLoading] = useState(false);
     const [collectionInfo, setCollectionInfo] = useState(null);
     const [foldersCollapsed, setFoldersCollapsed] = useState(() => new Set());
+    const [askSelectedFile, setAskSelectedFile] = useState('');
+    const [askQuery, setAskQuery] = useState('');
+    const [askResult, setAskResult] = useState(null);
+    const [askLoading, setAskLoading] = useState(false);
+    const [askError, setAskError] = useState(null);
     const fileInputRef = useRef(null);
     const folderInputRef = useRef(null);
 
@@ -102,6 +118,13 @@ function UploadTab() {
         loadFileList();
         loadCollectionInfo();
     }, []);
+
+    useEffect(() => {
+        if (fileList.length === 0) return;
+        const tree = buildFileTree(fileList);
+        const pathFulls = collectFolderPathFulls(tree);
+        setFoldersCollapsed(new Set(pathFulls));
+    }, [fileList]);
 
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -205,6 +228,23 @@ function UploadTab() {
     };
 
     const closePreview = () => setPreviewDoc(null);
+
+    const runAsk = async () => {
+        const query = (askQuery || '').trim();
+        if (!query) return;
+        setAskError(null);
+        setAskResult(null);
+        setAskLoading(true);
+        try {
+            const filenames = askSelectedFile ? [askSelectedFile] : fileList.map(f => f.filename);
+            const res = await api.post('/ask-matriya', { message: query, filenames }, { timeout: 90000 });
+            setAskResult(res.data?.reply ?? '');
+        } catch (err) {
+            setAskError(err.response?.data?.error || err.message || 'שגיאה בשאילתה');
+        } finally {
+            setAskLoading(false);
+        }
+    };
 
     const recentFiles = fileList.slice(0, 5);
     const fileTree = buildFileTree(fileList);
@@ -322,6 +362,42 @@ function UploadTab() {
                                     </tbody>
                                 </table>
                             </div>
+                        )}
+                    </div>
+
+                    <div className="card upload-ask-card">
+                        <h2>שאל על המסמכים</h2>
+                        <p className="upload-ask-hint">בחר קובץ (או כל הקבצים) ושאל שאלה – התשובה מבוססת על תוכן המסמכים.</p>
+                        {fileList.length > 0 && (
+                            <>
+                                <div className="form-group">
+                                    <label>חיפוש בתוך</label>
+                                    <select value={askSelectedFile} onChange={e => setAskSelectedFile(e.target.value)}>
+                                        <option value="">כל הקבצים</option>
+                                        {fileList.map(f => (
+                                            <option key={f.filename} value={f.filename}>{f.filename}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <label>שאל שאלה</label>
+                                <textarea
+                                    value={askQuery}
+                                    onChange={e => setAskQuery(e.target.value)}
+                                    placeholder="הזן שאלה..."
+                                    rows={4}
+                                    disabled={askLoading}
+                                />
+                                <button type="button" className="upload-ask-run" onClick={runAsk} disabled={askLoading || !askQuery.trim()}>
+                                    {askLoading ? 'מריץ...' : 'הרץ'}
+                                </button>
+                                {askError && <p className="upload-ask-error">{askError}</p>}
+                                {askResult != null && askResult !== '' && (
+                                    <div className="upload-ask-result">{askResult}</div>
+                                )}
+                            </>
+                        )}
+                        {fileList.length === 0 && !fileListLoading && (
+                            <p className="muted">העלה מסמכים למעלה כדי לשאול עליהם שאלות.</p>
                         )}
                     </div>
                 </div>
