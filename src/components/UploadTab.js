@@ -23,6 +23,38 @@ function formatDate(iso) {
     }
 }
 
+/** Build a tree from file list: { type: 'folder', pathFull, pathSegment, children: [], files: [] } or flat list of files at root */
+function buildFileTree(files) {
+    const root = { type: 'folder', pathFull: '', pathSegment: null, children: [], files: [] };
+    for (const f of files) {
+        const pathStr = (f.filename || '').trim();
+        const segments = pathStr.includes('/') ? pathStr.split('/').filter(Boolean) : [];
+        if (segments.length <= 1) {
+            root.files.push(f);
+            continue;
+        }
+        const fileSegment = segments.pop();
+        let node = root;
+        for (let i = 0; i < segments.length; i++) {
+            const pathFull = segments.slice(0, i + 1).join('/');
+            let child = node.children.find(c => c.pathFull === pathFull);
+            if (!child) {
+                child = { type: 'folder', pathFull, pathSegment: segments[i], children: [], files: [] };
+                node.children.push(child);
+            }
+            node = child;
+        }
+        node.files.push({ ...f, _basename: fileSegment });
+    }
+    root.children.sort((a, b) => (a.pathSegment || '').localeCompare(b.pathSegment || ''));
+    function sortNode(n) {
+        n.children.sort((a, b) => (a.pathSegment || '').localeCompare(b.pathSegment || ''));
+        n.children.forEach(sortNode);
+    }
+    sortNode(root);
+    return root;
+}
+
 function UploadTab() {
     const [fileList, setFileList] = useState([]);
     const [fileListLoading, setFileListLoading] = useState(true);
@@ -32,8 +64,18 @@ function UploadTab() {
     const [previewDoc, setPreviewDoc] = useState(null);
     const [previewLoading, setPreviewLoading] = useState(false);
     const [collectionInfo, setCollectionInfo] = useState(null);
+    const [foldersCollapsed, setFoldersCollapsed] = useState(() => new Set());
     const fileInputRef = useRef(null);
     const folderInputRef = useRef(null);
+
+    const toggleFolder = (pathFull) => {
+        setFoldersCollapsed(prev => {
+            const next = new Set(prev);
+            if (next.has(pathFull)) next.delete(pathFull);
+            else next.add(pathFull);
+            return next;
+        });
+    };
 
     const loadFileList = async () => {
         setFileListLoading(true);
@@ -128,6 +170,8 @@ function UploadTab() {
         for (const file of files) {
             const formData = new FormData();
             formData.append('file', file);
+            const relativePath = file.webkitRelativePath || (file.path && typeof file.path === 'string' ? file.path : null);
+            if (relativePath) formData.append('relative_path', relativePath);
             try {
                 const response = await api.post('/ingest/file', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
                 if (response.data?.success) ok++;
@@ -163,6 +207,45 @@ function UploadTab() {
     const closePreview = () => setPreviewDoc(null);
 
     const recentFiles = fileList.slice(0, 5);
+    const fileTree = buildFileTree(fileList);
+
+    const renderFileRow = (f, displayName) => (
+        <tr key={f.filename}>
+            <td className="doc-name">{displayName || f.filename}</td>
+            <td>{getFileType(displayName || f.filename)}</td>
+            <td>{formatDate(f.uploaded_at)}</td>
+            <td>{f.chunks_count ?? '—'}</td>
+            <td>
+                <button type="button" className="preview-btn" onClick={() => openPreview(f.filename)}>תצוגה מקדימה</button>
+            </td>
+        </tr>
+    );
+
+    const renderFolderRows = (node, depth = 0) => {
+        const rows = [];
+        if (node.pathSegment != null) {
+            const isCollapsed = foldersCollapsed.has(node.pathFull);
+            rows.push(
+                <tr key={`folder-${node.pathFull}`} className="folder-row">
+                    <td colSpan={5} className="folder-cell">
+                        <button type="button" className="folder-toggle" onClick={() => toggleFolder(node.pathFull)} aria-expanded={!isCollapsed}>
+                            <span className="folder-chevron" style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'none' }}>▼</span>
+                            <span>📁 {node.pathSegment}</span>
+                        </button>
+                    </td>
+                </tr>
+            );
+            if (!isCollapsed) {
+                node.files.forEach(f => rows.push(renderFileRow(f, f._basename || f.filename)));
+                node.children.forEach(c => renderFolderRows(c, depth + 1).forEach(r => rows.push(r)));
+            }
+        }
+        return rows;
+    };
+
+    const tableBodyRows = [];
+    fileTree.files.forEach(f => tableBodyRows.push(renderFileRow(f, null)));
+    fileTree.children.forEach(c => renderFolderRows(c).forEach(r => tableBodyRows.push(r)));
 
     return (
         <div className="upload-tab">
@@ -235,17 +318,7 @@ function UploadTab() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {fileList.map((f) => (
-                                            <tr key={f.filename}>
-                                                <td className="doc-name">{f.filename}</td>
-                                                <td>{getFileType(f.filename)}</td>
-                                                <td>{formatDate(f.uploaded_at)}</td>
-                                                <td>{f.chunks_count ?? '—'}</td>
-                                                <td>
-                                                    <button type="button" className="preview-btn" onClick={() => openPreview(f.filename)}>תצוגה מקדימה</button>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                        {tableBodyRows}
                                     </tbody>
                                 </table>
                             </div>

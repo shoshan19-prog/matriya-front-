@@ -122,6 +122,36 @@
     background: rgba(22, 101, 52, 0.1);
 }
 
+.documents-table .folder-row:hover {
+    background: rgba(22, 101, 52, 0.06);
+}
+
+.documents-table .folder-cell {
+    padding: 10px 14px;
+    font-weight: 600;
+    color: var(--matriya-accent);
+    vertical-align: middle;
+}
+
+.documents-table .folder-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    text-align: right;
+}
+
+.documents-table .folder-chevron {
+    display: inline-block;
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+}
+
 .upload-sidebar {
     display: flex;
     flex-direction: column;
