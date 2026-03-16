@@ -130,7 +130,6 @@ function LoginTab({ onLogin }) {
                             value={formData.password}
                             onChange={handleChange}
                             required
-                            minLength={6}
                             className="form-input"
                         />
                     </div>
