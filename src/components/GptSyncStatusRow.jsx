@@ -76,7 +76,7 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, className = '' }) {
             label = 'חיפוש המסמכים בענן לא מוגדר. פנה למנהל המערכת.';
         } else if (syncing) {
             dotColor = 'var(--matriya-accent, #166534)';
-            label = 'מסנכרן… (עשוי לקחת מספר דקות)';
+            label = 'מסנכרן';
         } else if (st.vector_store_id) {
             dotColor = 'var(--matriya-success, #166534)';
             label = 'מסונכרן';
