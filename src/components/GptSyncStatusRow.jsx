@@ -17,18 +17,40 @@ function hasEligibleFilenames(filenames) {
  * Cloud document sync status + actions (vendor-neutral UI).
  * @param {{ filenames: string[], onSyncComplete?: () => void, onSyncingChange?: (syncing: boolean) => void, className?: string }} props
  */
+const STATUS_REQUEST_MS = 45000;
+
+function statusFetchErrorMessage(err) {
+    if (err?.code === 'ECONNABORTED' || String(err?.message || '').toLowerCase().includes('timeout')) {
+        return 'פג הזמן לחיבור לשירות המסמכים. וודא ש־Matriya Back פועל ונסה «רענון סטטוס».';
+    }
+    if (!err?.response) {
+        return 'לא ניתן להתחבר ל־Matriya Back. בדקו את כתובת ה־API (REACT_APP_API_BASE_URL) ושהשרת רץ.';
+    }
+    const server = err.response?.data?.error || err.response?.data?.detail;
+    if (server) return `שגיאת שרת: ${server}`;
+    return 'לא ניתן לטעון סטטוס מסמכים. נסו «רענון סטטוס».';
+}
+
 function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, className = '' }) {
     const [st, setSt] = useState(null);
+    const [statusLoading, setStatusLoading] = useState(true);
+    const [statusError, setStatusError] = useState(null);
     const [syncing, setSyncing] = useState(false);
     const [postSyncIndexingPoll, setPostSyncIndexingPoll] = useState(false);
     const [syncHadError, setSyncHadError] = useState(false);
 
     const refresh = useCallback(async () => {
+        setStatusError(null);
+        setStatusLoading(true);
         try {
-            const res = await api.get('/gpt-rag/status');
-            setSt(res.data || null);
-        } catch {
+            const res = await api.get('/gpt-rag/status', { timeout: STATUS_REQUEST_MS });
+            setSt(res.data ?? null);
+        } catch (e) {
             setSt(null);
+            setStatusError(statusFetchErrorMessage(e));
+            console.warn('[GptSyncStatusRow] /gpt-rag/status failed', e);
+        } finally {
+            setStatusLoading(false);
         }
     }, []);
 
@@ -65,7 +87,7 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, cla
                     for (let i = 0; i < 36; i++) {
                         await new Promise((r) => setTimeout(r, 5000));
                         await refresh();
-                        const check = await api.get('/gpt-rag/status');
+                        const check = await api.get('/gpt-rag/status', { timeout: STATUS_REQUEST_MS });
                         const s = check.data;
                         const fc = s?.file_counts || {};
                         const inProg = fc.in_progress ?? 0;
@@ -92,7 +114,16 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, cla
     let hintId = 'gpt-sync-status-hint';
     let extraWarn = null;
 
-    if (st) {
+    if (statusLoading) {
+        dotColor = 'var(--matriya-muted, #6b7280)';
+        label = 'בודק חיבור לשירות המסמכים…';
+    } else if (statusError) {
+        dotColor = 'var(--matriya-error, #c0392b)';
+        label = statusError;
+    } else if (!st) {
+        dotColor = 'var(--matriya-error, #c0392b)';
+        label = 'לא התקבל מידע סטטוס מהשרת. נסו «רענון סטטוס».';
+    } else if (st) {
         if (!st.openai) {
             dotColor = 'var(--matriya-error, #c0392b)';
             label = 'חיפוש המסמכים בענן לא מוגדר. פנה למנהל המערכת.';
@@ -124,7 +155,7 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, cla
         }
     }
 
-    const uiBusy = syncing || postSyncIndexingPoll;
+    const uiBusy = syncing || postSyncIndexingPoll || statusLoading;
     const showResync =
         st?.openai && st?.use_openai_file_search && Boolean(st?.vector_store_id) && !uiBusy;
     const showRetry =
@@ -182,7 +213,12 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, cla
                         סנכרון
                     </button>
                 )}
-                <button type="button" className="gpt-sync-status-row__btn" disabled={uiBusy} onClick={refresh}>
+                <button
+                    type="button"
+                    className="gpt-sync-status-row__btn"
+                    disabled={syncing || postSyncIndexingPoll}
+                    onClick={refresh}
+                >
                     רענון סטטוס
                 </button>
             </div>
