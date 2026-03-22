@@ -20,6 +20,7 @@ function hasEligibleFilenames(filenames) {
 function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, className = '' }) {
     const [st, setSt] = useState(null);
     const [syncing, setSyncing] = useState(false);
+    const [postSyncIndexingPoll, setPostSyncIndexingPoll] = useState(false);
     const [syncHadError, setSyncHadError] = useState(false);
 
     const refresh = useCallback(async () => {
@@ -40,8 +41,8 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, cla
     }, [filenames.length, refresh]);
 
     useEffect(() => {
-        onSyncingChange?.(syncing);
-    }, [syncing, onSyncingChange]);
+        onSyncingChange?.(syncing || postSyncIndexingPoll);
+    }, [syncing, postSyncIndexingPoll, onSyncingChange]);
 
     useEffect(() => {
         const onVis = () => {
@@ -55,9 +56,26 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, cla
         setSyncing(true);
         setSyncHadError(false);
         try {
-            await api.post('/gpt-rag/sync', {}, { timeout: 300000 });
+            const res = await api.post('/gpt-rag/sync', {}, { timeout: 300000 });
             await refresh();
             onSyncComplete?.();
+            if (res.data?.indexing_pending) {
+                setPostSyncIndexingPoll(true);
+                try {
+                    for (let i = 0; i < 36; i++) {
+                        await new Promise((r) => setTimeout(r, 5000));
+                        await refresh();
+                        const check = await api.get('/gpt-rag/status');
+                        const s = check.data;
+                        const fc = s?.file_counts || {};
+                        const inProg = fc.in_progress ?? 0;
+                        if (inProg === 0 && (fc.completed > 0 || s?.vector_store_status === 'completed')) break;
+                    }
+                } finally {
+                    setPostSyncIndexingPoll(false);
+                    await refresh();
+                }
+            }
         } catch (e) {
             setSyncHadError(true);
             console.warn('[GptSyncStatusRow]', e);
@@ -78,9 +96,9 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, cla
         if (!st.openai) {
             dotColor = 'var(--matriya-error, #c0392b)';
             label = 'חיפוש המסמכים בענן לא מוגדר. פנה למנהל המערכת.';
-        } else if (syncing) {
+        } else if (syncing || postSyncIndexingPoll) {
             dotColor = 'var(--matriya-accent, #166534)';
-            label = 'מסנכרן....';
+            label = postSyncIndexingPoll ? 'מאנדקס מסמכים בענן…' : 'מסנכרן....';
         } else if (st.vector_store_id) {
             dotColor = 'var(--matriya-success, #166534)';
             label = 'מסונכרן';
@@ -106,20 +124,21 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, cla
         }
     }
 
+    const uiBusy = syncing || postSyncIndexingPoll;
     const showResync =
-        st?.openai && st?.use_openai_file_search && Boolean(st?.vector_store_id) && !syncing;
+        st?.openai && st?.use_openai_file_search && Boolean(st?.vector_store_id) && !uiBusy;
     const showRetry =
         st?.openai &&
         st?.use_openai_file_search &&
         !st?.vector_store_id &&
-        !syncing &&
+        !uiBusy &&
         hasEligible &&
         syncHadError;
     const showInitialSync =
         st?.openai &&
         st?.use_openai_file_search &&
         !st?.vector_store_id &&
-        !syncing &&
+        !uiBusy &&
         hasEligible &&
         !syncHadError;
 
@@ -163,7 +182,7 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, cla
                         סנכרון
                     </button>
                 )}
-                <button type="button" className="gpt-sync-status-row__btn" disabled={syncing} onClick={refresh}>
+                <button type="button" className="gpt-sync-status-row__btn" disabled={uiBusy} onClick={refresh}>
                     רענון סטטוס
                 </button>
             </div>
