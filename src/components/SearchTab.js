@@ -35,6 +35,11 @@ function SearchTab({ onGptSyncingChange }) {
     const [sessionLoading, setSessionLoading] = useState(true);
     const [answerMode, setAnswerMode] = useState('quick'); // 'quick' = GET /search (stage required) | 'agents' = POST /api/research/run (4 agents)
     const [preJustification, setPreJustification] = useState('');
+    /** Kernel v1.6 – optional JSON (POST /api/research/search when any block is non-empty). */
+    const [kernelSignalsJson, setKernelSignalsJson] = useState('');
+    const [dataAnchorsJson, setDataAnchorsJson] = useState('');
+    const [methodologyFlagsJson, setMethodologyFlagsJson] = useState('');
+    const [showKernelAdvanced, setShowKernelAdvanced] = useState(false);
 
     // Create research session on mount – required for every question (session_id + stage)
     useEffect(() => {
@@ -72,6 +77,16 @@ function SearchTab({ onGptSyncingChange }) {
         setError(null);
         setResults(null);
 
+        const parseJsonField = (label, raw) => {
+            const t = (raw || '').trim();
+            if (!t) return { ok: true, value: null };
+            try {
+                return { ok: true, value: JSON.parse(t) };
+            } catch {
+                return { ok: false, error: `${label}: JSON לא תקין` };
+            }
+        };
+
         try {
             if (answerMode === 'agents') {
                 const body = {
@@ -98,28 +113,70 @@ function SearchTab({ onGptSyncingChange }) {
                     sources: Array.isArray(data.sources) ? data.sources : []
                 });
             } else {
-                const params = {
-                    query: query.trim(),
-                    generate_answer: true,
-                    stage: researchStage,
-                    session_id: sessionId
-                };
-                if (selectedFile) params.filename = selectedFile;
+                const ks = parseJsonField('אותות קרנל (kernel_signals)', kernelSignalsJson);
+                const da = parseJsonField('עוגני נתונים', dataAnchorsJson);
+                const mf = parseJsonField('דגלי מתודולוגיה', methodologyFlagsJson);
+                if (!ks.ok) {
+                    setError(ks.error);
+                    setIsSearching(false);
+                    return;
+                }
+                if (!da.ok) {
+                    setError(da.error);
+                    setIsSearching(false);
+                    return;
+                }
+                if (!mf.ok) {
+                    setError(mf.error);
+                    setIsSearching(false);
+                    return;
+                }
 
-                const response = await api.get('/search', {
-                    params,
-                    timeout: 60000
-                });
+                const useKernelPost =
+                    ks.value != null || da.value != null || mf.value != null;
 
-                const data = response.data;
-                setResults(data);
-                if (data.session_id) setSessionId(data.session_id);
+                if (useKernelPost) {
+                    const body = {
+                        query: query.trim(),
+                        generate_answer: true,
+                        stage: researchStage,
+                        session_id: sessionId
+                    };
+                    if (selectedFile) body.filename = selectedFile;
+                    if (ks.value != null) body.kernel_signals = ks.value;
+                    if (da.value != null) body.data_anchors = da.value;
+                    if (mf.value != null) body.methodology_flags = mf.value;
+
+                    const response = await api.post('/api/research/search', body, { timeout: 60000 });
+                    const data = response.data;
+                    setResults(data);
+                    if (data.session_id) setSessionId(data.session_id);
+                } else {
+                    const params = {
+                        query: query.trim(),
+                        generate_answer: true,
+                        stage: researchStage,
+                        session_id: sessionId
+                    };
+                    if (selectedFile) params.filename = selectedFile;
+
+                    const response = await api.get('/search', {
+                        params,
+                        timeout: 60000
+                    });
+
+                    const data = response.data;
+                    setResults(data);
+                    if (data.session_id) setSessionId(data.session_id);
+                }
             }
         } catch (err) {
             const data = err.response?.data;
             const msg = data?.error || data?.detail || err.message;
             if (err.response?.status === 409 && data?.research_gate_locked) {
                 setError(`שער נעול (Kernel Lock): ${msg} נדרש Recovery לפני המשך.`);
+            } else if (err.response?.status === 409 && data?.possibility_shutdown) {
+                setError(`${msg || 'סגירת מרחב אפשרויות — מסלול 4 סוכנים חסום.'}`);
             } else {
                 setError(data?.research_stage_error ? msg : (msg || 'שגיאה בחיפוש'));
             }
@@ -283,6 +340,49 @@ function SearchTab({ onGptSyncingChange }) {
                                 {RESEARCH_STAGES.find((s) => s.id === researchStage)?.desc}
                             </span>
                         )}
+                        <div className="kernel-v16-advanced">
+                            <button
+                                type="button"
+                                className="kernel-advanced-toggle"
+                                onClick={() => setShowKernelAdvanced((v) => !v)}
+                            >
+                                {showKernelAdvanced ? '▼' : '▶'} קרנל v1.6 (אופציונלי): אותות / עוגנים / מתודולוגיה
+                            </button>
+                            {showKernelAdvanced && (
+                                <div className="kernel-advanced-fields">
+                                    <p className="stage-hint">
+                                        עוגן נתונים מותר בלבד: <code>experiment_snapshot</code>,{' '}
+                                        <code>similar_experiments</code>, <code>failure_patterns</code>. לשלב N עם
+                                        אותות: זיהוי שבירה (מודלים / OOD / שאריות / נקודת שינוי). לשלב L:{' '}
+                                        <code>l_validation</code> עם ≥3 הרצות, שיפור מול baseline, יציבות.
+                                    </p>
+                                    <label className="kernel-json-label">kernel_signals (JSON)</label>
+                                    <textarea
+                                        className="search-input kernel-json-textarea"
+                                        rows={4}
+                                        value={kernelSignalsJson}
+                                        onChange={(e) => setKernelSignalsJson(e.target.value)}
+                                        placeholder='{"model_fits":{"linear":{"ok":false},"polynomial":{"ok":false},"piecewise":{"ok":false}}}'
+                                    />
+                                    <label className="kernel-json-label">data_anchors (JSON)</label>
+                                    <textarea
+                                        className="search-input kernel-json-textarea"
+                                        rows={3}
+                                        value={dataAnchorsJson}
+                                        onChange={(e) => setDataAnchorsJson(e.target.value)}
+                                        placeholder='{"experiment_snapshot":{},"similar_experiments":[],"failure_patterns":[]}'
+                                    />
+                                    <label className="kernel-json-label">methodology_flags (JSON)</label>
+                                    <textarea
+                                        className="search-input kernel-json-textarea"
+                                        rows={2}
+                                        value={methodologyFlagsJson}
+                                        onChange={(e) => setMethodologyFlagsJson(e.target.value)}
+                                        placeholder='{"repeated_solution":false,"patches_without_hypothesis":false}'
+                                    />
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
 
@@ -366,6 +466,49 @@ function SearchTab({ onGptSyncingChange }) {
                                 {results.state && (
                                     <div className="state-badge blocked-state">
                                         מצב: {results.state}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        {results.kernel_v16?.possibility_shutdown && (
+                            <div className="kernel-shutdown-banner">
+                                מרחב אפשרויות סגור (אחרי זיהוי שבירה): אין אופטימיזציה/כוונון במסלול 4 סוכנים עד סשן
+                                חדש.
+                            </div>
+                        )}
+                        {results.kernel_v16?.structured && (
+                            <div className="kernel-v16-structured">
+                                <h3>מבנה תשובה (קרנל v1.6)</h3>
+                                <dl className="kernel-v16-dl">
+                                    <dt>Evidence</dt>
+                                    <dd>{results.kernel_v16.structured.Evidence}</dd>
+                                    <dt>Pattern</dt>
+                                    <dd>{results.kernel_v16.structured.Pattern}</dd>
+                                    <dt>Conclusion</dt>
+                                    <dd>
+                                        {formatBoldSegments(results.kernel_v16.structured.Conclusion || '').map(
+                                            (part, j) =>
+                                                part.type === 'bold' ? (
+                                                    <strong key={j}>{part.value}</strong>
+                                                ) : (
+                                                    part.value
+                                                )
+                                        )}
+                                    </dd>
+                                    <dt>Confidence</dt>
+                                    <dd>{results.kernel_v16.structured.Confidence}</dd>
+                                </dl>
+                                {results.kernel_v16.n_generation?.ideas?.length > 0 && (
+                                    <div className="kernel-n-generation">
+                                        <strong>יצירה מבנית (N):</strong>
+                                        <ul>
+                                            {results.kernel_v16.n_generation.ideas.map((idea, idx) => (
+                                                <li key={idx}>
+                                                    <code>{idea.kind}</code>: {idea.desc_he}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <p className="stage-hint">{results.kernel_v16.n_generation.acceptance_criteria_he}</p>
                                     </div>
                                 )}
                             </div>
