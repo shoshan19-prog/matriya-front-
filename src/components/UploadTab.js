@@ -87,6 +87,7 @@ function UploadTab({ onGptSyncingChange }) {
     const [askLoading, setAskLoading] = useState(false);
     const [askError, setAskError] = useState(null);
     const [askSources, setAskSources] = useState(null);
+    const [deletingFilename, setDeletingFilename] = useState(null);
     const fileInputRef = useRef(null);
     const folderInputRef = useRef(null);
 
@@ -235,6 +236,28 @@ function UploadTab({ onGptSyncingChange }) {
 
     const closePreview = () => setPreviewDoc(null);
 
+    const handleDeleteFile = async (filename) => {
+        if (!filename || !window.confirm(`למחוק את "${filename}" מהמאגר? לא ניתן יהיה לשאול על הקובץ לאחר המחיקה.`)) {
+            return;
+        }
+        setDeletingFilename(filename);
+        setUploadResult(null);
+        try {
+            await api.delete('/files', { data: { filename }, timeout: 60000 });
+            setUploadResult({ type: 'success', message: `הקובץ נמחק מהמאגר: ${filename}` });
+            if (askSelectedFile === filename) setAskSelectedFile('');
+            loadFileList();
+            loadCollectionInfo();
+        } catch (error) {
+            setUploadResult({
+                type: 'error',
+                message: error.response?.data?.error || error.response?.data?.detail || error.message || 'שגיאה במחיקה'
+            });
+        } finally {
+            setDeletingFilename(null);
+        }
+    };
+
     const runAsk = async () => {
         const query = (askQuery || '').trim();
         if (!query) return;
@@ -267,6 +290,16 @@ function UploadTab({ onGptSyncingChange }) {
             <td>
                 <button type="button" className="preview-btn" onClick={() => openPreview(f.filename)}>תצוגה מקדימה</button>
             </td>
+            <td>
+                <button
+                    type="button"
+                    className="preview-btn doc-delete-btn"
+                    disabled={deletingFilename === f.filename}
+                    onClick={() => handleDeleteFile(f.filename)}
+                >
+                    {deletingFilename === f.filename ? 'מוחק…' : 'מחק'}
+                </button>
+            </td>
         </tr>
     );
 
@@ -276,7 +309,7 @@ function UploadTab({ onGptSyncingChange }) {
             const isCollapsed = foldersCollapsed.has(node.pathFull);
             rows.push(
                 <tr key={`folder-${node.pathFull}`} className="folder-row">
-                    <td colSpan={5} className="folder-cell">
+                    <td colSpan={6} className="folder-cell">
                         <button type="button" className="folder-toggle" onClick={() => toggleFolder(node.pathFull)} aria-expanded={!isCollapsed}>
                             <span className="folder-chevron" style={{ transform: isCollapsed ? 'rotate(-90deg)' : 'none' }}>▼</span>
                             <span>📁 {node.pathSegment}</span>
@@ -364,6 +397,7 @@ function UploadTab({ onGptSyncingChange }) {
                                             <th>תאריך העלאה</th>
                                             <th>חלקים</th>
                                             <th>תצוגה מקדימה</th>
+                                            <th>מחיקה</th>
                                         </tr>
                                     </thead>
                                     <tbody>

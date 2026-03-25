@@ -92,9 +92,22 @@ function AskMatriyaTab() {
                 },
                 { timeout: 90000 }
             );
-            const reply = res.data?.reply ?? '';
-            const sources = Array.isArray(res.data?.sources) ? res.data.sources : [];
-            setMessages((prev) => [...prev, { role: 'assistant', content: reply, sources }]);
+            const data = res.data || {};
+            let replyText = data.reply != null ? String(data.reply) : '';
+            if (!replyText.trim() && data.status === 'PARTIAL_EVIDENCE') {
+                const lines = ['מצב: מידע חלקי (PARTIAL_EVIDENCE)'];
+                if (Array.isArray(data.what_exists) && data.what_exists.length) {
+                    lines.push(`קיים במערכת:\n${data.what_exists.map((x) => `• ${x}`).join('\n')}`);
+                }
+                if (Array.isArray(data.what_missing) && data.what_missing.length) {
+                    lines.push(`חסר להשלמה:\n${data.what_missing.map((x) => `• ${x}`).join('\n')}`);
+                }
+                replyText = lines.join('\n\n');
+            } else if (!replyText.trim() && (data.error || data.message)) {
+                replyText = String(data.message || data.error || '');
+            }
+            const sources = Array.isArray(data.sources) ? data.sources : [];
+            setMessages((prev) => [...prev, { role: 'assistant', content: replyText, sources }]);
         } catch (err) {
             const msg = err.response?.data?.error || err.message || 'שגיאה בשליחה';
             setError(msg);

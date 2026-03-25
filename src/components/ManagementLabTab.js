@@ -1,137 +1,140 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  createManagementApiClient,
-  getManagementApiBaseUrl,
-  getManagementFrontBaseUrl,
-  buildManagementLabUrl
-} from '../utils/managementApi';
+  MANAGEMENT_API_URL,
+  MANAGEMENT_FRONT_URL,
+  isManagementLabConfigured
+} from '../utils/managementConfig';
+import managementApi from '../utils/managementApi';
 import './ManagementLabTab.css';
 
 function ManagementLabTab() {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedId, setSelectedId] = useState(() => localStorage.getItem('matriya_management_lab_project_id') || '');
-  const [iframeKey, setIframeKey] = useState(0);
+  const [status, setStatus] = useState('idle');
+  const [detail, setDetail] = useState(null);
+  const [projectTotal, setProjectTotal] = useState(null);
 
-  const apiBase = getManagementApiBaseUrl();
-  const frontBase = getManagementFrontBaseUrl();
-
-  const loadProjects = useCallback(async () => {
-    const client = createManagementApiClient();
-    if (!client) {
-      setError('לא הוגדר כתובת API למערכת הניהול (REACT_APP_MANAGEMENT_API_URL).');
-      setProjects([]);
-      setLoading(false);
+  useEffect(() => {
+    if (!isManagementLabConfigured()) {
+      setStatus('unconfigured');
       return;
     }
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await client.get('/api/projects');
-      setProjects(data.projects || []);
-    } catch (e) {
-      const msg =
-        e.response?.data?.error ||
-        e.message ||
-        'לא ניתן לטעון פרויקטים. ודא שאתה מחובר ל־Matriya וש־CORS במערכת הניהול מאפשר את המקור הזה.';
-      setError(msg);
-      setProjects([]);
-    } finally {
-      setLoading(false);
-    }
+
+    let cancelled = false;
+    setStatus('checking');
+
+    (async () => {
+      try {
+        const me = await managementApi.get('/api/auth/me');
+        if (cancelled) return;
+        setDetail({ user: me.data });
+        setStatus('ok');
+
+        try {
+          const pr = await managementApi.get('/api/projects', { params: { limit: 1, offset: 0 } });
+          if (!cancelled && pr.data && typeof pr.data.total === 'number') {
+            setProjectTotal(pr.data.total);
+          }
+        } catch (_) {
+          if (!cancelled) setProjectTotal(null);
+        }
+      } catch (err) {
+        if (cancelled) return;
+        const msg =
+          err.response?.data?.error ||
+          err.response?.data?.detail ||
+          err.message ||
+          'שגיאת חיבור';
+        setDetail({ error: msg, status: err.response?.status });
+        setStatus('error');
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  useEffect(() => {
-    loadProjects();
-  }, [loadProjects]);
-
-  useEffect(() => {
-    if (selectedId) localStorage.setItem('matriya_management_lab_project_id', selectedId);
-  }, [selectedId]);
-
-  const labSrc = selectedId ? buildManagementLabUrl(selectedId) : '';
-
-  const openInNewWindow = () => {
-    if (!labSrc) return;
-    window.open(labSrc, '_blank', 'noopener,noreferrer');
+  const openManagementUi = () => {
+    if (!MANAGEMENT_FRONT_URL) return;
+    window.open(MANAGEMENT_FRONT_URL, '_blank', 'noopener,noreferrer');
   };
 
-  const reloadIframe = () => setIframeKey((k) => k + 1);
-
-  if (!apiBase || !frontBase) {
+  if (!isManagementLabConfigured()) {
     return (
-      <div className="management-lab-tab card-block">
-        <h2 className="management-lab-title">מעבדה — מערכת ניהול</h2>
-        <p className="management-lab-muted">
-          כדי לשלב את המעבדה, הגדר משתני סביבה בזמן הבנייה (Vercel / <code>.env</code>):
-        </p>
-        <ul className="management-lab-list">
-          <li>
-            <code>REACT_APP_MANAGEMENT_API_URL</code> — כתובת שרת הניהול (למשל <code>https://manegment-back.vercel.app</code>)
-          </li>
-          <li>
-            <code>REACT_APP_MANAGEMENT_FRONT_URL</code> — כתובת ממשק הניהול (למשל <code>https://manegment-front.vercel.app</code>)
-          </li>
-        </ul>
-        <p className="management-lab-muted">
-          אותו משתמש וסיסמה כמו ב־Matriya — שרת הניהול משתמש באותה התחברות.
-        </p>
+      <div className="management-lab-tab">
+        <div className="management-lab-card">
+          <h2>מעבדה (ניהול)</h2>
+          <p className="management-lab-lead">
+            כדי לשלב את המעבדה, הגדר משתני סביבה בזמן הבנייה (לוקאלי: קובץ <code>.env</code>, Vercel: Environment
+            Variables):
+          </p>
+          <ul className="management-lab-env-list">
+            <li>
+              <code>REACT_APP_MANAGEMENT_API_URL</code> — כתובת שרת הניהול (למשל{' '}
+              <code>https://manegment-back.vercel.app</code>)
+            </li>
+            <li>
+              <code>REACT_APP_MANAGEMENT_FRONT_URL</code> — כתובת ממשק הניהול (למשל{' '}
+              <code>https://manegment-front.vercel.app</code>)
+            </li>
+          </ul>
+          <p className="management-lab-note">
+            <strong>התחברות:</strong> אותו משתמש וסיסמה כמו ב־Matriya — שרת הניהול מאמת מול Matriya באמצעות אותו JWT.
+            בממשק הניהול (לשונית נפרדת) יש להתחבר עם אותם פרטים.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="management-lab-tab">
-      <div className="management-lab-toolbar card-block">
-        <h2 className="management-lab-title">מעבדה — מערכת ניהול</h2>
-        <p className="management-lab-desc">
-          בחרו פרויקט — תוצג כאן אותה מעבדה כמו בנתיב: ניהול → פרויקט → מעבדה.
+      <div className="management-lab-card">
+        <h2>מעבדה (ניהול)</h2>
+        <p className="management-lab-lead">
+          חיבור למערכת הפרויקטים והמעבדה. <strong>אותו שם משתמש וסיסמה כמו ב־Matriya</strong> — האימות עובר לשרת
+          Matriya דרך שרת הניהול.
         </p>
-        {error && <p className="management-lab-error">{error}</p>}
-        <div className="management-lab-row">
-          <label htmlFor="management-lab-project">פרויקט</label>
-          <select
-            id="management-lab-project"
-            className="management-lab-select"
-            value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value)}
-            disabled={loading}
-          >
-            <option value="">— בחרו פרויקט —</option>
-            {projects.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name || p.id}
-              </option>
-            ))}
-          </select>
-          <button type="button" className="management-lab-btn secondary" onClick={loadProjects} disabled={loading}>
-            {loading ? 'טוען…' : 'רענן רשימה'}
-          </button>
-          <button type="button" className="management-lab-btn secondary" onClick={reloadIframe} disabled={!selectedId}>
-            רענן מסגרת
-          </button>
-          <button type="button" className="management-lab-btn" onClick={openInNewWindow} disabled={!selectedId}>
-            פתח בחלון חדש
-          </button>
-        </div>
-      </div>
 
-      {selectedId && labSrc ? (
-        <div className="management-lab-frame-wrap">
-          <iframe
-            key={iframeKey}
-            title="מעבדת ניהול"
-            className="management-lab-iframe"
-            src={labSrc}
-            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-downloads allow-modals"
-          />
+        <div className="management-lab-urls">
+          <div>
+            <span className="management-lab-label">API</span>
+            <code className="management-lab-code">{MANAGEMENT_API_URL}</code>
+          </div>
+          <div>
+            <span className="management-lab-label">ממשק</span>
+            <code className="management-lab-code">{MANAGEMENT_FRONT_URL}</code>
+          </div>
         </div>
-      ) : (
-        <div className="management-lab-placeholder card-block">
-          <p>בחרו פרויקט כדי לטעון את המעבדה.</p>
+
+        {status === 'checking' && <p className="management-lab-status checking">בודק חיבור לשרת הניהול…</p>}
+
+        {status === 'ok' && detail?.user && (
+          <p className="management-lab-status ok">
+            מחובר לשרת הניהול כ־<strong>{detail.user.username || detail.user.full_name || 'משתמש'}</strong>
+            {projectTotal != null ? ` · ${projectTotal} פרויקטים במערכת` : ''}.
+          </p>
+        )}
+
+        {status === 'error' && (
+          <p className="management-lab-status error">
+            לא ניתן לאמת מול שרת הניהול: {detail?.error}
+            {detail?.status === 503
+              ? ' — ודא ש־MATRIYA_BACK_URL מוגדר אצל שרת הניהול וש־Matriya זמין.'
+              : ''}
+          </p>
+        )}
+
+        <div className="management-lab-actions">
+          <button type="button" className="management-lab-primary" onClick={openManagementUi}>
+            פתח את מערכת הניהול בלשונית חדשה
+          </button>
         </div>
-      )}
+
+        <p className="management-lab-hint">
+          אם נפתחת מסך התחברות במערכת הניהול, התחבר עם אותם פרטים שב־Matriya. הטוקן כאן משמש רק לבדיקת API מתוך
+          Matriya; הדפדפן בממשק הניהול שומר התחברות נפרדת.
+        </p>
+      </div>
     </div>
   );
 }
