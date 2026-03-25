@@ -271,13 +271,25 @@ function UploadTab({ onGptSyncingChange }) {
     const runAsk = async () => {
         const query = (askQuery || '').trim();
         if (!query) return;
+        const tableFilenames = fileList.map((f) => f.filename).filter(Boolean);
+        if (tableFilenames.length === 0) {
+            setAskError('אין מסמכים בטבלה — העלו מסמכים כדי לשאול.');
+            return;
+        }
+        const filenames = askSelectedFile
+            ? tableFilenames.includes(askSelectedFile)
+                ? [askSelectedFile]
+                : []
+            : tableFilenames;
+        if (askSelectedFile && filenames.length === 0) {
+            setAskError('המסמך שנבחר אינו ברשימה — רעננו את הדף או בחרו מחדש.');
+            return;
+        }
         setAskError(null);
         setAskResult(null);
         setAskSources(null);
         setAskLoading(true);
         try {
-            // Empty list ⇒ server uses OpenAI file_search; מקורות = retrieved snippets only (not every full file).
-            const filenames = askSelectedFile ? [askSelectedFile] : [];
             const res = await api.post('/ask-matriya', { message: query, filenames }, { timeout: 90000 });
             setAskResult(res.data?.reply ?? '');
             setAskSources(Array.isArray(res.data?.sources) ? res.data.sources : []);
@@ -439,7 +451,7 @@ function UploadTab({ onGptSyncingChange }) {
                                         onChange={e => setAskSelectedFile(e.target.value)}
                                         aria-describedby="upload-ask-scope-hint"
                                     >
-                                        <option value="">כל הקבצים במאגר</option>
+                                        <option value="">כל הקבצים המופיעים בטבלה למעלה</option>
                                         {fileList.map(f => (
                                             <option key={f.filename} value={f.filename} title={f.filename}>
                                                 {f.filename}
@@ -447,7 +459,7 @@ function UploadTab({ onGptSyncingChange }) {
                                         ))}
                                     </select>
                                     <p id="upload-ask-scope-hint" className="upload-ask-hint muted">
-                                        מקורות בתשובה הם קטעים שנמשכו מהמאגר; אחרי מחיקת קובץ יש לרענן סנכרון (למעלה) אם משתמשים בחיפוש OpenAI.
+                                        התשובה והציטוטים מבוססים רק על קבצים שמופיעים בטבלת המסמכים (לא על קבצים שנמחקו או שאינם ברשימה). אחרי מחיקה יש לרענן את הרשימה; סנכרון OpenAI למעלה מעדכן את החיפוש בענן.
                                     </p>
                                 </div>
                                 <label htmlFor="upload-ask-query">שאל שאלה</label>

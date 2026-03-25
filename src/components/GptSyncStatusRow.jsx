@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import api from '../utils/api';
 import './GptSyncStatusRow.css';
 
@@ -19,6 +19,21 @@ function hasEligibleFilenames(filenames) {
  */
 const STATUS_REQUEST_MS = 45000;
 
+/** Poll until OpenAI reports no files in_progress for several checks (avoids false “ready” when counts omit in_progress). */
+async function waitForVectorStoreIndexingIdle(api, { maxRounds = 48, intervalMs = 5000, stableNeeded = 3 } = {}) {
+    let stable = 0;
+    for (let i = 0; i < maxRounds; i++) {
+        await new Promise((r) => setTimeout(r, intervalMs));
+        const check = await api.get('/gpt-rag/status', { timeout: STATUS_REQUEST_MS });
+        const fc = check.data?.file_counts || {};
+        const raw = fc.in_progress;
+        const inProg = raw === undefined || raw === null ? null : Number(raw);
+        if (inProg != null && inProg > 0) stable = 0;
+        else stable++;
+        if (stable >= stableNeeded) return;
+    }
+}
+
 function statusFetchErrorMessage(err) {
     if (err?.code === 'ECONNABORTED' || String(err?.message || '').toLowerCase().includes('timeout')) {
         return 'פג הזמן לחיבור לשירות המסמכים. וודא ש־Matriya Back פועל ונסה «רענון סטטוס».';
@@ -38,6 +53,8 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, cla
     const [syncing, setSyncing] = useState(false);
     const [postSyncIndexingPoll, setPostSyncIndexingPoll] = useState(false);
     const [syncHadError, setSyncHadError] = useState(false);
+    const prevFileCountRef = useRef(0);
+    const prevVectorStoreIdRef = useRef('');
 
     const refresh = useCallback(async () => {
         setStatusError(null);
@@ -66,6 +83,37 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, cla
         onSyncingChange?.(syncing || postSyncIndexingPoll);
     }, [syncing, postSyncIndexingPoll, onSyncingChange]);
 
+    /** After new uploads or when vector store first appears, cloud indexing may lag; keep “מאנדקס…” until OpenAI is idle. */
+    useEffect(() => {
+        const n = filenames.length;
+        const prev = prevFileCountRef.current;
+        const increased = n > prev;
+        prevFileCountRef.current = n;
+        const vs = st?.vector_store_id || '';
+        const prevVs = prevVectorStoreIdRef.current;
+        const vsAppeared = Boolean(vs && !prevVs);
+        prevVectorStoreIdRef.current = vs;
+        if (!st?.openai || !st?.use_openai_file_search || !vs) return;
+        if ((!increased && !vsAppeared) || n === 0) return;
+        let cancelled = false;
+        (async () => {
+            setPostSyncIndexingPoll(true);
+            try {
+                await waitForVectorStoreIndexingIdle(api);
+            } catch (e) {
+                console.warn('[GptSyncStatusRow] post-upload indexing poll', e);
+            } finally {
+                if (!cancelled) {
+                    setPostSyncIndexingPoll(false);
+                    await refresh();
+                }
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [filenames.length, st?.openai, st?.use_openai_file_search, st?.vector_store_id, refresh]);
+
     useEffect(() => {
         const onVis = () => {
             if (document.visibilityState === 'visible') refresh();
@@ -84,15 +132,7 @@ function GptSyncStatusRow({ filenames = [], onSyncComplete, onSyncingChange, cla
             if (res.data?.indexing_pending) {
                 setPostSyncIndexingPoll(true);
                 try {
-                    for (let i = 0; i < 36; i++) {
-                        await new Promise((r) => setTimeout(r, 5000));
-                        await refresh();
-                        const check = await api.get('/gpt-rag/status', { timeout: STATUS_REQUEST_MS });
-                        const s = check.data;
-                        const fc = s?.file_counts || {};
-                        const inProg = fc.in_progress ?? 0;
-                        if (inProg === 0 && (fc.completed > 0 || s?.vector_store_status === 'completed')) break;
-                    }
+                    await waitForVectorStoreIndexingIdle(api);
                 } finally {
                     setPostSyncIndexingPoll(false);
                     await refresh();

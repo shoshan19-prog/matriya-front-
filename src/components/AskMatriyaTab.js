@@ -85,12 +85,19 @@ function AskMatriyaTab() {
         setSending(true);
 
         try {
+            const scopeFilenames =
+                selectedFilenames.length > 0 ? selectedFilenames : systemFiles;
+            if (scopeFilenames.length === 0) {
+                setError('אין מסמכים במערכת — העלו מסמכים בלשונית העלאה.');
+                setMessages((prev) => prev.slice(0, -1));
+                return;
+            }
             const res = await api.post(
                 '/ask-matriya',
                 {
                     message: text,
                     history: messages,
-                    filenames: selectedFilenames.length > 0 ? selectedFilenames : undefined
+                    filenames: scopeFilenames
                 },
                 { timeout: 90000 }
             );
@@ -131,8 +138,8 @@ function AskMatriyaTab() {
             <div className="ask-matriya-single card">
                 <h2>שאל את מטריה</h2>
                 <p className="ask-matriya-hint">
-                    בחרו מסמך אחד או כמה מהמערכת — התשובות יתבססו על תוכנם. ללא בחירה, החיפוש כולל את כל המסמכים
-                    הזמינים והמסונכרנים.
+                    בחרו מסמך אחד או כמה מהרשימה — התשובה תתבסס רק עליהם. ללא בחירה, החיפוש מוגבל לכל המסמכים המופיעים
+                    כרגע ברשימה (כמו בטבלת ההעלאה), בלי קבצים שנמחקו או שאינם ברשימה.
                 </p>
 
                 <div className="ask-matriya-file-section" ref={dropdownRef}>
