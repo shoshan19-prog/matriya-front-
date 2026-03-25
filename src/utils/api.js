@@ -27,7 +27,7 @@ API_BASE_URL = API_BASE_URL.replace(/\/$/, '');
 // Create axios instance
 const api = axios.create({
     baseURL: API_BASE_URL,
-    timeout: 30000, // 30 second default timeout (can be overridden per request)
+    timeout: 60000, // default; heavy routes override (e.g. gpt-rag/sync, ask-matriya)
     headers: {
         'Content-Type': 'application/json'
     }

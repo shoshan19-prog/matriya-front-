@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import api from '../utils/api';
 import { formatBoldSegments } from '../utils/formatBold';
-import GptSyncStatusRow from './GptSyncStatusRow';
+import GptSyncStatusRow, { filterEligibleLogicalNames } from './GptSyncStatusRow';
 import AnswerEvidenceSection from './AnswerEvidenceSection';
 import './UploadTab.css';
 
@@ -88,8 +88,18 @@ function UploadTab({ onGptSyncingChange }) {
     const [askError, setAskError] = useState(null);
     const [askSources, setAskSources] = useState(null);
     const [deletingFilename, setDeletingFilename] = useState(null);
+    /** Bumps requestId so GptSyncStatusRow runs POST /gpt-rag/sync with only_logical_names (new uploads only). */
+    const [gptUploadSyncRequest, setGptUploadSyncRequest] = useState(null);
+    const gptUploadSyncReqIdRef = useRef(0);
     const fileInputRef = useRef(null);
     const folderInputRef = useRef(null);
+
+    const queueGptSyncAfterIngest = (logicalNames) => {
+        const names = filterEligibleLogicalNames(Array.isArray(logicalNames) ? logicalNames : [logicalNames]);
+        if (names.length === 0) return;
+        gptUploadSyncReqIdRef.current += 1;
+        setGptUploadSyncRequest({ requestId: gptUploadSyncReqIdRef.current, logicalNames: names });
+    };
 
     const toggleFolder = (pathFull) => {
         setFoldersCollapsed(prev => {
@@ -188,6 +198,8 @@ function UploadTab({ onGptSyncingChange }) {
             const response = await api.post('/ingest/file', formData);
             if (response.data.success) {
                 setUploadResult({ type: 'success', message: 'העלאה הושלמה בהצלחה!', data: response.data.data });
+                const logicalName = response.data?.data?.filename;
+                if (logicalName) queueGptSyncAfterIngest([logicalName]);
                 loadFileList();
                 loadCollectionInfo();
             } else {
@@ -204,6 +216,7 @@ function UploadTab({ onGptSyncingChange }) {
         setIsUploading(true);
         setUploadResult(null);
         let ok = 0, err = 0;
+        const ingestedLogicalNames = [];
         for (const file of files) {
             const formData = new FormData();
             formData.append('file', file);
@@ -211,12 +224,16 @@ function UploadTab({ onGptSyncingChange }) {
             if (relativePath) formData.append('relative_path', relativePath);
             try {
                 const response = await api.post('/ingest/file', formData);
-                if (response.data?.success) ok++;
-                else err++;
+                if (response.data?.success) {
+                    ok++;
+                    const fn = response.data?.data?.filename;
+                    if (fn) ingestedLogicalNames.push(fn);
+                } else err++;
             } catch (_) {
                 err++;
             }
         }
+        if (ingestedLogicalNames.length > 0) queueGptSyncAfterIngest(ingestedLogicalNames);
         setIsUploading(false);
         setUploadResult({
             type: err === 0 ? 'success' : (ok === 0 ? 'error' : 'success'),
@@ -434,6 +451,8 @@ function UploadTab({ onGptSyncingChange }) {
                         <h2>שאל על המסמכים</h2>
                         <GptSyncStatusRow
                             filenames={fileList.map((f) => f.filename)}
+                            uploadSyncRequest={gptUploadSyncRequest}
+                            onUploadSyncHandled={() => setGptUploadSyncRequest(null)}
                             onSyncComplete={() => {
                                 loadFileList();
                                 loadCollectionInfo();

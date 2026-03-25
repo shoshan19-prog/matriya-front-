@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import api from '../utils/api';
 import { formatBoldSegments } from '../utils/formatBold';
 import AnswerEvidenceSection from './AnswerEvidenceSection';
+import GptSyncStatusRow from './GptSyncStatusRow';
 import './AskMatriyaTab.css';
 
 const ASK_CHAT_EVIDENCE_TITLE = 'מקורות מהמסמכים (ציטוטים)';
@@ -141,6 +142,12 @@ function AskMatriyaTab() {
                     בחרו מסמך אחד או כמה מהרשימה — התשובה תתבסס רק עליהם. ללא בחירה, החיפוש מוגבל לכל המסמכים המופיעים
                     כרגע ברשימה (כמו בטבלת ההעלאה), בלי קבצים שנמחקו או שאינם ברשימה.
                 </p>
+
+                <GptSyncStatusRow
+                    filenames={systemFiles}
+                    onSyncComplete={loadSystemFiles}
+                    className="ask-matriya-gpt-sync"
+                />
 
                 <div className="ask-matriya-file-section" ref={dropdownRef}>
                     <span className="ask-matriya-file-section-label">מסמכים במערכת:</span>
