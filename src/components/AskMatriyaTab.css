@@ -116,7 +116,7 @@
 }
 
 .ask-matriya-dropdown-list {
-    max-height: 220px;
+    max-height: min(50vh, 420px);
     overflow-y: auto;
 }
 
@@ -158,9 +158,21 @@
 }
 
 .ask-matriya-dropdown-option-label {
+    flex: 1;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.ask-matriya-file-kind {
+    flex-shrink: 0;
+    font-size: 0.72em;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(22, 101, 52, 0.14);
+    color: var(--matriya-accent, #166534);
 }
 
 .ask-matriya-messages {

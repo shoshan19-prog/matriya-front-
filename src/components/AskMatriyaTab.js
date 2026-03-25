@@ -8,6 +8,19 @@ import './AskMatriyaTab.css';
 const ASK_CHAT_EVIDENCE_TITLE = 'מקורות מהמסמכים (ציטוטים)';
 const ASK_CHAT_EVIDENCE_HINT = 'קטעים ששימשו כבסיס לתשובה — לשקיפות וביקורת.';
 
+/** Excel / spreadsheets first so they are not buried under long PDF/DOC lists; then locale sort. */
+function sortFilenamesForAskMatriya(filenames) {
+    const list = (Array.isArray(filenames) ? filenames : []).filter((f) => typeof f === 'string' && f.trim());
+    const base = (f) => f.split('/').filter(Boolean).pop() || f;
+    const isSheet = (f) => /\.xlsx$/i.test(base(f)) || /\.xls$/i.test(base(f));
+    return [...new Set(list)].sort((a, b) => {
+        const sa = isSheet(a);
+        const sb = isSheet(b);
+        if (sa !== sb) return sa ? -1 : 1;
+        return a.localeCompare(b, 'he', { sensitivity: 'base' });
+    });
+}
+
 function AskMatriyaTab() {
     const [systemFiles, setSystemFiles] = useState([]);
     const [selectedFilenames, setSelectedFilenames] = useState([]);
@@ -22,9 +35,12 @@ function AskMatriyaTab() {
     const dropdownRef = useRef(null);
     const searchInputRef = useRef(null);
 
-    const filteredFiles = systemFiles.filter((f) =>
-        f.toLowerCase().includes((searchQuery || '').trim().toLowerCase())
+    const filteredFiles = sortFilenamesForAskMatriya(
+        systemFiles.filter((f) => f.toLowerCase().includes((searchQuery || '').trim().toLowerCase()))
     );
+
+    const fileBasename = (f) => f.split('/').filter(Boolean).pop() || f;
+    const isSpreadsheetFilename = (f) => /\.xlsx$/i.test(fileBasename(f)) || /\.xls$/i.test(fileBasename(f));
 
     useEffect(() => {
         if (!dropdownOpen) return;
@@ -55,7 +71,8 @@ function AskMatriyaTab() {
             .get('/files/detail')
             .then((res) => {
                 const list = Array.isArray(res.data?.files) ? res.data.files : [];
-                setSystemFiles(list.map((f) => f.filename));
+                const names = list.map((f) => f.filename).filter((n) => typeof n === 'string' && n.trim());
+                setSystemFiles(sortFilenamesForAskMatriya(names));
             })
             .catch(() => setSystemFiles([]))
             .finally(() => setFilesLoading(false));
@@ -86,9 +103,12 @@ function AskMatriyaTab() {
         setSending(true);
 
         try {
-            const scopeFilenames =
-                selectedFilenames.length > 0 ? selectedFilenames : systemFiles;
-            if (scopeFilenames.length === 0) {
+            if (selectedFilenames.length === 0) {
+                setError('בחרו לפחות מסמך אחד מהרשימה לפני שליחת השאלה.');
+                setMessages((prev) => prev.slice(0, -1));
+                return;
+            }
+            if (systemFiles.length === 0) {
                 setError('אין מסמכים במערכת — העלו מסמכים בלשונית העלאה.');
                 setMessages((prev) => prev.slice(0, -1));
                 return;
@@ -98,7 +118,7 @@ function AskMatriyaTab() {
                 {
                     message: text,
                     history: messages,
-                    filenames: scopeFilenames
+                    filenames: selectedFilenames
                 },
                 { timeout: 90000 }
             );
@@ -139,8 +159,7 @@ function AskMatriyaTab() {
             <div className="ask-matriya-single card">
                 <h2>שאל את מטריה</h2>
                 <p className="ask-matriya-hint">
-                    בחרו מסמך אחד או כמה מהרשימה — התשובה תתבסס רק עליהם. ללא בחירה, החיפוש מוגבל לכל המסמכים המופיעים
-                    כרגע ברשימה (כמו בטבלת ההעלאה), בלי קבצים שנמחקו או שאינם ברשימה.
+                    חובה לבחור לפחות מסמך אחד מהרשימה — התשובה תתבסס רק על המסמכים שבחרתם.
                 </p>
 
                 <GptSyncStatusRow
@@ -163,7 +182,10 @@ function AskMatriyaTab() {
                                 onClick={() =>
                                     setDropdownOpen((o) => {
                                         const next = !o;
-                                        if (next) loadSystemFiles();
+                                        if (next) {
+                                            setSearchQuery('');
+                                            loadSystemFiles();
+                                        }
                                         return next;
                                     })
                                 }
@@ -185,7 +207,7 @@ function AskMatriyaTab() {
                                         ref={searchInputRef}
                                         type="text"
                                         className="ask-matriya-dropdown-search"
-                                        placeholder="חיפוש מסמכים..."
+                                        placeholder="חיפוש לפי שם קובץ (כל הסוגים: Word, PDF, Excel…)"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         onKeyDown={(e) => e.stopPropagation()}
@@ -209,6 +231,11 @@ function AskMatriyaTab() {
                                                     <span className="ask-matriya-dropdown-option-label" title={filename}>
                                                         {filename}
                                                     </span>
+                                                    {isSpreadsheetFilename(filename) ? (
+                                                        <span className="ask-matriya-file-kind" aria-hidden>
+                                                            Excel
+                                                        </span>
+                                                    ) : null}
                                                 </button>
                                             ))
                                         )}
@@ -222,7 +249,7 @@ function AskMatriyaTab() {
                 <div className="ask-matriya-messages">
                     {messages.length === 0 && (
                         <div className="ask-matriya-placeholder">
-                            כתבו שאלה למטה. אם בחרתם מסמכים למעלה, התשובה תתבסס עליהם.
+                            בחרו מסמך אחד או יותר למעלה, ואז כתבו שאלה למטה.
                         </div>
                     )}
                     {messages.map((msg, i) => (
@@ -259,13 +286,22 @@ function AskMatriyaTab() {
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         rows={2}
-                        disabled={sending}
+                        disabled={
+                            sending ||
+                            systemFiles.length === 0 ||
+                            selectedFilenames.length === 0
+                        }
                     />
                     <button
                         type="button"
                         className="ask-matriya-send"
                         onClick={handleSend}
-                        disabled={sending || !input.trim()}
+                        disabled={
+                            sending ||
+                            !input.trim() ||
+                            selectedFilenames.length === 0 ||
+                            systemFiles.length === 0
+                        }
                     >
                         שלח
                     </button>
