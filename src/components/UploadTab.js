@@ -596,15 +596,16 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                         ))}
                                     </select>
                                     <p id="upload-ask-scope-hint" className="upload-ask-hint muted">
-                                        התשובה והציטוטים מבוססים רק על קבצים שמופיעים בטבלת המסמכים (לא על קבצים שנמחקו או שאינם ברשימה). אחרי מחיקה יש לרענן את הרשימה; סנכרון OpenAI למעלה מעדכן את החיפוש בענן. בשאלת השוואה בין שתי פורמולציות (אחוזים), עדיף לבקש טבלת Markdown: רכיב | % A | % B | Δ (B−A) — רק לפי מה שמופיע במסמכים שנבחרו.
+                                        התשובה והציטוטים מבוססים רק על קבצים שמופיעים בטבלה. אפשר לשאול בעברית או באנגלית (התשובה תהיה באותה שפה). בהשוואת פורמולציות/אחוזים עדיף לבקש טבלת Markdown: רכיב | % A | % B | Δ (B−A) / Component | % A | % B | Δ (B−A) — רק לפי המסמכים שנבחרו.
                                     </p>
                                 </div>
                                 <label htmlFor="upload-ask-query">שאל שאלה</label>
                                 <textarea
                                     id="upload-ask-query"
+                                    dir="auto"
                                     value={askQuery}
                                     onChange={e => setAskQuery(e.target.value)}
-                                    placeholder="הזן שאלה..."
+                                    placeholder="הזן שאלה… / Ask in Hebrew or English"
                                     rows={4}
                                     disabled={askLoading || isUploading || gptRagSyncing}
                                 />
