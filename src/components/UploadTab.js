@@ -121,6 +121,7 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
     const [collectionInfo, setCollectionInfo] = useState(null);
     const [foldersCollapsed, setFoldersCollapsed] = useState(() => new Set());
     const [askSelectedFile, setAskSelectedFile] = useState('');
+    const [askDomain, setAskDomain] = useState('documents');
     const [askQuery, setAskQuery] = useState('');
     const [askResult, setAskResult] = useState(null);
     const [askLoading, setAskLoading] = useState(false);
@@ -415,29 +416,34 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
         const query = (askQuery || '').trim();
         if (!query) return;
         if (isUploading || gptRagSyncing) return;
+        const documentsMode = askDomain === 'documents';
         const tableFilenames = fileList.map((f) => f.filename).filter(Boolean);
-        if (tableFilenames.length === 0) {
-            setAskError('אין מסמכים בטבלה — העלו מסמכים כדי לשאול.');
-            return;
-        }
-        const useAllFilesScope = !askSelectedFile;
-        const filenames = askSelectedFile
-            ? tableFilenames.includes(askSelectedFile)
-                ? [askSelectedFile]
-                : []
-            : [];
-        if (askSelectedFile && filenames.length === 0) {
-            setAskError('המסמך שנבחר אינו ברשימה — רעננו את הדף או בחרו מחדש.');
-            return;
+        const useAllFilesScope = documentsMode ? !askSelectedFile : true;
+        let filenames = [];
+
+        if (documentsMode) {
+            if (tableFilenames.length === 0) {
+                setAskError('אין מסמכים בטבלה — העלו מסמכים כדי לשאול.');
+                return;
+            }
+            filenames = askSelectedFile
+                ? tableFilenames.includes(askSelectedFile)
+                    ? [askSelectedFile]
+                    : []
+                : [];
+            if (askSelectedFile && filenames.length === 0) {
+                setAskError('המסמך שנבחר אינו ברשימה — רעננו את הדף או בחרו מחדש.');
+                return;
+            }
         }
         setAskError(null);
         setAskResult(null);
         setAskSources(null);
         setAskLoading(true);
         try {
-            const body = useAllFilesScope
-                ? { message: query, all_files: true }
-                : { message: query, filenames };
+            const body = documentsMode
+                ? (useAllFilesScope ? { message: query, all_files: true } : { message: query, filenames })
+                : { message: query, all_files: true };
             const res = await api.post('/ask-matriya', body, { timeout: 120000 });
             setAskResult(res.data?.reply ?? '');
             setAskSources(Array.isArray(res.data?.sources) ? res.data.sources : []);
@@ -579,7 +585,7 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
                     </div>
 
                     <div className="card upload-ask-card">
-                        <h2>שאל על המסמכים</h2>
+                        <h2>{askDomain === 'materials' ? 'שאל על חומרים (מטא־דאטה)' : 'שאל על המסמכים'}</h2>
                         <GptSyncStatusRow
                             ref={gptSyncRowRef}
                             filenames={fileList.map((f) => f.filename)}
@@ -591,8 +597,19 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
                             fileUploadInProgress={isUploading}
                             className="upload-ask-gpt-sync"
                         />
-                        {fileList.length > 0 && (
+                        {(
                             <>
+                                <div className="form-group">
+                                    <label htmlFor="upload-ask-domain">שאלה על</label>
+                                    <select
+                                        id="upload-ask-domain"
+                                        value={askDomain}
+                                        onChange={e => setAskDomain(e.target.value)}
+                                    >
+                                        <option value="documents">מסמכים</option>
+                                        <option value="materials">חומרים (שיוך לפרויקטים)</option>
+                                    </select>
+                                </div>
                                 <div className="form-group">
                                     <label htmlFor="upload-ask-scope">חיפוש בתוך</label>
                                     <select
@@ -600,6 +617,7 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                         value={askSelectedFile}
                                         onChange={e => setAskSelectedFile(e.target.value)}
                                         aria-describedby="upload-ask-scope-hint"
+                                        disabled={askDomain === 'materials'}
                                     >
                                         <option value="">כל הקבצים המופיעים בטבלה למעלה</option>
                                         {fileList.map(f => (
@@ -609,7 +627,9 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                         ))}
                                     </select>
                                     <p id="upload-ask-scope-hint" className="upload-ask-hint muted">
-                                        התשובה והציטוטים מבוססים רק על קבצים שמופיעים בטבלה. אפשר לשאול בעברית או באנגלית (התשובה תהיה באותה שפה). בהשוואת פורמולציות/אחוזים עדיף לבקש טבלת Markdown: רכיב | % A | % B | Δ (B−A) / Component | % A | % B | Δ (B−A) — רק לפי המסמכים שנבחרו.
+                                        {askDomain === 'materials'
+                                            ? 'במצב חומרים: השאלה תיענה מתוך מטא־דאטה של פרויקטים/חומרים (למשל שיוך חומר לפרויקט ותפקיד החומר), בלי תלות בבחירת קובץ.'
+                                            : 'במצב מסמכים: התשובה והציטוטים מבוססים רק על קבצים שמופיעים בטבלה. אפשר לשאול בעברית או באנגלית (התשובה תהיה באותה שפה). בהשוואת פורמולציות/אחוזים עדיף לבקש טבלת Markdown: רכיב | % A | % B | Δ (B−A) / Component | % A | % B | Δ (B−A) — רק לפי המסמכים שנבחרו.'}
                                     </p>
                                 </div>
                                 <label htmlFor="upload-ask-query">שאל שאלה</label>
@@ -618,7 +638,9 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                     dir="auto"
                                     value={askQuery}
                                     onChange={e => setAskQuery(e.target.value)}
-                                    placeholder="הזן שאלה… / Ask in Hebrew or English"
+                                    placeholder={askDomain === 'materials'
+                                        ? 'למשל: איזה חומרים יש באיזה פרויקט? / איזה תפקיד יש לחומר X?'
+                                        : 'הזן שאלה… / Ask in Hebrew or English'}
                                     rows={4}
                                     disabled={askLoading || isUploading || gptRagSyncing}
                                 />
@@ -648,7 +670,7 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                 )}
                             </>
                         )}
-                        {fileList.length === 0 && !fileListLoading && (
+                        {fileList.length === 0 && !fileListLoading && askDomain !== 'materials' && (
                             <p className="muted">העלה מסמכים למעלה כדי לשאול עליהם שאלות.</p>
                         )}
                     </div>
