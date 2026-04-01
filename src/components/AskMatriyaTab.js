@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import api from '../utils/api';
+import { runAskMatriyaDocumentsQuery, sortFilenamesForAskMatriyaDisplay } from '../utils/askMatriyaDocumentsClient';
 import { formatBoldSegments } from '../utils/formatBold';
 import AnswerEvidenceSection from './AnswerEvidenceSection';
 import GptSyncStatusRow from './GptSyncStatusRow';
@@ -9,29 +10,9 @@ const ASK_CHAT_EVIDENCE_TITLE = 'מקורות מהמסמכים (ציטוטים)'
 const ASK_CHAT_EVIDENCE_HINT = 'קטעים ששימשו כבסיס לתשובה — לשקיפות וביקורת.';
 const ASK_ALL_FILES_VALUE = '__ALL_FILES__';
 
-function normalizeAskQuestion(text) {
-    return String(text || '').trim().replace(/\s+/g, ' ').toLowerCase();
-}
-
-function makeAskScopeKey(filenames) {
-    return sortFilenamesForAskMatriya(filenames).join('\n');
-}
-
-/** Excel / spreadsheets first so they are not buried under long PDF/DOC lists; then locale sort. */
-function sortFilenamesForAskMatriya(filenames) {
-    const list = (Array.isArray(filenames) ? filenames : []).filter((f) => typeof f === 'string' && f.trim());
-    const base = (f) => f.split('/').filter(Boolean).pop() || f;
-    const isSheet = (f) => /\.xlsx$/i.test(base(f)) || /\.xls$/i.test(base(f));
-    return [...new Set(list)].sort((a, b) => {
-        const sa = isSheet(a);
-        const sb = isSheet(b);
-        if (sa !== sb) return sa ? -1 : 1;
-        return a.localeCompare(b, 'he', { sensitivity: 'base' });
-    });
-}
-
 function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
-    const [systemFiles, setSystemFiles] = useState([]);
+    /** Same order as Upload file table (GET /files/detail) — used for /ask-matriya filenames. */
+    const [filesInApiOrder, setFilesInApiOrder] = useState([]);
     const [selectedFilenames, setSelectedFilenames] = useState([ASK_ALL_FILES_VALUE]);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
@@ -43,10 +24,9 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
     const messagesEndRef = useRef(null);
     const dropdownRef = useRef(null);
     const searchInputRef = useRef(null);
-    const lastAskRef = useRef(null);
 
-    const filteredFiles = sortFilenamesForAskMatriya(
-        systemFiles.filter((f) => f.toLowerCase().includes((searchQuery || '').trim().toLowerCase()))
+    const filteredFiles = sortFilenamesForAskMatriyaDisplay(
+        filesInApiOrder.filter((f) => f.toLowerCase().includes((searchQuery || '').trim().toLowerCase()))
     );
 
     const fileBasename = (f) => f.split('/').filter(Boolean).pop() || f;
@@ -83,7 +63,7 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
             .then((res) => {
                 const list = Array.isArray(res.data?.files) ? res.data.files : [];
                 const names = list.map((f) => f.filename).filter((n) => typeof n === 'string' && n.trim());
-                setSystemFiles(sortFilenamesForAskMatriya(names));
+                setFilesInApiOrder(names);
             })
             .catch(() => {
                 /* Keep existing list on refresh errors; only initial load stays empty. */
@@ -100,10 +80,10 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
     useEffect(() => {
         setSelectedFilenames((prev) => {
             if (prev.includes(ASK_ALL_FILES_VALUE)) return [ASK_ALL_FILES_VALUE];
-            const kept = prev.filter((f) => systemFiles.includes(f));
+            const kept = prev.filter((f) => filesInApiOrder.includes(f));
             return kept.length ? kept : [ASK_ALL_FILES_VALUE];
         });
-    }, [systemFiles]);
+    }, [filesInApiOrder]);
 
     const isAllFilesSelected = selectedFilenames.includes(ASK_ALL_FILES_VALUE);
 
@@ -138,49 +118,20 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
                 setMessages((prev) => prev.slice(0, -1));
                 return;
             }
-            if (systemFiles.length === 0) {
+            if (filesInApiOrder.length === 0) {
                 setError('אין מסמכים במערכת — העלו מסמכים בלשונית העלאה.');
                 setMessages((prev) => prev.slice(0, -1));
                 return;
             }
             const filenames = isAllFilesSelected
-                ? [...systemFiles]
-                : selectedFilenames.filter((f) => systemFiles.includes(f));
+                ? [...filesInApiOrder]
+                : filesInApiOrder.filter((f) => selectedFilenames.includes(f));
             if (filenames.length === 0) {
                 setError('אין מסמכים זמינים לשאילתה. רעננו את הרשימה ונסו שוב.');
                 setMessages((prev) => prev.slice(0, -1));
                 return;
             }
-            const repeatKey = `${normalizeAskQuestion(text)}\n---\n${makeAskScopeKey(filenames)}`;
-            if (lastAskRef.current?.key === repeatKey) {
-                const cached = lastAskRef.current;
-                setMessages((prev) => [...prev, { role: 'assistant', content: cached.reply, sources: cached.sources }]);
-                return;
-            }
-            const res = await api.post(
-                '/ask-matriya',
-                {
-                    message: text,
-                    filenames
-                },
-                { timeout: 90000 }
-            );
-            const data = res.data || {};
-            let replyText = data.reply != null ? String(data.reply) : '';
-            if (!replyText.trim() && data.status === 'PARTIAL_EVIDENCE') {
-                const lines = ['מצב: מידע חלקי (PARTIAL_EVIDENCE)'];
-                if (Array.isArray(data.what_exists) && data.what_exists.length) {
-                    lines.push(`קיים במערכת:\n${data.what_exists.map((x) => `• ${x}`).join('\n')}`);
-                }
-                if (Array.isArray(data.what_missing) && data.what_missing.length) {
-                    lines.push(`חסר להשלמה:\n${data.what_missing.map((x) => `• ${x}`).join('\n')}`);
-                }
-                replyText = lines.join('\n\n');
-            } else if (!replyText.trim() && (data.error || data.message)) {
-                replyText = String(data.message || data.error || '');
-            }
-            const sources = Array.isArray(data.sources) ? data.sources : [];
-            lastAskRef.current = { key: repeatKey, reply: replyText, sources };
+            const { reply: replyText, sources } = await runAskMatriyaDocumentsQuery(text, filenames);
             setMessages((prev) => [...prev, { role: 'assistant', content: replyText, sources }]);
         } catch (err) {
             const msg = err.response?.data?.error || err.message || 'שגיאה בשליחה';
@@ -213,7 +164,7 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
                 </p>
 
                 <GptSyncStatusRow
-                    filenames={systemFiles}
+                    filenames={filesInApiOrder}
                     onSyncComplete={() => loadSystemFiles()}
                     onSyncingChange={onGptSyncingChange}
                     className="ask-matriya-gpt-sync"
@@ -222,11 +173,11 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
                 <div className="ask-matriya-file-section" ref={dropdownRef}>
                     <span className="ask-matriya-file-section-label">
                         מסמכים במערכת
-                        {!filesLoading && systemFiles.length > 0 ? ` (${systemFiles.length})` : ''}:
+                        {!filesLoading && filesInApiOrder.length > 0 ? ` (${filesInApiOrder.length})` : ''}:
                     </span>
                     {filesLoading ? (
                         <div className="ask-matriya-loading-files">טוען...</div>
-                    ) : systemFiles.length === 0 ? (
+                    ) : filesInApiOrder.length === 0 ? (
                         <div className="ask-matriya-no-files">אין מסמכים במערכת. העלו מסמכים בלשונית העלאת מסמכים קודם.</div>
                     ) : (
                         <div className="ask-matriya-dropdown">
@@ -357,7 +308,7 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
                         disabled={
                             sending ||
                             gptRagSyncing ||
-                            systemFiles.length === 0 ||
+                            filesInApiOrder.length === 0 ||
                             selectedFilenames.length === 0
                         }
                     />
@@ -370,7 +321,7 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
                             gptRagSyncing ||
                             !input.trim() ||
                             selectedFilenames.length === 0 ||
-                            systemFiles.length === 0
+                            filesInApiOrder.length === 0
                         }
                     >
                         שלח

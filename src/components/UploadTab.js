@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import api from '../utils/api';
+import { runAskMatriyaDocumentsQuery } from '../utils/askMatriyaDocumentsClient';
 import { formatBoldSegments } from '../utils/formatBold';
 import GptSyncStatusRow, { filterEligibleLogicalNames, GPT_ELIGIBLE_RE } from './GptSyncStatusRow';
 import AnswerEvidenceSection from './AnswerEvidenceSection';
@@ -10,20 +11,6 @@ const ASK_EVIDENCE_HINT = 'קטעים ששימשו כבסיס לתשובה — �
 
 const ACCEPT = '.pdf,.docx,.txt,.doc,.xlsx,.xls';
 const ACCEPT_LIST = ['pdf', 'docx', 'txt', 'doc', 'xlsx', 'xls'];
-
-function normalizeAskQuestion(text) {
-    return String(text || '').trim().replace(/\s+/g, ' ').toLowerCase();
-}
-
-function makeAskScopeKey(filenames) {
-    return [...new Set((Array.isArray(filenames) ? filenames : []).filter(Boolean))]
-        .sort((a, b) => a.localeCompare(b, 'he', { sensitivity: 'base' }))
-        .join('\n');
-}
-
-function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 /** Tells matriya-back to skip debounced OpenAI auto-sync — UI runs POST /gpt-rag/sync itself. */
 const INGEST_OPT_OUT_AUTO_GPT_SYNC = { 'X-Matriya-Client-Gpt-Sync': '1' };
@@ -147,7 +134,6 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
     const fileInputRef = useRef(null);
     const folderInputRef = useRef(null);
     const gptResyncDebounceRef = useRef(null);
-    const lastUploadAskRef = useRef(null);
 
     const toggleFolder = (pathFull) => {
         setFoldersCollapsed(prev => {
@@ -440,17 +426,7 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
         setAskSources(null);
         setAskLoading(true);
         try {
-            const repeatKey = `${normalizeAskQuestion(query)}\n---\n${makeAskScopeKey(filenames)}`;
-            if (lastUploadAskRef.current?.key === repeatKey) {
-                await sleep(3000);
-                setAskResult(lastUploadAskRef.current.reply);
-                setAskSources(lastUploadAskRef.current.sources);
-                return;
-            }
-            const res = await api.post('/ask-matriya', { message: query, filenames }, { timeout: 90000 });
-            const reply = res.data?.reply ?? '';
-            const sources = Array.isArray(res.data?.sources) ? res.data.sources : [];
-            lastUploadAskRef.current = { key: repeatKey, reply, sources };
+            const { reply, sources } = await runAskMatriyaDocumentsQuery(query, filenames);
             setAskResult(reply);
             setAskSources(sources);
         } catch (err) {
