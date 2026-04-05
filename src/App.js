@@ -169,7 +169,6 @@ function App() {
             </div>
 
             <div className="tab-content-wrapper" key={activeTab}>
-            <div className="tab-content-wrapper" key={activeTab}>
                 <ErrorBoundary>
                     {activeTab === 'upload' && (
                         <UploadTab onGptSyncingChange={setGptRagSyncing} gptRagSyncing={gptRagSyncing} />
@@ -182,7 +181,6 @@ function App() {
                     )}
                     {activeTab === 'admin' && isAdmin && <AdminTab isAdmin={isAdmin} />}
                 </ErrorBoundary>
-            </div>
             </div>
         </div>
     );

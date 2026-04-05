@@ -268,39 +268,43 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
                     )}
                 </div>
 
-                <div key={`messages-count-${messages.length}`} className="ask-matriya-messages">
+                <div className="ask-matriya-messages">
                     {messages.length === 0 && (
                         <div className="ask-matriya-placeholder">
                             <span key="placeholder-text">בחרו מסמך אחד או יותר למעלה, ואז כתבו שאלה למטה.</span>
                         </div>
                     )}
-                    {messages.map((msg, i) => (
-                        <div key={i} className={`ask-matriya-msg ask-matriya-msg-${msg.role}`}>
-                            <div className="ask-matriya-msg-content">
-                                {formatBoldSegments(msg.content || '').map((part, j) => (
-                                    part.type === 'bold' ? (
-                                        <strong key={`msg-${i}-part-${j}`}>{part.value}</strong>
-                                    ) : (
-                                        <span key={`msg-${i}-part-${j}`}>{part.value}</span>
-                                    )
-                                ))}
+                    <div className="ask-matriya-messages-list">
+                        {messages.map((msg, i) => (
+                            <div key={i} className={`ask-matriya-msg ask-matriya-msg-${msg.role}`}>
+                                <div className="ask-matriya-msg-content">
+                                    {formatBoldSegments(msg.content || '').map((part, j) => (
+                                        part.type === 'bold' ? (
+                                            <strong key={`msg-${i}-part-${j}`}>{part.value}</strong>
+                                        ) : (
+                                            <span key={`msg-${i}-part-${j}`}>{part.value}</span>
+                                        )
+                                    ))}
+                                </div>
+                                {msg.role === 'assistant' ? (
+                                    <AnswerEvidenceSection
+                                        sources={msg.sources || []}
+                                        title={ASK_CHAT_EVIDENCE_TITLE}
+                                        hint={ASK_CHAT_EVIDENCE_HINT}
+                                    />
+                                ) : null}
                             </div>
-                            {msg.role === 'assistant' ? (
-                                <AnswerEvidenceSection
-                                    sources={msg.sources || []}
-                                    title={ASK_CHAT_EVIDENCE_TITLE}
-                                    hint={ASK_CHAT_EVIDENCE_HINT}
-                                />
-                            ) : null}
-                        </div>
-                    ))}
-                    {sending && (
-                        <div key="typing" className="ask-matriya-msg ask-matriya-msg-assistant">
-                            <div className="ask-matriya-msg-content ask-matriya-typing">
-                                <span key="typing-indicator">מחפש תשובה...</span>
+                        ))}
+                    </div>
+                    <div className="ask-matriya-typing-container">
+                        {sending ? (
+                            <div key="typing" className="ask-matriya-msg ask-matriya-msg-assistant">
+                                <div className="ask-matriya-msg-content ask-matriya-typing">
+                                    <span key="typing-indicator">מחפש תשובה...</span>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        ) : null}
+                    </div>
                     <div ref={messagesEndRef} />
                 </div>
 
