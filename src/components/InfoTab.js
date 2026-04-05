@@ -41,15 +41,21 @@ function InfoTab() {
                     <div className="info-list">
                         <div className="info-item">
                             <span className="info-label">שם האוסף:</span>
-                            <span className="info-value">{info.collection_name || 'N/A'}</span>
+                            <span className="info-value">
+                                <span key={info.collection_name || 'na'}>{info.collection_name || 'N/A'}</span>
+                            </span>
                         </div>
                         <div className="info-item">
                             <span className="info-label">מספר מסמכים:</span>
-                            <span className="info-value">{info.document_count || 0}</span>
+                            <span className="info-value">
+                                <span key={info.document_count ?? '0'}>{info.document_count || 0}</span>
+                            </span>
                         </div>
                         <div className="info-item">
                             <span className="info-label">נתיב מאגר:</span>
-                            <span className="info-value">{info.db_path || 'N/A'}</span>
+                            <span className="info-value">
+                                <span key={info.db_path || 'na'}>{info.db_path || 'N/A'}</span>
+                            </span>
                         </div>
                     </div>
                 )}
@@ -59,12 +65,14 @@ function InfoTab() {
                     className={`refresh-button ${loading ? 'loading' : ''}`}
                 >
                     {loading ? (
-                        <>
+                        <span key="loading" className="btn-inner">
                             <span className="spinner"></span>
-                            טוען...
-                        </>
+                            <span>טוען...</span>
+                        </span>
                     ) : (
-                        'רענן מידע'
+                        <span key="idle" className="btn-inner">
+                            <span>רענן מידע</span>
+                        </span>
                     )}
                 </button>
             </div>

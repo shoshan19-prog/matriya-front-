@@ -406,12 +406,14 @@ function AdminTab({ isAdmin }) {
                                         disabled={deletingFile === filename}
                                     >
                                         {deletingFile === filename ? (
-                                            <>
+                                            <span key="loading" className="btn-inner">
                                                 <span className="spinner"></span>
-                                                מוחק...
-                                            </>
+                                                <span>מוחק...</span>
+                                            </span>
                                         ) : (
-                                            'מחק'
+                                            <span key="idle" className="btn-inner">
+                                                <span>מחק</span>
+                                            </span>
                                         )}
                                     </button>
                                     </div>
@@ -482,12 +484,14 @@ function AdminTab({ isAdmin }) {
                                     disabled={savingPermissions}
                                 >
                                     {savingPermissions ? (
-                                        <>
+                                        <span key="loading" className="btn-inner">
                                             <span className="spinner"></span>
-                                            שומר...
-                                        </>
+                                            <span>שומר...</span>
+                                        </span>
                                     ) : (
-                                        'שמור הרשאות'
+                                        <span key="idle" className="btn-inner">
+                                            <span>שמור הרשאות</span>
+                                        </span>
                                     )}
                                 </button>
                             </div>

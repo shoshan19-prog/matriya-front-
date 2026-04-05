@@ -388,7 +388,9 @@ function SearchTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                 className="kernel-advanced-toggle"
                                 onClick={() => setShowKernelAdvanced((v) => !v)}
                             >
-                                {showKernelAdvanced ? '▼' : '▶'} קרנל v1.6 (אופציונלי): אותות / עוגנים / מתודולוגיה
+                                <span key={showKernelAdvanced ? 'open' : 'closed'}>
+                                    {showKernelAdvanced ? '▼' : '▶'} קרנל v1.6 (אופציונלי): אותות / עוגנים / מתודולוגיה
+                                </span>
                             </button>
                             {showKernelAdvanced && (
                                 <div className="kernel-advanced-fields">
@@ -452,12 +454,14 @@ function SearchTab({ onGptSyncingChange, gptRagSyncing = false }) {
                         className={`search-button ${isSearching ? 'loading' : ''}`}
                     >
                         {isSearching ? (
-                            <>
+                            <span key="searching" className="btn-inner">
                                 <span className="spinner"></span>
-                                מחפש...
-                            </>
+                                <span>מחפש...</span>
+                            </span>
                         ) : (
-                            'חפש'
+                            <span key="idle" className="btn-inner">
+                                <span>חפש</span>
+                            </span>
                         )}
                     </button>
                 </div>
@@ -579,9 +583,9 @@ function SearchTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                         {formatBoldSegments(results.kernel_v16.structured.Conclusion || '').map(
                                             (part, j) =>
                                                 part.type === 'bold' ? (
-                                                    <strong key={j}>{part.value}</strong>
+                                                    <strong key={`kernel- conclusão-${j}`}>{part.value}</strong>
                                                 ) : (
-                                                    part.value
+                                                    <span key={`kernel- conclusão-${j}`}>{part.value}</span>
                                                 )
                                         )}
                                     </dd>
@@ -635,7 +639,7 @@ function SearchTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                 )}
                                 <div className="answer-text">
                                     {formatBoldSegments(results.answer || '').map((part, j) =>
-                                        part.type === 'bold' ? <strong key={j}>{part.value}</strong> : part.value
+                                        part.type === 'bold' ? <strong key={`search-ans-${j}`}>{part.value}</strong> : <span key={`search-ans-${j}`}>{part.value}</span>
                                     )}
                                 </div>
                                 <AnswerEvidenceSection
@@ -651,7 +655,7 @@ function SearchTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                                 <div key={name} className="agent-output-item">
                                                     <strong>{name}:</strong>{' '}
                                                     {formatBoldSegments(text || '—').map((part, j) =>
-                                                        part.type === 'bold' ? <strong key={j}>{part.value}</strong> : part.value
+                                                        part.type === 'bold' ? <strong key={`agent-out-${name}-${j}`}>{part.value}</strong> : <span key={`agent-out-${name}-${j}`}>{part.value}</span>
                                                     )}
                                                 </div>
                                             ))}
@@ -681,12 +685,14 @@ function SearchTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                         className={`agent-button contradiction-button ${isAnalyzing ? 'loading' : ''}`}
                                     >
                                         {isAnalyzing ? (
-                                            <>
+                                            <span key="analyzing" className="btn-inner">
                                                 <span className="spinner"></span>
-                                                בודק...
-                                            </>
+                                                <span>בודק...</span>
+                                            </span>
                                         ) : (
-                                            '🔍 בדוק סתירות (Contradiction Agent)'
+                                            <span key="idle" className="btn-inner">
+                                                <span>🔍 בדוק סתירות (Contradiction Agent)</span>
+                                            </span>
                                         )}
                                     </button>
                                     <button
@@ -695,12 +701,14 @@ function SearchTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                         className={`agent-button risk-button ${isAnalyzing ? 'loading' : ''}`}
                                     >
                                         {isAnalyzing ? (
-                                            <>
+                                            <span key="analyzing" className="btn-inner">
                                                 <span className="spinner"></span>
-                                                בודק...
-                                            </>
+                                                <span>בודק...</span>
+                                            </span>
                                         ) : (
-                                            '⚠️ זהה סיכונים (Risk Agent)'
+                                            <span key="idle" className="btn-inner">
+                                                <span>⚠️ זהה סיכונים (Risk Agent)</span>
+                                            </span>
                                         )}
                                     </button>
                                 </div>
@@ -722,7 +730,7 @@ function SearchTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                 </h3>
                                 <div className="agent-analysis-text">
                                     {formatBoldSegments(agentAnalysis.analysis || '').map((part, j) =>
-                                        part.type === 'bold' ? <strong key={j}>{part.value}</strong> : part.value
+                                        part.type === 'bold' ? <strong key={`analysis-${j}`}>{part.value}</strong> : <span key={`analysis-${j}`}>{part.value}</span>
                                     )}
                                 </div>
                             </div>
@@ -746,7 +754,7 @@ function SearchTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                     </div>
                                     <div className="result-text">
                                         {formatBoldSegments(item.document || '').map((part, j) =>
-                                            part.type === 'bold' ? <strong key={j}>{part.value}</strong> : part.value
+                                            part.type === 'bold' ? <strong key={`res-item-${index}-${j}`}>{part.value}</strong> : <span key={`res-item-${index}-${j}`}>{part.value}</span>
                                         )}
                                     </div>
                                     {item.metadata?.chunk_index !== undefined && (

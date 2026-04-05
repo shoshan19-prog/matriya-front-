@@ -110,17 +110,21 @@ function ManagementLabTab() {
 
         {status === 'ok' && detail?.user && (
           <p className="management-lab-status ok">
-            מחובר לשרת הניהול כ־<strong>{detail.user.username || detail.user.full_name || 'משתמש'}</strong>
-            {projectTotal != null ? ` · ${projectTotal} פרויקטים במערכת` : ''}.
+            <span key="status-ok">
+              מחובר לשרת הניהול כ־<strong>{detail.user.username || detail.user.full_name || 'משתמש'}</strong>
+              {projectTotal != null ? ` · ${projectTotal} פרויקטים במערכת` : ''}.
+            </span>
           </p>
         )}
 
         {status === 'error' && (
           <p className="management-lab-status error">
-            לא ניתן לאמת מול שרת הניהול: {detail?.error}
-            {detail?.status === 503
-              ? ' — ודא ש־MATRIYA_BACK_URL מוגדר אצל שרת הניהול וש־Matriya זמין.'
-              : ''}
+            <span key="status-error">
+              לא ניתן לאמת מול שרת הניהול: {detail?.error}
+              {detail?.status === 503
+                ? ' — ודא ש־MATRIYA_BACK_URL מוגדר אצל שרת הניהול וש־Matriya זמין.'
+                : ''}
+            </span>
           </p>
         )}
 

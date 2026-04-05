@@ -283,8 +283,12 @@ const GptSyncStatusRow = forwardRef(function GptSyncStatusRow(
             <div className="gpt-sync-status-row__inner">
                 <span className="gpt-sync-status-row__dot" style={{ background: dotColor }} aria-hidden />
                 <span id={hintId} className="gpt-sync-status-row__label">
-                    {label}
-                    {extraWarn ? <span className="gpt-sync-status-row__warn"> {extraWarn}</span> : null}
+                    <span key={label || 'empty'}>{label}</span>
+                    {extraWarn ? (
+                        <span key="warning" className="gpt-sync-status-row__warn">
+                            {extraWarn}
+                        </span>
+                    ) : null}
                 </span>
                 {showResync && (
                     <button
@@ -293,7 +297,7 @@ const GptSyncStatusRow = forwardRef(function GptSyncStatusRow(
                         disabled={!hasEligible}
                         onClick={() => runSync()}
                     >
-                        סנכרון מחדש
+                        <span key="resync">סנכרון מחדש</span>
                     </button>
                 )}
                 {showRetry && (
@@ -305,7 +309,7 @@ const GptSyncStatusRow = forwardRef(function GptSyncStatusRow(
                             runSync();
                         }}
                     >
-                        נסה שוב
+                        <span key="retry">נסה שוב</span>
                     </button>
                 )}
                 {showInitialSync && (
@@ -315,7 +319,7 @@ const GptSyncStatusRow = forwardRef(function GptSyncStatusRow(
                         disabled={!hasEligible}
                         onClick={() => runSync()}
                     >
-                        סנכרון
+                        <span key="initial-sync">סנכרון</span>
                     </button>
                 )}
                 <button
@@ -324,7 +328,7 @@ const GptSyncStatusRow = forwardRef(function GptSyncStatusRow(
                     disabled={syncing || backgroundGptSyncBusy}
                     onClick={() => refresh({ silent: false })}
                 >
-                    רענון סטטוס
+                    <span key="refresh-status">רענון סטטוס</span>
                 </button>
             </div>
         </div>

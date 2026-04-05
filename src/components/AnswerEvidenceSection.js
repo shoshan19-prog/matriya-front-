@@ -18,8 +18,12 @@ function AnswerEvidenceSection({ sources, title, hint }) {
                     const key = s.source_id != null ? String(s.source_id) : `${label}-${i}`;
                     return (
                         <li key={key} className="matriya-evidence__card">
-                            <div className="matriya-evidence__file">{label}</div>
-                            <blockquote className="matriya-evidence__quote">{body}</blockquote>
+                            <div className="matriya-evidence__file">
+                                <span key={`file-${key}`}>{label}</span>
+                            </div>
+                            <blockquote className="matriya-evidence__quote">
+                                <span key={`quote-${key}`}>{body}</span>
+                            </blockquote>
                         </li>
                     );
                 })}

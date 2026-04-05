@@ -455,7 +455,11 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
                     disabled={deletingFilename === f.filename}
                     onClick={() => handleDeleteFile(f.filename)}
                 >
-                    {deletingFilename === f.filename ? 'מוחק…' : 'מחק'}
+                    {deletingFilename === f.filename ? (
+                        <span key="loading" className="btn-inner">מוחק…</span>
+                    ) : (
+                        <span key="idle" className="btn-inner">מחק</span>
+                    )}
                 </button>
             </td>
         </tr>
@@ -621,12 +625,18 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                     onClick={runAsk}
                                     disabled={askLoading || !askQuery.trim() || isUploading || gptRagSyncing}
                                 >
-                                    {askLoading ? 'מריץ...' : 'הרץ'}
+                                    {askLoading ? (
+                                        <span key="asking" className="btn-inner">מריץ...</span>
+                                    ) : (
+                                        <span key="idle" className="btn-inner">הרץ</span>
+                                    )}
                                 </button>
                                 {askError && <p className="upload-ask-error">{askError}</p>}
                                 {askResult != null && askResult !== '' && (
                                     <>
-                                        <div className="upload-ask-result">{askResult}</div>
+                                    <div className="upload-ask-result">
+                                        <span key={askResult || 'empty'}>{askResult}</span>
+                                    </div>
                                         <AnswerEvidenceSection
                                             sources={askSources || []}
                                             title={ASK_EVIDENCE_TITLE}
@@ -689,9 +699,13 @@ function UploadTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                 <div className="loading">טוען...</div>
                             ) : (
                                 <div className="preview-text">
-                                    {formatBoldSegments(previewDoc.text || 'אין תוכן').map((part, j) =>
-                                        part.type === 'bold' ? <strong key={j}>{part.value}</strong> : part.value
-                                    )}
+                                    {formatBoldSegments(previewDoc.text || 'אין תוכן').map((part, j) => (
+                                        part.type === 'bold' ? (
+                                            <strong key={`preview-part-${j}`}>{part.value}</strong>
+                                        ) : (
+                                            <span key={`preview-part-${j}`}>{part.value}</span>
+                                        )
+                                    ))}
                                 </div>
                             )}
                         </div>

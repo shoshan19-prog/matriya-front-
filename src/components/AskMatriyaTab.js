@@ -172,8 +172,11 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
 
                 <div className="ask-matriya-file-section" ref={dropdownRef}>
                     <span className="ask-matriya-file-section-label">
-                        מסמכים במערכת
-                        {!filesLoading && filesInApiOrder.length > 0 ? ` (${filesInApiOrder.length})` : ''}:
+                        <span key="label-prefix">מסמכים במערכת</span>
+                        {!filesLoading && filesInApiOrder.length > 0 ? (
+                            <span key="label-count">{` (${filesInApiOrder.length})`}</span>
+                        ) : null}
+                        <span key="label-suffix">:</span>
                     </span>
                     {filesLoading ? (
                         <div className="ask-matriya-loading-files">טוען...</div>
@@ -229,7 +232,7 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                                 {isAllFilesSelected ? '✓' : ''}
                                             </span>
                                             <span className="ask-matriya-dropdown-option-label" title="כל המסמכים במערכת">
-                                                כל המסמכים במערכת
+                                                <span key="val-all">כל המסמכים במערכת</span>
                                             </span>
                                         </button>
                                         {filteredFiles.length === 0 ? (
@@ -245,14 +248,14 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
                                                     onClick={() => toggleFile(filename)}
                                                 >
                                                     <span className="ask-matriya-dropdown-option-check">
-                                                        {selectedFilenames.includes(filename) ? '✓' : ''}
+                                                        {selectedFilenames.includes(filename) ? <span key="check">✓</span> : null}
                                                     </span>
                                                     <span className="ask-matriya-dropdown-option-label" title={filename}>
-                                                        {filename}
+                                                        <span key={filename}>{filename}</span>
                                                     </span>
                                                     {isSpreadsheetFilename(filename) ? (
                                                         <span className="ask-matriya-file-kind" aria-hidden>
-                                                            Excel
+                                                            <span key="excel">Excel</span>
                                                         </span>
                                                     ) : null}
                                                 </button>
@@ -265,18 +268,22 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
                     )}
                 </div>
 
-                <div className="ask-matriya-messages">
+                <div key={`messages-count-${messages.length}`} className="ask-matriya-messages">
                     {messages.length === 0 && (
                         <div className="ask-matriya-placeholder">
-                            בחרו מסמך אחד או יותר למעלה, ואז כתבו שאלה למטה.
+                            <span key="placeholder-text">בחרו מסמך אחד או יותר למעלה, ואז כתבו שאלה למטה.</span>
                         </div>
                     )}
                     {messages.map((msg, i) => (
                         <div key={i} className={`ask-matriya-msg ask-matriya-msg-${msg.role}`}>
                             <div className="ask-matriya-msg-content">
-                                {formatBoldSegments(msg.content || '').map((part, j) =>
-                                    part.type === 'bold' ? <strong key={j}>{part.value}</strong> : part.value
-                                )}
+                                {formatBoldSegments(msg.content || '').map((part, j) => (
+                                    part.type === 'bold' ? (
+                                        <strong key={`msg-${i}-part-${j}`}>{part.value}</strong>
+                                    ) : (
+                                        <span key={`msg-${i}-part-${j}`}>{part.value}</span>
+                                    )
+                                ))}
                             </div>
                             {msg.role === 'assistant' ? (
                                 <AnswerEvidenceSection
@@ -288,8 +295,10 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
                         </div>
                     ))}
                     {sending && (
-                        <div className="ask-matriya-msg ask-matriya-msg-assistant">
-                            <div className="ask-matriya-msg-content ask-matriya-typing">מחפש תשובה...</div>
+                        <div key="typing" className="ask-matriya-msg ask-matriya-msg-assistant">
+                            <div className="ask-matriya-msg-content ask-matriya-typing">
+                                <span key="typing-indicator">מחפש תשובה...</span>
+                            </div>
                         </div>
                     )}
                     <div ref={messagesEndRef} />
@@ -324,7 +333,11 @@ function AskMatriyaTab({ onGptSyncingChange, gptRagSyncing = false }) {
                             filesInApiOrder.length === 0
                         }
                     >
-                        שלח
+                        {sending || gptRagSyncing ? (
+                            <span key="sending" className="btn-inner">שולח...</span>
+                        ) : (
+                            <span key="idle" className="btn-inner">שלח</span>
+                        )}
                     </button>
                 </div>
             </div>

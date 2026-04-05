@@ -146,12 +146,14 @@ function LoginTab({ onLogin }) {
                         className={`auth-button ${isLoading ? 'loading' : ''}`}
                     >
                         {isLoading ? (
-                            <>
+                            <span key="loading" className="btn-inner">
                                 <span className="spinner"></span>
-                                מעבד...
-                            </>
+                                <span>מעבד...</span>
+                            </span>
                         ) : (
-                            isLogin ? 'התחבר' : 'הירשם'
+                            <span key="idle" className="btn-inner">
+                                <span>{isLogin ? 'התחבר' : 'הירשם'}</span>
+                            </span>
                         )}
                     </button>
                 </form>
