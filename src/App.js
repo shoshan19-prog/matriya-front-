@@ -5,6 +5,7 @@ import SearchTab from './components/SearchTab';
 import AskMatriyaTab from './components/AskMatriyaTab';
 import LoginTab from './components/LoginTab';
 import AdminTab from './components/AdminTab';
+import JudgmentTab from './components/JudgmentTab';
 import axios from 'axios';
 import { API_BASE_URL } from './utils/api';
 
@@ -92,6 +93,7 @@ function App() {
         { id: 'upload', label: 'העלאת מסמכים' },
         { id: 'ask', label: 'Ask Matriya' },
         { id: 'search', label: 'מחקר' },
+        { id: 'judgment', label: 'שיפוטים' },
         ...(isAdmin ? [{ id: 'admin', label: 'ניהול' }] : [])
     ];
 
@@ -166,6 +168,7 @@ function App() {
                 {activeTab === 'search' && (
                     <SearchTab onGptSyncingChange={setGptRagSyncing} gptRagSyncing={gptRagSyncing} />
                 )}
+                {activeTab === 'judgment' && <JudgmentTab />}
                 {activeTab === 'admin' && isAdmin && <AdminTab isAdmin={isAdmin} />}
             </div>
         </div>
