@@ -11,9 +11,10 @@ _Last updated: 2026-06-26 (daily-triage run #1)_
 
 > Append `- [ ] <item> — discovered <date> by <loop>`; check off when resolved.
 
-- [ ] 🔴 `npm audit`: 64 vulnerabilities (1 critical, 22 high, 36 moderate, 5 low) — discovered 2026-06-26 by daily-triage. Mostly react-scripts transitive deps; triage carefully (CRA audit noise is common — don't blindly `audit fix --force`, it can break the build).
-- [ ] 🟡 react / react-dom 18.3.1 → 19.x available (major) — discovered 2026-06-26 by daily-triage
-- [ ] 🟢 CI workflow added this session — confirm it goes green on first run — discovered 2026-06-26 by daily-triage
+- [ ] 🔴 `[VERIFIED count / UNVERIFIED exploitability]` `npm audit`: 64 vulnerabilities (1 critical, 22 high, 36 moderate, 5 low) — counts confirmed via `npm audit --json`; mostly react-scripts **transitive, dev-only** deps. **Action: classify runtime/dev/transitive/non-exploitable before any fix; never `audit fix --force` (breaks the build).** discovered 2026-06-26 by daily-triage
+- [ ] 🟡 `[VERIFIED drift / UNVERIFIED impact]` react / react-dom 18.3.1 → 19.x available (major) — confirmed via `npm outdated`; migration impact not evaluated. discovered 2026-06-26 by daily-triage
+- [x] 🟢 `[VERIFIED]` CI workflow added this session — confirmed GREEN on 18.x + 20.x (PR #1 checks) — 2026-06-26
+- [x] 🟢 `[VERIFIED]` Lockfile drift (`yaml@2.9.0` missing) — reproduced in CI log, fixed by ci-sweeper, re-run green — 2026-06-26
 
 ---
 
@@ -21,7 +22,7 @@ _Last updated: 2026-06-26 (daily-triage run #1)_
 
 - **Build:** `npm run build` (react-scripts)
 - **Test:** `CI=true npm test` (non-watch)
-- **Last green commit:** _(not yet confirmed — CI just added)_
+- **Last green commit:** `1de5b27` (CI green on Node 18 + 20, 2026-06-26)
 - **Node:** see CI matrix (18 / 20)
 
 > ⚠️ Local sandbox note: dependencies are not installed here and `npm ci` may be blocked
