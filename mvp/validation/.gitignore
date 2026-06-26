@@ -1,1 +1,6 @@
-*.template.json
+fresco-project.template.json
+preregistrations.jsonl
+v1-ledger.jsonl
+*.dataset.json
+*.filled.json
+store.json

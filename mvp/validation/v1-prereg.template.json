@@ -1,0 +1,17 @@
+{
+  "_README": "V1 Pre-registration form. Fill EVERY field BEFORE running. Then: node preregister.mjs this-file.json -> commit+push preregistrations.jsonl -> node run-v1.mjs <id>. The hidden_boundary lives ONLY here (sealed), never in the dataset file, so the operator stays blind to it in the data.",
+  "project": "PROJECT-NAME (e.g. INT-TFX)",
+  "dataset_file": "your-project.dataset.json",
+  "input_variable": "the driver you believe explains the outcome (e.g. app_pct)",
+  "target_variable": "the measured outcome (e.g. ttf_days)",
+  "candidate_features": ["list", "features", "a boundary might live along", "MUST include hidden_boundary.feature"],
+  "hidden_boundary": { "feature": "humidity_pct", "threshold": 80, "tolerance": 6 },
+  "who_knows_boundary": "name — the person who set the held-out boundary",
+  "who_runs_blind": "name — the operator who runs the test without seeing the boundary in the data",
+  "success_criterion": "breakdown on hidden_boundary.feature, threshold within tolerance, AND permutation p < p_threshold",
+  "p_threshold": 0.05,
+  "permutation_count": 300,
+  "held_out_rule": "the boundary is removed from the dataset file and recorded only in this sealed form",
+  "failure_reporting": "the run is recorded in v1-ledger.jsonl whether it PASSES or FAILS; failures count in attempts",
+  "decision": "advance toward V2 only after >=2 distinct projects PASS under this frozen protocol"
+}
