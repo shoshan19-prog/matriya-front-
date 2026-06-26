@@ -99,3 +99,15 @@ front/
 - Firefox
 - Safari
 - Modern browsers with ES6 support
+
+## Loop Engineering
+
+This repo's automated loops (`loops/`) follow the MATRIYA Loop Engineering
+architectural principles. Those principles have a **single canonical source of
+truth** — do not copy them here; reference only:
+
+📄 **[Loop Engineering — Architectural Principles](https://github.com/shoshan19-prog/matriya-back/blob/main/docs/LOOP_ENGINEERING_PRINCIPLES.md)**
+&nbsp;(canonical, owned by MATRIYA, in `matriya-back/docs/`)
+
+The local implementation for this frontend lives in [`loops/`](loops/) (LOOP.md,
+STATE.md, loop-run-log.md, loop-budget.md, MONITORING-POLICY.md).
