@@ -1,0 +1,20 @@
+{
+  "_README": "DOE input table — features only; strength_28d is HELD OUT in a separate file (doe-strength.json: {batch_id: value}). One row per INDEPENDENT batch (not per cube). Cast_order randomised 1..15. blind_code hides the cement level from the operator who crushes the cubes. binder_class / PSD_key / water_powder_ratio_target are CONSTANT by design (so they cannot confound).",
+  "rows": [
+    { "batch_id": "D01", "cement_pct": 8,  "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D02", "cement_pct": 8,  "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D03", "cement_pct": 8,  "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D04", "cement_pct": 10, "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D05", "cement_pct": 10, "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D06", "cement_pct": 10, "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D07", "cement_pct": 12, "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D08", "cement_pct": 12, "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D09", "cement_pct": 12, "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D10", "cement_pct": 14, "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D11", "cement_pct": 14, "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D12", "cement_pct": 14, "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D13", "cement_pct": 16, "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D14", "cement_pct": 16, "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 },
+    { "batch_id": "D15", "cement_pct": 16, "binder_class": "FIXED", "PSD_key": "FIXED", "water_powder_ratio_target": 0.18, "water_powder_ratio_actual": null, "cast_order": null, "blind_code": "", "cast_date": "", "test_date": "", "age_days": 28 }
+  ]
+}

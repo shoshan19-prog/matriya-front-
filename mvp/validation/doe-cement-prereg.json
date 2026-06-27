@@ -1,0 +1,63 @@
+{
+  "pre_registration_id": "DOE-V1CEM-44ef2cf0ea",
+  "sealed_hash": "44ef2cf0ea9133c075251997f2c7e722e8a07d9a1975884eb36fe9b8b3d4a2cb",
+  "sealed_at": "2026-06-27T08:43:36.197Z",
+  "title": "DOE V1 — Cement Threshold (controlled experiment)",
+  "hypothesis_H1": "Within a fixed binder system, 28-day strength has a one-break (nonlinear) transition as cement% increases.",
+  "design": {
+    "fixed": [
+      "binder_class",
+      "PSD_key",
+      "water_powder_ratio_target",
+      "curing_protocol"
+    ],
+    "varied": "cement_pct",
+    "levels": [
+      8,
+      10,
+      12,
+      14,
+      16
+    ],
+    "independent_batches_per_level": 3,
+    "analysis_unit": "batch_mean",
+    "randomization": "cast order and test order randomized; cubes labelled with blind codes",
+    "blinding": "operator measuring strength is blind to cement level"
+  },
+  "variables": {
+    "join_key": "batch_id",
+    "input_feature": "cement_pct",
+    "outcome": "strength_28d (HELD OUT)"
+  },
+  "parameters": {
+    "breakpoint_search_range": {
+      "lo": 9,
+      "hi": 15
+    },
+    "min_points_per_segment": 6,
+    "improvement_threshold": 0.3,
+    "permutation": {
+      "count": 1000,
+      "p_threshold": 0.05
+    },
+    "bootstrap": {
+      "count": 1000,
+      "max_ci_width": 4
+    },
+    "confounders": {
+      "continuous": [
+        "water_powder_ratio_actual",
+        "cast_order"
+      ],
+      "categorical": []
+    }
+  },
+  "success_criteria": [
+    "breakpoint_detected",
+    "improvement_exceeds",
+    "permutation_significant",
+    "bootstrap_stable",
+    "persists_after_confounders"
+  ],
+  "provenance": "Immutable once signed; any change requires a new pre_registration_id."
+}
