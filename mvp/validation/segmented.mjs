@@ -56,15 +56,33 @@ export function segmentedBest(x, y, range, minPer = 3) {
 
 const aic = (n, rss, k) => n * Math.log((rss / n) || 1e-9) + 2 * k;
 
-// improvement statistic: fraction of linear residual variance explained by the break
+// Level-shift (jump) model: y = b0 + b1·x + δ·1[x>=T]. This is the faithful
+// model for a "threshold JUMP" and — unlike two independent sloped segments —
+// localizes the breakpoint sharply (a sloped segment can mimic a break one
+// level away; a level shift cannot). Estimated breakpoint = T minimizing RSS.
+export function segmentedJump(x, y, range, minPer = 3) {
+  const xs = [...new Set(x)].sort((a, b) => a - b);
+  let best = null;
+  for (let i = 1; i < xs.length; i++) {
+    const T = (xs[i - 1] + xs[i]) / 2;
+    if (T < range.lo || T > range.hi) continue;
+    const left = x.filter((v) => v < T).length;
+    if (left < minPer || x.length - left < minPer) continue;
+    const f = ols(x.map((v) => [1, v, v >= T ? 1 : 0]), y);
+    if (!best || f.rss < best.rss) best = { T, rss: f.rss, jump: f.beta[2], beta: f.beta };
+  }
+  return best;
+}
+
+// improvement statistic: fraction of linear residual variance explained by the jump
 export function improvement(x, y, range, minPer) {
   const lin = linfit(x, y);
-  const seg = segmentedBest(x, y, range, minPer);
+  const seg = segmentedJump(x, y, range, minPer);
   if (!seg) return { seg: null, lin, improvement: 0 };
   return {
     seg, lin,
     improvement: lin.rss > 0 ? (lin.rss - seg.rss) / lin.rss : 0,
-    aic_lin: aic(x.length, lin.rss, 2), aic_seg: aic(x.length, seg.rss, 5),
+    aic_lin: aic(x.length, lin.rss, 2), aic_seg: aic(x.length, seg.rss, 3),
   };
 }
 
@@ -84,7 +102,7 @@ export function bootstrapT(x, y, range, minPer, B, seed = 11) {
   const rnd = mulberry32(seed); const n = x.length; const Ts = [];
   for (let b = 0; b < B; b++) {
     const idx = Array.from({ length: n }, () => Math.floor(rnd() * n));
-    const seg = segmentedBest(idx.map((i) => x[i]), idx.map((i) => y[i]), range, minPer);
+    const seg = segmentedJump(idx.map((i) => x[i]), idx.map((i) => y[i]), range, minPer);
     if (seg) Ts.push(seg.T);
   }
   Ts.sort((a, b) => a - b);

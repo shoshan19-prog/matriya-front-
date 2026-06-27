@@ -59,6 +59,14 @@ const c = {
   bootstrap_stable: boot.width <= P.bootstrap.max_ci_width,
   persists_after_confounders: permAdj.p < P.permutation.p_threshold,
 };
+// V4 (prospective) mode: a PREDICTED window elevates "is there a break?" to
+// "is the break where the mechanism predicted?". Search range is wider than the
+// window, so the breakpoint can land outside it — PASS requires it lands inside.
+const W = P.predicted_window;
+if (W) {
+  c.breakpoint_in_window = !!imp.seg && imp.seg.T >= W.lo && imp.seg.T <= W.hi;
+  c.ci_overlaps_window = !!imp.seg && !(boot.hi < W.lo || boot.lo > W.hi);
+}
 const result = Object.values(c).every(Boolean) ? 'PASS' : 'FAIL';
 
 // 7) append to ledger (locked; failures counted) — NO raw strengths stored
@@ -72,7 +80,8 @@ const entry = {
 appendFileSync(LEDGER, JSON.stringify(entry) + '\n');
 
 // 8) blind report (aggregates only)
-console.log(`\n# Cement-threshold V1 — ${pre_registration_id}   (n=${x.length} batches)`);
+console.log(`\n# Cement-threshold ${W ? 'V4 (prospective)' : 'V1'} — ${pre_registration_id}   (n=${x.length} batches)`);
+if (W) console.log(`predicted window:       ${W.lo}–${W.hi}% cement (center ${(W.lo + W.hi) / 2})`);
 console.log(`estimated breakpoint:   ${entry.estimated_threshold ?? '—'}% cement` + (imp.seg ? `   bootstrap 95% CI [${entry.threshold_CI[0]}, ${entry.threshold_CI[1]}] (width ${boot.width.toFixed(1)})` : ''));
 console.log(`model comparison:       improvement ${entry.improvement}  | AIC linear ${entry.aic_lin} vs segmented ${entry.aic_seg}`);
 console.log(`permutation:            p=${entry.permutation_p}   confounder-adjusted p=${entry.permutation_p_adjusted}`);

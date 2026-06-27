@@ -1,72 +1,75 @@
-# DOE — Cement Threshold (the decision experiment)
+# DOE — Cement Threshold (the decision experiment, V4 prospective)
 
-*Prepared 2026-06-26. The observational product data can only be K (it confounds cement% with binder system). This controlled experiment is the decision tool: vary **only** cement%, hold everything else fixed, and test for a nonlinear strength transition. Sealed pre-registration `mvp/validation/doe-cement-prereg.json` (id `DOE-V1CEM-44ef2cf0ea`); analysis runs through the already-built blind instrument `run-v1-segmented.mjs`.*
+*Prepared 2026-06-26. The observational product data can only be **K** (it confounds cement% with binder system). This controlled experiment is the decision tool: vary **only** cement%, hold everything else fixed, and test whether 28-day strength undergoes a non-linear transition **at a predicted window**. Because the threshold location is predicted in advance, a PASS is **V4-grade (prospective)** — the first result that could move VDI from 0 to 1. Sealed pre-registration `mvp/validation/doe-cement-prereg-v4.json` (id `DOE-V4CEM-f72e82b6b4`, supersedes the V1 `DOE-V1CEM-…`); analysis runs through the blind instrument `run-v1-segmented.mjs`.*
 
-## The sharpened hypothesis
+## The prospective hypothesis (predicted window, not a single point)
 
-Not "higher product grade → higher strength" (circular), but:
+> A non-linear strength transition will occur when cement content crosses the **11–13 % window (center 12 %)**, under constant binder_class, PSD, W/P target, curing, and mixing protocol.
 
-> **Within a fixed binder system, as cement% rises, 28-day strength undergoes a one-break (nonlinear) transition at a critical cement fraction.**
+A window (not 12.0 % exactly) is deliberate: actual weighing drifts, real W/P shifts, 28-day strength is noisy, and a physical threshold is a transition *zone*. The search range (9–15 %) is **wider** than the window, so the estimated breakpoint *can* land outside 11–13 % — and a PASS requires it lands inside. That is what makes it a genuine prediction rather than a fitted description.
 
 ## Design
 
 | Factor | Setting |
 |---|---|
-| **Varied** | `cement_pct` at **5 levels**: 8 / 10 / 12 / 14 / 16 % |
-| **Fixed** | binder system, PSD, target W/P, curing protocol — identical across all batches |
-| **Replicates** | **3 *independent batches* per level** (15 batches). NOT 3 cubes from one batch — that is pseudo-replication and measures cube scatter, not real variability |
-| **Analysis unit** | the **batch mean** 28-day strength (n = 15) |
-| **Randomisation** | cast order and test order randomised (1…15); cubes carry **blind codes** |
-| **Blinding** | the operator crushing cubes does **not** know the cement level |
+| **Varied** | `cement_pct` at 5 levels: 8 / 10 / 12 / 14 / 16 % |
+| **Fixed** | binder system, PSD, target W/P, curing, mixing — identical across all batches |
+| **Replicates** | **4 independent batches per level** (20 batches); **2 cubes/batch averaged** to cut measurement noise |
+| **Analysis unit** | batch-mean 28-day strength (n = 20) — never per-cube (pseudo-replication) |
+| **Randomisation / blinding** | cast & test order randomised; cubes blind-coded; strength operator blind to cement level |
 
-Three refinements above (independent batches, randomisation, blinding) are not optional polish — without them the experiment re-confounds cement with batch-day / operator / position drift.
+## The model — a level shift, not two free slopes
 
-## Why a DOE removes the confounder that sank the observational test
+The fit is `strength = β₀ + β₁·cement + δ·1[cement ≥ T]` (common slope + a jump δ at T). This is the faithful model for a *threshold jump*, and — unlike two independent sloped segments — it **localizes the breakpoint sharply**. (Self-test proved this matters: with two free slopes a true break at 15 % was mis-estimated as 13 % and wrongly passed the window; the level-shift model estimates it at 15 % and correctly fails.)
 
-In the observational data, cement% and `binder_class` were collinear, so a detected break could not be attributed to cement. Here **binder/PSD/W-P are constant by construction** — they *cannot* confound, because they do not vary. The only residual confounders are **actual W/P** (record it; fixing target W/P while changing cement can shift real water demand) and **execution order** (record `cast_order`). Both are pre-registered as covariates.
+## Decision rule — PASS only if all seven
 
-## Decision rule — PASS only if all five
+1. breakpoint detected (estimated in 9–15 %, never hand-picked)
+2. improvement ≥ 0.30 (jump vs linear, fractional RSS reduction)
+3. permutation p < **0.025** (2000 shuffles; tightened from 0.05 after the null FP measured 8 %)
+4. bootstrap stable — breakpoint 95 % CI width ≤ 4 % (2000 resamples)
+5. persists after confounder control (actual W/P + cast_order)
+6. **breakpoint_in_window** — estimate within 11–13 %
+7. **ci_overlaps_window** — bootstrap CI intersects 11–13 %
 
-1. **breakpoint detected** in 9–15 % (estimated, never hand-picked; ≥6 batch-means per segment)
-2. **improvement ≥ 0.30** (segmented vs linear, fractional RSS reduction)
-3. **permutation p < 0.05** (1000 shuffles)
-4. **bootstrap stable** — breakpoint 95% CI width ≤ 4 % cement (1000 resamples)
-5. **persists after confounder control** — significant after residualising on actual W/P + cast_order
+Criteria 6–7 are the prospective (V4) gate. Fail any → FAIL, recorded; VDI unchanged.
 
-Failing any one → **FAIL**, recorded; VDI unchanged.
+## Self-test (synthetic — proves the instrument, not a result)
 
-## Power — read this BEFORE casting (from `node doe-power.mjs`)
+| Case | Truth | Result |
+|---|---|---|
+| **A** | break at 12 % (inside window) | **PASS** — est 13 %, CI [12,13], improvement 0.75, perm p=0.0005, all 7 ✓ |
+| **C** | break at 15 % (**outside** window) | **FAIL** — est 15 %, CI width 6 → fails `bootstrap_stable` **and** `breakpoint_in_window`, despite a real break |
+| **B** | no break (null) | **FAIL** — improvement 0.08, perm p=0.62 |
 
-Detection rate of the full criteria, by true strength-jump and batch-to-batch σ:
+A returns PASS only when the break is real *and where predicted*; C shows a real-but-mispredicted break is rejected; B rejects noise.
+
+## Power — read before casting (`node doe-power.mjs`, V4 design)
 
 ```
 jump(MPa)   σ=1.0   σ=2.0   σ=3.0
-3            40%      9%      5%
-5            97%     32%     11%
-8           100%     74%     34%
-12          100%    100%     74%
-NULL (jump=0, σ=2): false-positive 8%
+3            45%     11%      4%
+5            97%     28%     13%
+8           100%     81%     39%
+12          100%    100%     80%
+NULL (jump=0, σ=2): false-positive 2.0%   (tightened p brought it under 5%)
 ```
 
 **Honest implications:**
-- **15 cubes suffice only if the jump is large (≥ 8 MPa) AND batch noise is tight (σ ≤ 2).**
-- If the real transition is modest (3–5 MPa), or batch σ is ~3 (the scatter the rain-affected observational batches showed), **the design is under-powered and will miss it.** Mitigate *before* committing: 4–5 batches/level, and/or average 2–3 cubes per batch to cut σ.
-- Null false-positive is **8%** (above nominal 5%) from scanning two breakpoints + the bootstrap gate — consider tightening permutation `p_threshold` to 0.025, or rely on the 5-criterion conjunction (the confounder gate, not in this sim, lowers it further).
-
-## Ladder placement — this is the path to a real VDI increment
-
-The observational V1 is at best a screen. This DOE, done blind, is a **controlled, prospective** test: if you also pre-register the *predicted* threshold location (the chemist's "~12%") and new cubes confirm it, the result is **V4-grade (prospective prediction confirmed by a new experiment)** — the first thing that could legitimately move **VDI from 0 to 1**. To claim V4, add the predicted threshold to the prereg before running; to claim only V1 (existence of a break), leave it estimated.
+- The 20-batch design detects reliably only when the **jump ≥ 8 MPa AND batch σ ≤ 2** (or jump ≥ 12 at σ = 3).
+- A modest transition (3–5 MPa) or high batch noise (σ ≈ 3, the rain-batch scatter) will be **missed** — add batches/level or average more cubes per batch to cut σ *before* committing.
+- Null false-positive is now **2 %** (the tighter p + window gate fixed the earlier 8 %).
 
 ## Execution → analysis
 
-1. Run the DOE; fill `mvp/validation/doe-input.template.json` (features only — randomised order, blind codes, actual W/P).
-2. Rachel keeps `strength_28d` in a **separate** `doe-strength.json` (`{batch_id: value}`), held out from the investigator.
+1. Run the DOE; fill `mvp/validation/doe-input.template.json` (20 rows; randomised order, blind codes, **actual** W/P recorded).
+2. Rachel keeps `strength_28d` (batch mean of 2 cubes) in a **separate** `doe-strength.json` (`{batch_id: value}`), held out from the investigator.
 3. Commit the input table + the sealed prereg (so the seal predates the strengths in git history).
-4. Rachel runs the blind instrument:
+4. Rachel runs:
    ```
    node mvp/validation/run-v1-segmented.mjs \
-        mvp/validation/doe-cement-prereg.json  doe-input.json  doe-strength.json
+        mvp/validation/doe-cement-prereg-v4.json  doe-input.json  doe-strength.json
    ```
-5. Output is PASS/FAIL + estimated threshold + CI + model-comparison stats only; raw strengths never exposed; result locked in `v1-ledger.jsonl`.
+5. Output: PASS/FAIL + estimated threshold + CI + model-comparison stats only; raw strengths never exposed; result locked in `v1-ledger.jsonl`.
 
-> Bottom line: the observational data is **K** (it framed the question). This DOE is **V** (it decides the answer). Power says: make the jump large and the batches clean, or scale up — then it is the cleanest shot the project has at its first validated discovery.
+> Bottom line: observational data framed the question (**K**); this DOE decides it (**V**), and because the threshold is predicted in advance it is **V4-eligible**. Power says: make the jump large and the batches clean (or scale up), and this is the project's first real shot at **VDI = 1**.

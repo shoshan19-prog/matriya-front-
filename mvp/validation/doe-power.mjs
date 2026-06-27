@@ -10,8 +10,10 @@
 //
 import { improvement, permutationP, bootstrapT } from './segmented.mjs';
 
-const P = { range: { lo: 9, hi: 15 }, minPer: 6, improvement: 0.30, permP: 0.05, bootMaxWidth: 4, permN: 300, bootN: 300 };
-const LEVELS = [8, 10, 12, 14, 16], NPER = 3, TRUE_T = 11; // jump occurs above 11% (between 10 and 12)
+// V4 design: 5 levels × 4 independent batches (2 cubes/batch averaged → batch-mean σ),
+// predicted window 11–13%, permutation p<0.025, jump model.
+const P = { range: { lo: 9, hi: 15 }, window: { lo: 11, hi: 13 }, minPer: 4, improvement: 0.30, permP: 0.025, bootMaxWidth: 4, permN: 300, bootN: 300 };
+const LEVELS = [8, 10, 12, 14, 16], NPER = 4, TRUE_T = 11; // jump above 11% (break between 10 and 12)
 
 function mulberry32(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 const gauss = (rnd, sd) => { let u = 0, v = 0; while (!u) u = rnd(); while (!v) v = rnd(); return sd * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
@@ -30,11 +32,13 @@ function decide(x, y) {
   if (!imp.seg) return false;
   const perm = permutationP(x, y, P.range, P.minPer, P.permN);
   const boot = bootstrapT(x, y, P.range, P.minPer, P.bootN);
-  return imp.improvement >= P.improvement && perm.p < P.permP && boot.width <= P.bootMaxWidth;
+  const inWindow = imp.seg.T >= P.window.lo && imp.seg.T <= P.window.hi;
+  const ciOverlap = !(boot.hi < P.window.lo || boot.lo > P.window.hi);
+  return imp.improvement >= P.improvement && perm.p < P.permP && boot.width <= P.bootMaxWidth && inWindow && ciOverlap;
 }
 
 const TRIALS = 100;
-console.log('DOE: 5 levels (8/10/12/14/16% cement) × 3 independent batches = 15 batch means; true break above 11%\n');
+console.log('DOE V4: 5 levels (8/10/12/14/16%) × 4 independent batches = 20 batch means; true break above 11%;\n  PASS = improvement + permutation(p<0.025) + bootstrap-stable + breakpoint in 11–13% window\n');
 console.log('  detection rate (PASS of breakpoint+improvement+permutation+bootstrap), by jump size × batch noise σ:\n');
 console.log('  jump(MPa)   σ=1.0     σ=2.0     σ=3.0');
 for (const jump of [3, 5, 8, 12]) {

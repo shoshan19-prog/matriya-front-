@@ -1,0 +1,72 @@
+{
+  "pre_registration_id": "DOE-V4CEM-f72e82b6b4",
+  "sealed_hash": "f72e82b6b41277ee477e0e2736efae2748ef0ba2555387191d948abc3fa633b9",
+  "sealed_at": "2026-06-27T08:50:09.472Z",
+  "title": "DOE V4 — Cement Threshold (prospective, predicted window)",
+  "hypothesis": "A non-linear strength transition will occur when cement content crosses the 11-13% window (center 12%), under constant binder_class, PSD, W/P target, curing, and mixing protocol.",
+  "design": {
+    "fixed": [
+      "binder_class",
+      "PSD_key",
+      "water_powder_ratio_target",
+      "curing_protocol",
+      "mixing_protocol"
+    ],
+    "varied": "cement_pct",
+    "levels": [
+      8,
+      10,
+      12,
+      14,
+      16
+    ],
+    "independent_batches_per_level": 4,
+    "cubes_per_batch": 2,
+    "analysis_unit": "batch_mean (mean of 2 cubes)",
+    "total_batches": 20,
+    "randomization": "cast and test order randomized; cubes blind-coded",
+    "blinding": "strength operator blind to cement level"
+  },
+  "variables": {
+    "join_key": "batch_id",
+    "input_feature": "cement_pct",
+    "outcome": "strength_28d (HELD OUT, batch mean)"
+  },
+  "parameters": {
+    "breakpoint_search_range": {
+      "lo": 9,
+      "hi": 15
+    },
+    "predicted_window": {
+      "lo": 11,
+      "hi": 13
+    },
+    "min_points_per_segment": 4,
+    "improvement_threshold": 0.3,
+    "permutation": {
+      "count": 2000,
+      "p_threshold": 0.025
+    },
+    "bootstrap": {
+      "count": 2000,
+      "max_ci_width": 4
+    },
+    "confounders": {
+      "continuous": [
+        "water_powder_ratio_actual",
+        "cast_order"
+      ],
+      "categorical": []
+    }
+  },
+  "success_criteria": [
+    "breakpoint_detected",
+    "improvement_exceeds",
+    "permutation_significant",
+    "bootstrap_stable",
+    "persists_after_confounders",
+    "breakpoint_in_window",
+    "ci_overlaps_window"
+  ],
+  "provenance": "Supersedes DOE-V1CEM-44ef2cf0ea (V1, estimated). Immutable once signed."
+}
