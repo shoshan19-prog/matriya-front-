@@ -1,0 +1,47 @@
+{
+  "pre_registration_id": "V1CEM-0f9baeceb2",
+  "sealed_hash": "0f9baeceb2e4076eb9258c21568e50be2ce3ca053a3a6609f85f4c93a1e4905e",
+  "sealed_at": "2026-06-27T08:37:57.186Z",
+  "title": "V1 Pre-registration — Cement Threshold Hypothesis",
+  "hypothesis_H1": "A one-break segmented model explains strength_28d vs cement% significantly better than a continuous linear model.",
+  "hypothesis_H0": "Strength changes continuously with cement%; no supported breakpoint.",
+  "variables": {
+    "join_key": "batch_id",
+    "input_feature": "cement_pct",
+    "outcome": "strength_28d (HELD OUT)"
+  },
+  "parameters": {
+    "breakpoint_search_range": {
+      "lo": 6,
+      "hi": 18
+    },
+    "min_points_per_segment": 3,
+    "improvement_threshold": 0.3,
+    "permutation": {
+      "count": 1000,
+      "p_threshold": 0.05
+    },
+    "bootstrap": {
+      "count": 1000,
+      "max_ci_width": 6
+    },
+    "confounders": {
+      "continuous": [
+        "water_powder_ratio"
+      ],
+      "categorical": [
+        "PSD_key",
+        "binder_class"
+      ],
+      "rule": "covariate_residualization"
+    }
+  },
+  "success_criteria": [
+    "breakpoint_detected",
+    "improvement_exceeds",
+    "permutation_significant",
+    "bootstrap_stable",
+    "persists_after_confounders"
+  ],
+  "provenance": "Immutable once signed; any change requires a new pre_registration_id."
+}

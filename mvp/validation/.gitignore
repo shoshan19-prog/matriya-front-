@@ -3,4 +3,6 @@ preregistrations.jsonl
 v1-ledger.jsonl
 *.dataset.json
 *.filled.json
+*.input.json
+*.strength.json
 store.json
