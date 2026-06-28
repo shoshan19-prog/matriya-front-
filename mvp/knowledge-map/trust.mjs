@@ -21,6 +21,18 @@ import { SOURCE_MAP, sourceById } from './sources.mjs';
 const PRIOR_STRENGTH = 4;     // total pseudo-count injected by the prior (small → data dominates)
 const CALIBRATED_AT = 3;      // need ≥3 real observations before a cell is "calibrated"
 
+// The four outcomes the Episode Builder reports, mapped to Beta evidence:
+//   DELIVERED      — the source actually gave this knowledge        → success
+//   EMPTY          — the source SHOULD hold it but the field is blank → failure
+//   CONTRADICTED   — it gave it, but it conflicts with another source → failure
+//   LOW_CONFIDENCE — it gave it, but weakly / unexplained            → half failure
+export const OUTCOME = {
+  DELIVERED:      { a: 1, b: 0 },
+  EMPTY:          { a: 0, b: 1 },
+  CONTRADICTED:   { a: 0, b: 1 },
+  LOW_CONFIDENCE: { a: 0, b: 0.5 },
+};
+
 const stars = (s, k) => (s.expert && k in s.expert ? s.expert[k] : 0); // 0..5, 0 = "not expected"
 
 export function makeTrustEngine() {
@@ -40,11 +52,14 @@ export function makeTrustEngine() {
   };
 
   return {
-    /** Record one real observation: did `source` deliver `ktype` when consulted? */
-    observe(source, ktype, success) {
+    /** Record one real observation. `outcome` is an OUTCOME key (DELIVERED/EMPTY/
+     *  CONTRADICTED/LOW_CONFIDENCE) — or a boolean for back-compat. */
+    observe(source, ktype, outcome) {
+      const o = typeof outcome === 'string'
+        ? (OUTCOME[outcome] || OUTCOME.EMPTY)
+        : (outcome ? OUTCOME.DELIVERED : OUTCOME.EMPTY);
       const c = cell(source, ktype);
-      if (success) c.a += 1; else c.b += 1;
-      c.obs += 1;
+      c.a += o.a; c.b += o.b; c.obs += 1;
       return this;
     },
 

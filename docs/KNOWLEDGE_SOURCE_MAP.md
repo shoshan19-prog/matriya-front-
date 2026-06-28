@@ -134,9 +134,40 @@ GAPS: MEASUREMENT, BATCH ← connect lab data + Priority to close the story
 - **Observations here are hand-seeded from the reconstruction**, not auto-extracted. Wiring `observe()` to fire automatically whenever the Episode Builder finds (or fails to find) a field in a source is the next step — then the trust matrix calibrates itself continuously.
 - **This sits directly on the Knowledge Identity Engine and Episodes** — it tells those engines *where to pull each field from, and how much to believe it.*
 
-## 7. Status & next
+## 7. Auto-learning — Episode Builder → `observe()` → Trust Engine
 
-- Built & runnable: `sources.mjs` (Source Map), `trust.mjs` (Trust Engine, Beta-calibrated), `router.mjs` (Knowledge Flow + "where to look" + complementary-coverage), `demo.mjs` (calibrated on real TLV data).
-- Next (opt-in): auto-`observe()` from the Episode Builder; per-source-instance trust (not just per-type); decay so stale sources lose trust; wire `whereToLook()` into PROTEUS's retrieval loop; add adapters (Teams/Slack/service-desk) as Source-Map rows.
+The Router is no longer a hand-written matrix. Every time the Episode Builder assembles a decision cycle it implicitly **tests each source that fed it**: did this source type actually deliver the knowledge it claims? That test is turned into an observation and fed to the Trust Engine — **no graph writes, just calibration**. (`mvp/knowledge-map/episode-bridge.mjs`, run `node demo-learn.mjs`.)
+
+Each source is judged only on **what it claims** (prior stars ≥ 3), with one of four outcomes:
+
+| Outcome | Meaning | Beta evidence |
+|---------|---------|---------------|
+| `DELIVERED` | the source gave this knowledge | success |
+| `EMPTY` | it should hold it, but the field is blank | failure |
+| `CONTRADICTED` | it gave it, but conflicts with another source | failure |
+| `LOW_CONFIDENCE` | it gave a decision with **no recorded why** | half failure |
+
+Running it on a TLV-shaped corpus, the matrix learns itself and reports exactly three things:
+
+```
+OUTPUT 1 — TRUST MATRIX UPDATED   (19 observations from 4 episodes)
+   lab_sheet|MEASUREMENT   ★4→★3      rd_report|SUPPLIER   ★4→★3   …
+
+OUTPUT 2 — SOURCE RELIABILITY CHANGED
+   lab_sheet × MEASUREMENT : prior ★5 → learned ★3  (present-but-EMPTY → unreliable here)
+   rd_report × REASON      : prior ★5 → learned ★4  (delivered the WHY → trusted)
+   sharepoint × DECISION   : decision logged with no reason → LOW_CONFIDENCE
+
+OUTPUT 3 — NEXT SEARCH ROUTE CHANGED
+   "REASON":  before (prior) → weekly  →  after learning → דו"ח מו"פ
+   "MEASUREMENT": lab sheet no longer trusted blindly — it was empty every time
+```
+
+The lab sheet stays the *natural* home for a strength number but loses trust **because in Fresco's episodes it was empty every time** — `מקור טבעי ≠ מקור אמין בפועל`, learned automatically rather than declared.
+
+## 8. Status & next
+
+- Built & runnable: `sources.mjs` (Source Map), `trust.mjs` (Trust Engine, Beta-calibrated, 4-outcome `observe`), `router.mjs` (Knowledge Flow + "where to look" + complementary-coverage), `episode-bridge.mjs` (Episode Builder → `observe()`), `demo.mjs` + `demo-learn.mjs`.
+- Next (opt-in): per-source-**instance** trust (not just per-type); time-decay so stale sources lose trust; wire `whereToLook()` into PROTEUS's retrieval loop; add adapters (Teams/Slack/service-desk) as Source-Map rows.
 
 > MATRIYA stops being "a system that centralizes knowledge" and becomes a system that **understands Fresco's knowledge ecology**: which source produces which knowledge, how reliable each is for it, and where to look for the answer *before* starting a new experiment.
