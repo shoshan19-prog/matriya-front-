@@ -13,6 +13,7 @@ import { buildKnowledgeAssets } from '../assets/knowledge-asset.mjs';
 // the order evidence actually arrived (extraction order)
 export const ACQUISITION_ORDER = [
   'טיח תל אביב', 'תרמי', 'INT-TFX', 'MPZ', 'GRANITAL', 'fire-retardant plaster', 'BETONIZE', 'PROTECH A1',
+  'raw-material QC',   // ROI-scouted FIRST_MEASUREMENT for Granulometry (retrieved)
 ];
 
 // Innovation 2 — Surprise Index: evidence that changed the model QUALITATIVELY

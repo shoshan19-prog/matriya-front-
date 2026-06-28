@@ -26,16 +26,18 @@ export function learningPrimitives(events) {
 }
 
 // ── Candidate FUTURE events: specific tests PROTEUS could acquire ────────────
-// Each instantiates a learning-type (→ predicted ΔK from its primitive) and
-// carries a specific cost. ΔK predicted = real (learned); cost = estimate.
+// Each instantiates a learning-type (→ predicted ΔK from its primitive), carries
+// a specific cost, and an `acquisition`: RETRIEVE (data exists, scout fetches) vs
+// GENERATE (data does NOT exist — must run a new lab test). The ROI-scout set
+// these verdicts: FIRST_SIEVE_CURVE was RETRIEVED (now in corpus → removed);
+// SET/CURE and ADHESION are confirmed ABSENT → GENERATE.
 export const CANDIDATE_EVENTS = [
-  { name: 'FIRST_PULL_OFF',        learningType: 'FIRST_MEASUREMENT', asset: 'Adhesion',                    costILS: 1200,  days: 7 },
-  { name: 'FIRST_SET_TIME',        learningType: 'FIRST_MEASUREMENT', asset: 'Set / Cure',                  costILS: 600,   days: 3 },
-  { name: 'FIRST_SIEVE_CURVE',     learningType: 'FIRST_MEASUREMENT', asset: 'Granulometry / Fractions',    costILS: 900,   days: 5 },
-  { name: 'SEM_AFTER_COMPRESSION', learningType: 'MORE_MEASURED',     asset: 'Compression Strength',        costILS: 2500,  days: 14 },
-  { name: 'EN13381_FIRE_RATING',   learningType: 'MORE_MEASURED',     asset: 'Fire Resistance',             costILS: 18000, days: 45 },
-  { name: 'SALT_SPRAY',            learningType: 'MORE_MEASURED',     asset: 'Water Resistance / Moisture',  costILS: 18000, days: 30 },
-  { name: 'FREEZE_THAW',           learningType: 'MORE_MEASURED',     asset: 'Compression Strength',         costILS: 9000,  days: 60 },
+  { name: 'FIRST_SET_TIME',        learningType: 'FIRST_MEASUREMENT', asset: 'Set / Cure',                  costILS: 600,   days: 3,  acquisition: 'GENERATE' },
+  { name: 'FIRST_PULL_OFF',        learningType: 'FIRST_MEASUREMENT', asset: 'Adhesion',                    costILS: 1200,  days: 7,  acquisition: 'GENERATE' },
+  { name: 'SEM_AFTER_COMPRESSION', learningType: 'MORE_MEASURED',     asset: 'Compression Strength',        costILS: 2500,  days: 14, acquisition: 'GENERATE' },
+  { name: 'FREEZE_THAW',           learningType: 'MORE_MEASURED',     asset: 'Compression Strength',         costILS: 9000,  days: 60, acquisition: 'GENERATE' },
+  { name: 'EN13381_FIRE_RATING',   learningType: 'MORE_MEASURED',     asset: 'Fire Resistance',             costILS: 18000, days: 45, acquisition: 'GENERATE' },
+  { name: 'SALT_SPRAY',            learningType: 'MORE_MEASURED',     asset: 'Water Resistance / Moisture',  costILS: 18000, days: 30, acquisition: 'GENERATE' },
 ];
 
 function predict(candidate, primitives) {

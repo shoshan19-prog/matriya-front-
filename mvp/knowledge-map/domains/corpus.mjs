@@ -99,4 +99,11 @@ export const REAL_EPISODES = [
     materials:[mat('antifoam','positive','0.45% removes entrapped air'), mat('thickeners','negative','over-thicken route')] },
   { id:'PT-F', product:'PROTECH A1', domains:[sig(D.FIRE,'measured','Class A1: ISO 1182 ΔT 5.1°C, mass loss 16.4%, 0s flaming; ISO 1716 0.0 MJ/kg')],
     materials:[mat('alkali silicate base','positive','non-combustible <5% organic')] },
+
+  // ── raw-material QC granulometry (FIRST_MEASUREMENT acquired by RETRIEVAL, ROI-scout) ──
+  // Incoming raw-material sieve/PSD QC — real measured granulometry, cross-product.
+  { id:'QC-GR-1', product:'raw-material QC', domains:[sig(D.GRANULOMETRY,'measured','Kfar Giladi 003 sieve curve (0.6→0.025mm) + multi-supplier QC 2021–2024')],
+    materials:[mat('Kfar Giladi aggregate','neutral','sieve %'), mat('Negev Mineralim','neutral',''), mat('Tzmitut','neutral','')] },
+  { id:'QC-GR-2', product:'raw-material QC', domains:[sig(D.GRANULOMETRY,'measured','Malvern laser PSD Dv50 102µm (Dv10 50.6/Dv90 174); Repra-60 sieve table')],
+    materials:[mat('Repra-60 filler','neutral','PSD'), mat('H150 filler','neutral','laser PSD')] },
 ];
