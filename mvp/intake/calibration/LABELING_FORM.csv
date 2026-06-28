@@ -1,0 +1,4 @@
+id,file_name,folder_path,content_snippet,gold_product,gold_version,gold_experiment
+EX1,בדיקת לחיצה.xlsx,בדיקות מעבדה,"MPZ 15 28 יום 14.12.2025 שם לבורנט דוד",MPZ hydraulic line,,
+EX2,Furnace_Report.pdf,Fire,"INT-TFX-044 Version 044 Operator Rachel 2024-03-11",טיח מעכב בעירה,v044,INT-TFX-044
+EX3,IMG_3421.jpg,Photos,"v043",,,

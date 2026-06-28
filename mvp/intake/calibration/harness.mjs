@@ -2,6 +2,7 @@
 //   run:  node harness.mjs   (writes nothing to the graph)
 import { writeFileSync } from 'node:fs';
 import { LABELED } from './labeled-set.mjs';
+import { loadLabeledIfPresent } from './load-labeled.mjs';
 import { normalize } from '../normalizer.mjs';
 import { classify } from '../classifier.mjs';
 import { link } from '../linker.mjs';
@@ -21,9 +22,12 @@ function predict(item, authority = DEFAULT_AUTHORITY) {
   return { id: item.id, gold: item.gold, pred: { product, confidence: +confidence.toFixed(3) }, chain };
 }
 
-const raw = LABELED.map((it) => predict(it));
+const real = loadLabeledIfPresent();
+const LAB = real || LABELED;
+const raw = LAB.map((it) => predict(it));
 console.log('============ KNOWLEDGE IDENTITY ENGINE — CALIBRATION ============');
-console.log(`labeled: ${LABELED.length} (adversarial ${LABELED.filter((i) => i.id.startsWith('A')).length}, true orphans ${LABELED.filter((i) => !i.gold.product).length})\n`);
+console.log(`source: ${real ? 'REAL human labels (labeled-real.csv)' : 'SYNTHETIC fixture (replace with 30–50 real labels)'}`);
+console.log(`labeled: ${LAB.length} (adversarial ${LAB.filter((i) => i.id.startsWith('A')).length}, true orphans ${LAB.filter((i) => !i.gold.product).length})\n`);
 
 const m0 = confusion(raw);
 console.log('— with Authority + Evidence-Chain + Margin —');
@@ -41,7 +45,7 @@ const { authority: learned, changes } = updateAuthority(DEFAULT_AUTHORITY, attri
 console.log('\n— feedback attribution (which entity helped / misled) —');
 changes.sort((a, b) => b.misled - a.misled || b.correct - a.correct).forEach((c) =>
   console.log(`  ${c.type.padEnd(13)} helped ${c.correct}  misled ${c.misled}  → authority ${c.before} → ${c.after}`));
-const after = LABELED.map((it) => predict(it, learned));
+const after = LAB.map((it) => predict(it, learned));
 const m1 = confusion(after);
 console.log(`  after learning: precision ${m0.precision}→${m1.precision}  false-link ${m0.false_link_rate}→${m1.false_link_rate}`);
 
