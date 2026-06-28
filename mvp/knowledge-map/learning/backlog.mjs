@@ -14,14 +14,18 @@ export const PROMOTION_GATE = { episodes: 30, families: 3, productionDecisions: 
 const MIN_SUPPORT = 4;
 
 // ── Evidence ledger: ONLY what has really been reconstructed. ────────────────
-// Today: the טיח תל אביב reconstruction (decision spine EP-01..07), one product
-// family (restoration plaster), one production decision (14.12.2022-002 → bag).
+// After extracting all four planned products (TLV, thermal, INT-TFX, MPZ) from
+// the real Drive corpus. Numbers are the ACTUAL reconstructed yields — not the
+// earlier optimistic projection (INT-TFX yielded 0 production decisions, not 2).
 export const LEDGER = {
-  episodes: 7,
-  families: 1,                 // restoration plaster
-  productionDecisions: 1,      // 14.12.2022-002 approved to bag
+  episodes: 25,                // 7 TLV + 7 thermal + 4 INT-TFX + 7 MPZ
+  families: 3,                 // restoration plaster · intumescent coating · cementitious
+  productionDecisions: 3,      // 1 TLV + 0 thermal + 0 INT-TFX + 2 MPZ
   byProduct: [
-    { product: 'טיח תל אביב', family: 'restoration plaster', episodes: 7, productionDecisions: 1, status: 'started' },
+    { product: 'טיח תל אביב',          family: 'restoration plaster', episodes: 7, productionDecisions: 1, status: 'done' },
+    { product: 'טיח תל אביב תרמי',      family: 'restoration plaster', episodes: 7, productionDecisions: 0, status: 'done (halted product)' },
+    { product: 'INT-TFX',              family: 'intumescent coating', episodes: 4, productionDecisions: 0, status: 'done (Stage-0 dossier, 0 trials run)' },
+    { product: 'MPZ / cementitious',   family: 'cementitious',        episodes: 7, productionDecisions: 2, status: 'done (real strength data)' },
   ],
 };
 
@@ -33,7 +37,7 @@ export const HYPOTHESES = [
     current_support: 1, kind: 'canonical-path' },
   { id: 'OLH-2', source: 'engine',
     statement: 'דילוג על שלב SEM/אפיון-מבנה מעלה את ההסתברות לניסוי חוזר.',
-    current_support: 0, kind: 'step-skip→retrial', note: 'אין ולו Episode אחד עם SEM בקורפוס הנוכחי — לא ניתן לבדוק עדיין.' },
+    current_support: 0, kind: 'step-skip→retrial', note: 'בכל 4 המשפחות SEM נעדר לחלוטין — פרסקו כמעט אף פעם לא מבצעת SEM. ההשערה אינה ניתנת לבדיקה; הממצא עצמו: SEM אינו חלק מהתהליך.' },
   { id: 'OLH-3', source: 'expert',
     statement: 'החלטות שהסתמכו רק על מדידת צמיגות (בלי חוזק) הסתיימו לעיתים קרובות בניסוי נוסף.',
     current_support: 1, kind: 'measurement→outcome', note: 'נצפה בווריאנט התרמי; צריך עוד מקרים.' },
@@ -42,21 +46,30 @@ export const HYPOTHESES = [
     current_support: 1, kind: 'pair→success', note: 'ב-TLV המדידה היתה ריקה — אי-אפשר לאשש את צד-המעבדה.' },
   { id: 'OLH-5', source: 'engine',
     statement: 'מספר הניסויים עד הקפאת פורמולציה מתכנס לטווח אופייני.',
-    current_support: 1, kind: 'trials-to-freeze', note: 'TLV ~15 פיילוטים → נקודת-נתון אחת.' },
+    current_support: 2, kind: 'trials-to-freeze', note: 'TLV ~15 פיילוטים + סדרת מנות MPZ → 2 נקודות.' },
   { id: 'OLH-6', source: 'expert',
     statement: 'החלפת ספק מתרחשת כשבדיקות איכות (ניפוי/COA) מראות חוסר-עקביות בפרקציות.',
-    current_support: 1, kind: 'trigger→action', note: 'צמיתות→כפר גלעדי.' },
+    current_support: 1, kind: 'trigger→action', note: 'צמיתות→כפר גלעדי (TLV). ב-MPZ לא נמצא אירוע החלפת-ספק.' },
   { id: 'OLH-7', source: 'expert',
     statement: 'דילוג על אפיון ספיגת-מים לפני בחירת אגרגט קל → כשל חוזר.',
     current_support: 1, kind: 'step-skip→failure', note: 'שרשרת הכשלים של הווריאנט התרמי.' },
+  { id: 'OLH-8', source: 'engine',
+    statement: 'בקרת תהליך (מים/אשפרה) יכולה להכריע את תוצאת החוזק יותר מהפורמולציה עצמה.',
+    current_support: 1, kind: 'process>formula', note: 'MPZ: אותה פורמולציה, קמפיין דצמבר-2025 ניצח את אפריל בכל דרגה בזכות בקרת מים/אשפרה. אות מדיד — אך משפחה אחת בלבד.' },
+  { id: 'OLH-9', source: 'engine',
+    statement: 'בפרסקו החלטות מתקבלות לרוב לפני שנמדדת התגובה (תהליך "דל-מדידה").',
+    current_support: 3, kind: 'cross-family', note: 'TLV (ריק), תרמי (צפיפות בלבד), INT-TFX (ריק), MPZ (נמדד רק מ-2025) — נצפה ב-4/4 משפחות, אך תיאורי ולא דפוס-החלטה; דורש הגדרת תוצאה ברורה לפני קידום.' },
 ];
 
-// ── Extraction plan to clear the gate (projected episode yield, not invented data). ──
+// ── Extraction plan — ACTUAL yields after all four reconstructions. ──────────
+// The earlier projection (32/3/5) assumed INT-TFX +9ep/+2prod and MPZ +9ep/+2prod.
+// Reality: INT-TFX is a Stage-0 dossier (4 ep / 0 prod), so the real total falls
+// SHORT on episodes and production decisions even though families cleared.
 export const EXTRACTION_PLAN = [
-  { product: 'טיח תל אביב', family: 'restoration plaster', projected_episodes: 7, projected_prod: 1, status: 'done' },
-  { product: 'INT-TFX', family: 'INT-TFX', projected_episodes: 9, projected_prod: 2, status: 'todo' },
-  { product: 'MPZ / חומרים צמנטיים', family: 'cementitious', projected_episodes: 9, projected_prod: 2, status: 'todo' },
-  { product: 'טיח תל אביב תרמי (נעצר)', family: 'restoration plaster', projected_episodes: 7, projected_prod: 0, status: 'todo (halted product — negative knowledge)' },
+  { product: 'טיח תל אביב',          family: 'restoration plaster', projected_episodes: 7, projected_prod: 1, actual_episodes: 7, actual_prod: 1, status: 'done' },
+  { product: 'טיח תל אביב תרמי',      family: 'restoration plaster', projected_episodes: 7, projected_prod: 0, actual_episodes: 7, actual_prod: 0, status: 'done — negative knowledge' },
+  { product: 'INT-TFX',              family: 'intumescent coating', projected_episodes: 9, projected_prod: 2, actual_episodes: 4, actual_prod: 0, status: 'done — Stage-0 dossier, UNDER projection' },
+  { product: 'MPZ / cementitious',   family: 'cementitious',        projected_episodes: 9, projected_prod: 2, actual_episodes: 7, actual_prod: 2, status: 'done — real strength data' },
 ];
 
 const bar = (have, need) => {
@@ -76,13 +89,18 @@ export function assess(ledger = LEDGER) {
     own_support_met: h.current_support >= MIN_SUPPORT,
     status: open ? (h.current_support >= MIN_SUPPORT ? 'READY_TO_PROMOTE' : 'NEEDS_OWN_SUPPORT') : 'BLOCKED_ON_VOLUME',
   }));
-  // projected ledger if the whole plan is executed
-  const projected = EXTRACTION_PLAN.reduce(
-    (a, p) => ({ episodes: a.episodes + p.projected_episodes, prod: a.prod + p.projected_prod,
+  // actual ledger realised after executing the whole plan
+  const actual = EXTRACTION_PLAN.reduce(
+    (a, p) => ({ episodes: a.episodes + p.actual_episodes, prod: a.prod + p.actual_prod,
                  families: new Set([...a.families, p.family]) }),
     { episodes: 0, prod: 0, families: new Set() });
-  return { gate, gate_open: open, hyps,
-    projected: { episodes: projected.episodes, families: projected.families.size, productionDecisions: projected.prod } };
+  const gap = {
+    episodes: Math.max(0, PROMOTION_GATE.episodes - ledger.episodes),
+    families: Math.max(0, PROMOTION_GATE.families - ledger.families),
+    productionDecisions: Math.max(0, PROMOTION_GATE.productionDecisions - ledger.productionDecisions),
+  };
+  return { gate, gate_open: open, hyps, gap,
+    actual: { episodes: actual.episodes, families: actual.families.size, productionDecisions: actual.prod } };
 }
 
 // ── CLI report ───────────────────────────────────────────────────────────────
@@ -99,13 +117,17 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   for (const h of a.hyps)
     console.log(`    ${h.id} [${h.status}]  support ${h.current_support}/${MIN_SUPPORT}  (${h.source})\n        ${h.statement}${h.note ? `\n        ⓘ ${h.note}` : ''}`);
 
-  console.log('\n  EXTRACTION PLAN → projected ledger if executed:');
+  console.log('\n  EXTRACTION PLAN → ACTUAL yield (projection → reality):');
   for (const p of EXTRACTION_PLAN)
-    console.log(`    • ${p.product.padEnd(28)} +${p.projected_episodes} ep / +${p.projected_prod} prod   [${p.status}]`);
-  console.log(`    ── projected total: ${a.projected.episodes} episodes · ${a.projected.families} families · ${a.projected.productionDecisions} production decisions`);
-  const ok = a.projected.episodes >= PROMOTION_GATE.episodes && a.projected.families >= PROMOTION_GATE.families && a.projected.productionDecisions >= PROMOTION_GATE.productionDecisions;
-  console.log(`    ${ok ? '✓ executing the full plan CLEARS the gate.' : '✗ plan still short of the gate.'}`);
+    console.log(`    • ${p.product.padEnd(22)} proj +${p.projected_episodes}ep/+${p.projected_prod}prod → real +${p.actual_episodes}ep/+${p.actual_prod}prod   [${p.status}]`);
+  console.log(`    ── actual total: ${a.actual.episodes} episodes · ${a.actual.families} families · ${a.actual.productionDecisions} production decisions`);
 
-  console.log('\n  Until the gate opens, every row above is an HONEST HYPOTHESIS awaiting volume —');
-  console.log('  not a proven organizational pattern. That restraint is the deliverable.');
+  console.log('\n  REMAINING GAP TO GATE:');
+  console.log(`    episodes              need ${a.gap.episodes} more`);
+  console.log(`    product families      need ${a.gap.families} more  ${a.gap.families === 0 ? '✓ CLEARED' : ''}`);
+  console.log(`    production decisions  need ${a.gap.productionDecisions} more`);
+
+  console.log('\n  Families CLEARED; episodes & production decisions still short → PROMOTION STAYS LOCKED.');
+  console.log('  Every OLH above remains an HONEST HYPOTHESIS. INT-TFX under-delivered (Stage-0 dossier),');
+  console.log('  so reality fell short of the projection — exactly why we count real episodes, not planned ones.');
 }
