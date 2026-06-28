@@ -35,24 +35,30 @@ export const SIGNAL_DOMAINS = {
 
 /**
  * Score a candidate product by how much it would close domain gaps.
- * candidate = { product, signals:{COLOR:true,...}, richness:'rich'|'medium'|'thin'|'none' }
+ * candidate = { product, signals:{COLOR:'measured'|'qualitative'|true, ...},
+ *               richness:'rich'|'medium'|'thin'|'none' }
+ * A MEASURED signal fills an empty domain better than a qualitative one — crucial
+ * when seeding an empty domain (real ΔE color data > a "shade looked off" note).
  */
+const STRENGTH = { measured: 1.0, qualitative: 0.6, true: 0.8 };
+
 export function scoreCandidate(candidate, gaps) {
   const gapOf = Object.fromEntries(gaps.map((g) => [g.domain, g.gap]));
   const richnessMult = { rich: 1, medium: 0.7, thin: 0.4, none: 0 }[candidate.richness] ?? 0.5;
   const filled = [];
   let score = 0;
-  for (const [sigName, on] of Object.entries(candidate.signals || {})) {
-    if (!on) continue;
-    if (sigName === 'PRODUCTION_DECISION') { score += 3; filled.push('production-decision (gate)'); continue; }
+  for (const [sigName, val] of Object.entries(candidate.signals || {})) {
+    if (!val) continue;
+    if (sigName === 'PRODUCTION_DECISION') { score += 3; filled.push('production-decision (gate +3)'); continue; }
+    const s = STRENGTH[val] ?? STRENGTH.true;
     for (const d of SIGNAL_DOMAINS[sigName] || []) {
-      const g = gapOf[d] ?? 3;
+      const g = (gapOf[d] ?? 3) * s;
       score += g;
-      filled.push(`${d} (+${g})`);
+      filled.push(`${d} (+${g.toFixed(1)}${val === 'measured' ? ' measured' : val === 'qualitative' ? ' qual' : ''})`);
     }
   }
   return { product: candidate.product, score: +(score * richnessMult).toFixed(1),
-    raw: score, richness: candidate.richness, fills: filled };
+    raw: +score.toFixed(1), richness: candidate.richness, fills: filled };
 }
 
 export function selectNextExtraction(candidates, gaps) {
