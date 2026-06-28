@@ -11,14 +11,15 @@ import { productForEntity, REGISTRY } from './registry.mjs';
 
 const noisyOR = (ws) => 1 - ws.reduce((a, w) => a * (1 - w), 1);
 
-export function resolve(entities, registry = REGISTRY) {
+export function resolve(entities, registry = REGISTRY, typeReliability = {}) {
   const cand = new Map(); // product -> [{via, weight}]
   for (const e of entities) {
     const p = productForEntity(e.type, e.value, registry);
     if (!p) continue;
-    // registry-confirmed evidence: take the stronger of the signal weight and the relationship weight
-    const weight = Math.max(e.weight, SIGNAL_WEIGHT.relationship);
-    const arr = cand.get(p.name) || []; arr.push({ via: `${e.type}=${e.value} (${e.signal}+relationship)`, weight }); cand.set(p.name, arr);
+    // registry-confirmed evidence: stronger of signal/relationship weight, scaled by
+    // how reliable this ENTITY TYPE has proven to be (improvement #2; default 1).
+    const weight = Math.max(e.weight, SIGNAL_WEIGHT.relationship) * (typeReliability[e.type] ?? 1);
+    const arr = cand.get(p.name) || []; arr.push({ via: `${e.type}=${e.value} (${e.signal}+relationship)`, weight, type: e.type }); cand.set(p.name, arr);
   }
 
   const scored = [...cand.entries()].map(([name, ev]) => {

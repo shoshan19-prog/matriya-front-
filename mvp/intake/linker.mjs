@@ -15,10 +15,10 @@ import { REGISTRY } from './registry.mjs';
  * are optional parsed text (xlsx text, PDF text, OCR of an image). Without them the
  * resolver still tries name+path, and honestly reports low/zero confidence.
  */
-export function link(doc, { content = null, metadata = null } = {}, registry = REGISTRY) {
+export function link(doc, { content = null, metadata = null } = {}, registry = REGISTRY, typeReliability = {}) {
   const signals = { name: doc.name, path: doc.source?.path, content, metadata };
   const entities = extractEntities(signals);
-  const res = resolve(entities, registry);
+  const res = resolve(entities, registry, typeReliability);
 
   doc.identity = {
     entities: entities.map((e) => ({ type: e.type, value: e.value, signal: e.signal })),
