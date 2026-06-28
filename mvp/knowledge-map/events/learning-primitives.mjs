@@ -37,6 +37,8 @@ export const CANDIDATE_EVENTS = [
   { name: 'SEM_AFTER_COMPRESSION', learningType: 'MORE_MEASURED',     asset: 'Compression Strength',        costILS: 2500,  days: 14, acquisition: 'GENERATE' },
   { name: 'FREEZE_THAW',           learningType: 'MORE_MEASURED',     asset: 'Compression Strength',         costILS: 9000,  days: 60, acquisition: 'GENERATE' },
   { name: 'EN13381_FIRE_RATING',   learningType: 'MORE_MEASURED',     asset: 'Fire Resistance',             costILS: 18000, days: 45, acquisition: 'GENERATE' },
+  { name: 'FIRE_CONE_CALORIMETER', learningType: 'MORE_MEASURED',     asset: 'Fire Resistance',             costILS: 3000,  days: 10, acquisition: 'GENERATE' },
+  { name: 'COLOR_QUV_WEATHERING',  learningType: 'MORE_MEASURED',     asset: 'Color / Shade',                costILS: 2500,  days: 21, acquisition: 'GENERATE' },
   { name: 'SALT_SPRAY',            learningType: 'MORE_MEASURED',     asset: 'Water Resistance / Moisture',  costILS: 18000, days: 30, acquisition: 'GENERATE' },
 ];
 

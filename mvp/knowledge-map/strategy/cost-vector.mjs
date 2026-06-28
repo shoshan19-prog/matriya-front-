@@ -12,6 +12,8 @@ export const COST_VECTORS = {
   SEM_AFTER_COMPRESSION: { ils: 2500,  days: 14, technicians: 1, equipment: 'SEM',                 external: true  },
   FREEZE_THAW:           { ils: 9000,  days: 60, technicians: 1, equipment: 'Climate chamber',     external: false },
   EN13381_FIRE_RATING:   { ils: 18000, days: 45, technicians: 2, equipment: 'Fire furnace',        external: true  },
+  FIRE_CONE_CALORIMETER: { ils: 3000,  days: 10, technicians: 1, equipment: 'Cone calorimeter',    external: true  },
+  COLOR_QUV_WEATHERING:  { ils: 2500,  days: 21, technicians: 1, equipment: 'QUV chamber',         external: false },
   SALT_SPRAY:            { ils: 18000, days: 40, technicians: 2, equipment: 'Salt-spray chamber',  external: true  },
 };
 
