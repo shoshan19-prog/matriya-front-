@@ -1,0 +1,47 @@
+// Knowledge Events — the atom of learning.   run: node demo.mjs
+// Events compose Transformations; Learning Primitives emerge from events.
+
+import { REAL_EPISODES } from '../domains/corpus.mjs';
+import { buildKnowledgeEvents, renderEventCard } from './event.mjs';
+import { learningPrimitives, rankEventsByROI, eventPortfolio } from './learning-primitives.mjs';
+
+const events = buildKnowledgeEvents(REAL_EPISODES);
+
+console.log('═══ KNOWLEDGE EVENTS — the atom (Transformations are composed of these) ═══\n');
+console.log(`  ${events.length} events derived from the real acquisition.\n`);
+console.log('  id      type                      asset                     ΔK     cost     decision  ROI/₪1k');
+for (const e of events)
+  console.log(`  ${e.id}  ${e.type.padEnd(24)} ${e.asset.padEnd(24)} ${(e.dK>=0?'+':'')}${e.dK.toFixed(2)}  ₪${String(e.costILS).padStart(5)}   ${e.decisionChanged?'YES ':'  · '}     ${e.roiPer1k}`);
+
+console.log('\n═══ ONE EVENT CARD (the atom, in full) ═══\n');
+const big = [...events].sort((a, b) => b.dK - a.dK)[0];
+console.log(renderEventCard(big).split('\n').map((l) => '  ' + l).join('\n'));
+
+console.log('\n═══ LEARNING PRIMITIVES — laws of LEARNING (not of materials) ═══\n');
+const prims = learningPrimitives(events);
+console.log('  type                      n   avg ΔK   avg cost   ROI/₪1k   decision-rate');
+for (const p of prims)
+  console.log(`  ${p.type.padEnd(24)} ${String(p.n).padStart(2)}   ${p.avgDK>=0?'+':''}${p.avgDK.toFixed(3)}    ₪${String(p.avgCostILS).padStart(5)}    ${String(p.roiPer1k).padStart(5)}     ${p.decisionRate}`);
+console.log('\n  e.g. "FIRST_MEASUREMENT, repeated 4×, avg ΔK 0.46" — a learning law, observed not assumed.');
+
+console.log('\n═══ EFFICIENCY 1 — COST-AWARE ACQUISITION (rank events by ΔK per ₪, not raw ΔK) ═══\n');
+const byRoi = rankEventsByROI(prims);
+console.log('  event                      asset                     predicted ΔK   cost      ROI/₪1k');
+for (const e of byRoi)
+  console.log(`  ${e.name.padEnd(24)} ${e.asset.padEnd(24)} ${e.predictedDK.toFixed(3)}        ₪${String(e.costILS).padStart(6)}   ${e.roiPer1k}`);
+const top = byRoi[0];
+console.log(`\n  ▶ PROTEUS recommends an EVENT: ${top.name}  (ΔK≈${top.predictedDK.toFixed(2)}, ₪${top.costILS}, ROI ${top.roiPer1k}) — PENDING HUMAN APPROVAL`);
+console.log('    not "acquire document", not "acquire product" — acquire the EVENT with the best knowledge-per-shekel.');
+console.log(`    contrast: SALT_SPRAY would cost ₪18,000 for ΔK≈0.12 (ROI ${byRoi.find(e=>e.name==='SALT_SPRAY').roiPer1k}); PULL_OFF wins.`);
+
+console.log('\n═══ EFFICIENCY 2 — BUDGET-CONSTRAINED EVENT PORTFOLIO (max ΣΔK under budget) ═══\n');
+for (const budget of [3000, 6000]) {
+  const port = eventPortfolio(prims, budget);
+  console.log(`  budget ₪${budget}: pick {${port.chosen.map((e) => e.name).join(', ')}}  → spend ₪${port.spendILS}, expected ΣΔK ≈ ${port.expectedDKtotal}`);
+}
+console.log('\n  PROTEUS plans an R&D portfolio, not one test — maximizing knowledge gained per budget.');
+
+console.log('\n────────────────────────────────────────────────────────────────────────');
+console.log('The core is no longer a Knowledge Graph but a SCIENTIFIC LEARNING GRAPH:');
+console.log('nodes include Learning Events. Knowledge Gain = Σ Event Gain; Laws are the');
+console.log('repeated Learning Primitives. PROTEUS acquires the most cost-effective EVENT.');
