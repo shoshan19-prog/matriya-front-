@@ -14,6 +14,8 @@ import { buildKnowledgeAssets } from '../assets/knowledge-asset.mjs';
 export const ACQUISITION_ORDER = [
   'טיח תל אביב', 'תרמי', 'INT-TFX', 'MPZ', 'GRANITAL', 'fire-retardant plaster', 'BETONIZE', 'PROTECH A1',
   'raw-material QC',   // ROI-scouted FIRST_MEASUREMENT for Granulometry (retrieved)
+  // RETRIEVE scout "more of the good and known" — additional existing measured evidence
+  'concrete densifiers', 'field-stone QC', 'F.SILICATO', 'MP-1000 primer', 'CC primer', 'Sloxan/LASUR',
 ];
 
 // Innovation 2 — Surprise Index: evidence that changed the model QUALITATIVELY

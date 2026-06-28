@@ -21,19 +21,21 @@ The index is **inverted**: knowledge stops being organized around *what we made*
 
 `node mvp/knowledge-map/domains/demo.mjs` — every tag is traceable to a `docs/PRODUCT_STORY_*.md` episode; nothing is invented, so the numbers are honestly thin:
 
-*Updated after 8 extractions (4 original + GRANITAL, fire-plaster, BETONIZE, PROTECH A1). Numbers are real.*
+*Updated after 8 extractions + 2 retrieval iterations (Granulometry, then "more of the good and known"). Numbers are real.*
 
-| Domain | Evidence | Products | Episodes | Measured | Status |
+| Domain | Evidence | Products | Measured | Confidence | Status |
 |--------|:--------:|:--------:|:--------:|:--------:|--------|
-| Workability / Flow | 28 | 5 | 18 | 10 | **Mature** |
-| Color / Shade | 14 | 3 | 11 | 3 | **Mature** ← was Empty |
-| Compression Strength | 9 | 1 | 5 | 4 | Partial |
-| Fire Resistance | 9 | 3 | 7 | 2 | Growing |
-| Water Resistance / Moisture | 8 | 3 | 6 | 2 | Growing |
-| Adhesion | 6 | 2 | 6 | 0 | Growing |
-| Density | 4 | 2 | 2 | 2 | Partial |
-| Granulometry / Fractions | 2 | 2 | 2 | 0 | Partial |
-| Set / Cure | 2 | 1 | 2 | 0 | Partial |
+| Compression Strength | 15 | 3 | 7 | 0.94 | **Mature** ← was 1-product Partial |
+| Density | 10 | 5 | 5 | 0.93 | **Mature** |
+| Workability / Flow | 34 | 8 | 13 | 0.81 | **Mature** |
+| Color / Shade | 16 | 4 | 4 | 0.67 | Mature |
+| Granulometry / Fractions | 6 | 3 | 2 | 0.65 | Partial |
+| Fire Resistance | 9 | 3 | 2 | 0.62 | Growing |
+| Water Resistance / Moisture | 8 | 3 | 2 | 0.62 | Growing |
+| **Adhesion** | 6 | 2 | **0** | **0.35** | Growing — *GENERATE gap* |
+| **Set / Cure** | 2 | 1 | **0** | **0.15** | Partial — *GENERATE gap* |
+
+**The RETRIEVE class is now nearly exhausted.** "More of the good and known" lifted Compression (2nd + 3rd real sources → 1-product Partial to **Mature 0.94**) and Density (**0.93**). What stays weak — **Adhesion and Set/Cure, both 0 measured** — is exactly the data that *does not exist* and must be **generated** by experiment (confirmed by the ROI scout). The knowledge frontier has shifted from retrieval to the lab.
 
 *Evidence weight: `measured = 2 · qualitative = 1 · empty = 0`.* The aspirational "Mature" table from the proposal is now **partly real**: gap-/gain-driven extraction took Color from Empty → **Mature** (3 products, measured ΔE) and built Workability into the most-grounded domain (5 products, 10 measured). The standout remaining weakness is **Adhesion** — well-*covered* (6 episodes, 2 products) but **0 measured** → low density (see Knowledge Density in `KNOWLEDGE_ACQUISITION_OPTIMIZATION.md`); a *measured-adhesion* source is the next high-value target.
 

@@ -106,4 +106,26 @@ export const REAL_EPISODES = [
     materials:[mat('Kfar Giladi aggregate','neutral','sieve %'), mat('Negev Mineralim','neutral',''), mat('Tzmitut','neutral','')] },
   { id:'QC-GR-2', product:'raw-material QC', domains:[sig(D.GRANULOMETRY,'measured','Malvern laser PSD Dv50 102µm (Dv10 50.6/Dv90 174); Repra-60 sieve table')],
     materials:[mat('Repra-60 filler','neutral','PSD'), mat('H150 filler','neutral','laser PSD')] },
+
+  // ── RETRIEVE scout "more of the good and known" — additional EXISTING measured evidence ──
+  // Compression 2nd source (NEW family): silicate-treated concrete cubes, real MPa matrix.
+  { id:'CD-01', product:'concrete densifiers', domains:[sig(D.COMPRESSION,'measured','silicate-treated concrete cubes 18–36 MPa: Top-Inhibitor-820, Haddener-313, Consolidator CFC-120, FCI-500 ×2 sols ×2 dates')],
+    materials:[mat('Betol KS 402 sol','neutral','K-silicate'), mat('Levasil CC401 sol','neutral','sol-silica')] },
+  { id:'CD-02', product:'concrete densifiers', domains:[sig(D.COMPRESSION,'measured','untreated reference cube ~26 MPa vs sol-treated comparison')],
+    materials:[] },
+  // Compression 3rd source: field stone QC.
+  { id:'FS-01', product:'field-stone QC', domains:[sig(D.COMPRESSION,'measured','ziv-ziv+cement 10cm cube 24.12 kN → 2.41 MPa (CT-DA3000)')],
+    materials:[] },
+  // F.SILICATO (silicate sibling): measured viscosity + density.
+  { id:'FS2-01', product:'F.SILICATO', domains:[sig(D.WORKABILITY,'measured','9-formula viscosity dev 11.4k–45.5k cps + 50°C oven series'), sig(D.DENSITY,'measured','s.g. 1.29–1.41 g/cm³')],
+    materials:[mat('thickeners','neutral','viscosity tuning')] },
+  // MP-1000 primer (NEW family: primer): measured viscosity + density.
+  { id:'MP-01', product:'MP-1000 primer', domains:[sig(D.WORKABILITY,'measured','oven cps series -007..-011 SPD-4 6/12/30/60'), sig(D.DENSITY,'measured','s.g. 1.327 g/cm³, PH 12.1–12.4')],
+    materials:[] },
+  // CC primer: measured viscosity + density.
+  { id:'CC-01', product:'CC primer', domains:[sig(D.WORKABILITY,'measured','oven cps 8614/4720/2221/1301'), sig(D.DENSITY,'measured','s.g. 1.47 g/cm³')],
+    materials:[] },
+  // Color depth: measured ΔE across more substrates (Sloxan/LASUR/Italian/Acryl-Plus).
+  { id:'SX-01', product:'Sloxan/LASUR', domains:[sig(D.COLOR,'measured','measured ΔE deck-matches (Tinting log) across Sloxan/LASUR/Italian/Acryl-Plus vs Weber/KEIM/Tambour/Nirlat')],
+    materials:[mat('OC pigment','positive',''), mat('RO pigment','positive','')] },
 ];
