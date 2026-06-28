@@ -90,10 +90,26 @@ A clear structural boundary between the **existing corpus** and the **research f
 
 The Frontier adds no new engine; it adds the ability to **explain why** the acquisition engine stops searching and starts generating — the governance boundary that must exist before promoting Scientific Laws.
 
+## Retrieval round on the RETRIEVE_AVAILABLE frontier (the law in action)
+
+Per the law, a scout was sent **only** to the two RETRIEVE_AVAILABLE assets (not to the exhausted or generate-only ones):
+
+- **Granulometry:** captured the multi-supplier QC file (3 suppliers + 7 material PSDs) → confidence 0.65 → **0.78**, and the scout confirmed it is now **near-exhausted** — every corpus sieve table is in. But all of it is *raw-material* QC; *finished-product* PSD was never measured. So Granulometry flips to **RETRIEVE_COMPLETE**, and its remaining frontier is **GENERATE** (finished-product PSD).
+- **Color:** captured the spectro **DE2000 / L\*a\*b\*** layer (440 measured records) + 3 more product substrates → 4 → **7 products, confidence 0.73**. Still **RETRIEVE_AVAILABLE** (the most untapped depth in the corpus).
+
+The frontier has now shifted decisively:
+```
+RETRIEVE_AVAILABLE : Color (only one left)
+RETRIEVE_COMPLETE  : Compression · Density · Workability · Granulometry
+GENERATE_REQUIRED  : Adhesion · Set/Cure
+EXTERNAL_ONLY      : Fire · Water
+```
+Exactly as the structural law predicts: as the corpus is consumed, the frontier moves from retrieval toward generation. One more Color pass and the RETRIEVE class closes entirely — after which **all** new knowledge must be *generated* or *sourced externally*.
+
 ## Status & next
 
 - Built & runnable: `frontier.mjs` (4 frontier types · `retrievalSaturated` law · `classifyFrontier` · `frontierStatus` · `lawStatement`), `demo.mjs`.
-- Real classification from the live corpus + transformation history; every `RETRIEVE_COMPLETE` is justified by computed headroom/ΔK decline.
+- Real classification from the live corpus + transformation history; every `RETRIEVE_COMPLETE` is justified by computed headroom/ΔK decline or a confirmed exhaustion verdict.
 - Next (opt-in): retrieve the still-available frontier (Color ΔE depth, Granulometry tables); route GENERATE_REQUIRED assets to the lab-emitter (pull-off, Vicat) under approval; route EXTERNAL_ONLY assets to standards/external labs; surface Frontier Status in every PROTEUS recommendation.
 
 > The Knowledge Frontier turns "we don't know X" into "we don't know X **because** the data must be *generated* / *retrieved* / *sourced externally* / *is closed*". It is the structural boundary between the corpus and the research frontier — and the last governance layer before knowledge becomes Law.

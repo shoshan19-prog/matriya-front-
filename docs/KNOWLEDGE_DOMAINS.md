@@ -25,15 +25,15 @@ The index is **inverted**: knowledge stops being organized around *what we made*
 
 | Domain | Evidence | Products | Measured | Confidence | Status |
 |--------|:--------:|:--------:|:--------:|:--------:|--------|
-| Compression Strength | 15 | 3 | 7 | 0.94 | **Mature** ← was 1-product Partial |
-| Density | 10 | 5 | 5 | 0.93 | **Mature** |
-| Workability / Flow | 34 | 8 | 13 | 0.81 | **Mature** |
-| Color / Shade | 16 | 4 | 4 | 0.67 | Mature |
-| Granulometry / Fractions | 6 | 3 | 2 | 0.65 | Partial |
-| Fire Resistance | 9 | 3 | 2 | 0.62 | Growing |
-| Water Resistance / Moisture | 8 | 3 | 2 | 0.62 | Growing |
-| **Adhesion** | 6 | 2 | **0** | **0.35** | Growing — *GENERATE gap* |
-| **Set / Cure** | 2 | 1 | **0** | **0.15** | Partial — *GENERATE gap* |
+| Compression Strength | 15 | 3 | 7 | 0.94 | **Mature** · RETRIEVE_COMPLETE |
+| Density | 10 | 5 | 5 | 0.93 | **Mature** · RETRIEVE_COMPLETE |
+| Workability / Flow | 34 | 8 | 13 | 0.81 | **Mature** · RETRIEVE_COMPLETE |
+| Granulometry / Fractions | 10 | 3 | 4 | 0.78 | Partial · RETRIEVE_COMPLETE |
+| Color / Shade | 22 | 7 | 7 | 0.73 | Mature · *RETRIEVE_AVAILABLE* |
+| Fire Resistance | 9 | 3 | 2 | 0.62 | Growing · EXTERNAL_ONLY |
+| Water Resistance / Moisture | 8 | 3 | 2 | 0.62 | Growing · EXTERNAL_ONLY |
+| **Adhesion** | 6 | 2 | **0** | **0.35** | *GENERATE_REQUIRED* |
+| **Set / Cure** | 2 | 1 | **0** | **0.15** | *GENERATE_REQUIRED* |
 
 **The RETRIEVE class is now nearly exhausted.** "More of the good and known" lifted Compression (2nd + 3rd real sources → 1-product Partial to **Mature 0.94**) and Density (**0.93**). What stays weak — **Adhesion and Set/Cure, both 0 measured** — is exactly the data that *does not exist* and must be **generated** by experiment (confirmed by the ROI scout). The knowledge frontier has shifted from retrieval to the lab.
 

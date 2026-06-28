@@ -24,8 +24,8 @@ const VERDICT = {
   'Set / Cure':                  { kind: 'GENERATE_REQUIRED', reason: '0 measured set-time/Vicat; corpus scanned, none exists', action: 'Run first Vicat / set-time test' },
   'Fire Resistance':             { kind: 'EXTERNAL_ONLY', reason: 'only a 2-min internal burner screen; no standardized rating', action: 'EN 13381-4 / ASTM via external lab' },
   'Water Resistance / Moisture': { kind: 'EXTERNAL_ONLY', reason: 'no w-value / salt-spray measured internally', action: 'EN 1062-3 / salt-spray via external lab' },
-  'Color / Shade':               { kind: 'RETRIEVE_AVAILABLE', reason: 'more measured ΔE records exist (Tinting log ~115) beyond captured', action: 'Retrieve remaining ΔE records' },
-  'Granulometry / Fractions':    { kind: 'RETRIEVE_AVAILABLE', reason: 'more supplier sieve/PSD tables exist in the corpus', action: 'Retrieve remaining sieve tables' },
+  'Color / Shade':               { kind: 'RETRIEVE_AVAILABLE', reason: 'untapped depth remains — spectro DE2000 layer (440 records) + finer per-product breakdown', action: 'Retrieve remaining ΔE / DE2000 records' },
+  'Granulometry / Fractions':    { kind: 'RETRIEVE_COMPLETE', reason: 'all corpus sieve tables captured (raw-material QC, 3 suppliers + 7 materials); finished-product PSD was never measured', action: 'No further retrieval — finished-product PSD would require GENERATE' },
 };
 
 const EXPECTED_DK = { GENERATE_REQUIRED: 'high', EXTERNAL_ONLY: 'high (costly)', RETRIEVE_AVAILABLE: 'medium', RETRIEVE_COMPLETE: 'low', CLOSED: 'none' };
@@ -56,7 +56,7 @@ export function classifyFrontier(assets, transformations) {
     const v = VERDICT[a.name];
     const sat = retrievalSaturated(a.name, transformations, a.confidence);
     let kind, reason, action;
-    if (v && (v.kind === 'GENERATE_REQUIRED' || v.kind === 'EXTERNAL_ONLY')) {
+    if (v && (v.kind === 'GENERATE_REQUIRED' || v.kind === 'EXTERNAL_ONLY' || v.kind === 'RETRIEVE_COMPLETE')) {
       ({ kind, reason, action } = v);
     } else if (v && v.kind === 'RETRIEVE_AVAILABLE' && !sat.saturated) {
       ({ kind, reason, action } = v);

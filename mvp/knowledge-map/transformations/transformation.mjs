@@ -16,6 +16,8 @@ export const ACQUISITION_ORDER = [
   'raw-material QC',   // ROI-scouted FIRST_MEASUREMENT for Granulometry (retrieved)
   // RETRIEVE scout "more of the good and known" — additional existing measured evidence
   'concrete densifiers', 'field-stone QC', 'F.SILICATO', 'MP-1000 primer', 'CC primer', 'Sloxan/LASUR',
+  // Frontier RETRIEVE_AVAILABLE round — Color & Granulometry depth
+  'spectro QC', 'Italian/Acryl-Plus',
 ];
 
 // Innovation 2 — Surprise Index: evidence that changed the model QUALITATIVELY

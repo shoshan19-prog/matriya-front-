@@ -126,6 +126,18 @@ export const REAL_EPISODES = [
   { id:'CC-01', product:'CC primer', domains:[sig(D.WORKABILITY,'measured','oven cps 8614/4720/2221/1301'), sig(D.DENSITY,'measured','s.g. 1.47 g/cm³')],
     materials:[] },
   // Color depth: measured ΔE across more substrates (Sloxan/LASUR/Italian/Acryl-Plus).
-  { id:'SX-01', product:'Sloxan/LASUR', domains:[sig(D.COLOR,'measured','measured ΔE deck-matches (Tinting log) across Sloxan/LASUR/Italian/Acryl-Plus vs Weber/KEIM/Tambour/Nirlat')],
+  { id:'SX-01', product:'Sloxan/LASUR', domains:[sig(D.COLOR,'measured','measured ΔE deck-matches (Tinting log): Sloxan 76 rows 0.22–2.06, LASUR 1.74–1.94')],
     materials:[mat('OC pigment','positive',''), mat('RO pigment','positive','')] },
+
+  // ── Frontier RETRIEVE_AVAILABLE round — Color & Granulometry depth (scout-verified) ──
+  // Color: the spectro DE2000/L*a*b* layer — a wholly new 440-record measured source.
+  { id:'SP-01', product:'spectro QC', domains:[sig(D.COLOR,'measured','spectrophotometer DE2000 + L*a*b*: 440 measured records (0.01–21.75, median 1.74)')],
+    materials:[] },
+  { id:'SX-02', product:'F.SILICATO', domains:[sig(D.COLOR,'measured','measured ΔE (Tinting): F-Silicato 0.58–0.70')], materials:[] },
+  { id:'SX-03', product:'Italian/Acryl-Plus', domains:[sig(D.COLOR,'measured','measured ΔE (Tinting): Italian 0.73–1.67, Acryl-Plus 0.85')], materials:[] },
+  // Granulometry: multi-supplier QC programs + material PSDs (near-exhausts the asset).
+  { id:'QC-GR-3', product:'raw-material QC', domains:[sig(D.GRANULOMETRY,'measured','3 supplier QC programs: Kfar Giladi, Negev Mineralim (סידנית 0.6:34.58%), Tzmitut (25.09.24 0.125:43.41%) — dated sieve %')],
+    materials:[mat('Negev Mineralim','neutral',''), mat('Tzmitut','neutral','')] },
+  { id:'QC-GR-4', product:'raw-material QC', domains:[sig(D.GRANULOMETRY,'measured','7 material PSDs: Webber Dry, Misterfix, glass sand, perlite 75–300µm, Carolith 0.5–1.0, Remmeres, ripara60+')],
+    materials:[mat('perlite','neutral',''), mat('glass sand','neutral',''), mat('CAROLITH','neutral','')] },
 ];
