@@ -6,17 +6,17 @@
 
 ## Promotion gate — nothing is promoted until ALL three clear
 
-*Updated after the gap-driven 5th extraction (GRANITAL — silicate paint, seeds the Color domain).*
+*Updated after 8 gap-/gain-driven extractions (TLV · thermal · INT-TFX · MPZ · GRANITAL · fire-plaster · BETONIZE · PROTECH A1).*
 
 ```
-episodes              [████████████████████]  32/30   ✓  CLEARED
-product families      [████████████████████]   4/3    ✓  CLEARED
-production decisions  [████████████████░░░░]   4/5    ✗  (need 1 more)
+episodes              [████████████████████]  50/30   ✓  CLEARED
+product families      [████████████████████]   5/3    ✓  CLEARED
+production decisions  [████████████████████]   8/5    ✓  CLEARED
 
-VERDICT: PROMOTION LOCKED — one production decision short of opening the gate
+VERDICT: GATE OPEN — promotion allowed per-hypothesis
 ```
 
-**Two of three gates now cleared.** GRANITAL was chosen by *domain gap* (not by name) and pushed episodes past 30 and families past 3 while seeding the empty Color domain. Only one more real go-to-production decision stands between the corpus and `GATE OPEN`.
+**All three gates cleared — the gate is OPEN.** But opening the gate is a *precondition*, not a promotion: each hypothesis still needs its own ≥4 support, in ≥2 families, with a real effect size, and a human sign-off (the 5-step protocol below). Today every OLH is still `NEEDS_OWN_SUPPORT` — the closest is **OLH-8** (process > formula, 2 families). So the corpus is now large enough to *test* patterns; none is yet *proven*.
 
 The gate is a **global precondition**: even a hypothesis that reached its own support threshold may not be promoted while the corpus as a whole is this thin. Numbers reflect only Episodes actually reconstructed — nothing is invented.
 

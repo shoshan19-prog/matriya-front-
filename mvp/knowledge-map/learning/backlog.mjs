@@ -18,15 +18,18 @@ const MIN_SUPPORT = 4;
 // the real Drive corpus. Numbers are the ACTUAL reconstructed yields — not the
 // earlier optimistic projection (INT-TFX yielded 0 production decisions, not 2).
 export const LEDGER = {
-  episodes: 32,                // 7 TLV + 7 thermal + 4 INT-TFX + 7 MPZ + 7 GRANITAL
-  families: 4,                 // restoration plaster · intumescent coating · cementitious · silicate paint
-  productionDecisions: 4,      // 1 TLV + 0 thermal + 0 INT-TFX + 2 MPZ + 1 GRANITAL
+  episodes: 50,                // 7+7+4+7+7 + 5 fire-plaster + 7 BETONIZE + 6 PROTECH
+  families: 5,                 // restoration plaster · intumescent coating · cementitious · silicate coatings · SFRM fire plaster
+  productionDecisions: 8,      // 1 TLV + 2 MPZ + 1 GRANITAL + 0 fire-plaster + 2 BETONIZE + 2 PROTECH
   byProduct: [
     { product: 'טיח תל אביב',          family: 'restoration plaster', episodes: 7, productionDecisions: 1, status: 'done' },
     { product: 'טיח תל אביב תרמי',      family: 'restoration plaster', episodes: 7, productionDecisions: 0, status: 'done (halted product)' },
     { product: 'INT-TFX',              family: 'intumescent coating', episodes: 4, productionDecisions: 0, status: 'done (Stage-0 dossier, 0 trials run)' },
     { product: 'MPZ / cementitious',   family: 'cementitious',        episodes: 7, productionDecisions: 2, status: 'done (real strength data)' },
-    { product: 'GRANITAL',             family: 'silicate paint',      episodes: 7, productionDecisions: 1, status: 'done (gap-driven: seeds Color domain, measured ΔE)' },
+    { product: 'GRANITAL',             family: 'silicate coatings',   episodes: 7, productionDecisions: 1, status: 'done (gap-driven: seeds Color domain, measured ΔE)' },
+    { product: 'fire-retardant plaster', family: 'SFRM fire plaster', episodes: 5, productionDecisions: 0, status: 'done (2nd Fire source, thin; 2nd measured Density)' },
+    { product: 'BETONIZE 2030',        family: 'silicate coatings',   episodes: 7, productionDecisions: 2, status: 'done (2nd Color source qual; measured Workability)' },
+    { product: 'PROTECH A1',           family: 'silicate coatings',   episodes: 6, productionDecisions: 2, status: 'done (measured Workability + measured Fire A1)' },
   ],
 };
 
@@ -41,7 +44,7 @@ export const HYPOTHESES = [
     current_support: 0, kind: 'step-skip→retrial', note: 'בכל 4 המשפחות SEM נעדר לחלוטין — פרסקו כמעט אף פעם לא מבצעת SEM. ההשערה אינה ניתנת לבדיקה; הממצא עצמו: SEM אינו חלק מהתהליך.' },
   { id: 'OLH-3', source: 'expert',
     statement: 'החלטות שהסתמכו רק על מדידת צמיגות (בלי חוזק) הסתיימו לעיתים קרובות בניסוי נוסף.',
-    current_support: 1, kind: 'measurement→outcome', note: 'נצפה בווריאנט התרמי; צריך עוד מקרים.' },
+    current_support: 3, kind: 'measurement→outcome', note: 'תרמי + BETONIZE 2030-B (קרישה→retrial) + GRANITAL/PROTECH (צמיגות תנור→retrial). מתקרב לסף.' },
   { id: 'OLH-4', source: 'expert',
     statement: 'שילוב משוב שטח + תוצאת מעבדה לפני שינוי פורמולציה → שיעור הצלחה גבוה יותר.',
     current_support: 1, kind: 'pair→success', note: 'ב-TLV המדידה היתה ריקה — אי-אפשר לאשש את צד-המעבדה.' },
@@ -55,11 +58,11 @@ export const HYPOTHESES = [
     statement: 'דילוג על אפיון ספיגת-מים לפני בחירת אגרגט קל → כשל חוזר.',
     current_support: 1, kind: 'step-skip→failure', note: 'שרשרת הכשלים של הווריאנט התרמי.' },
   { id: 'OLH-8', source: 'engine',
-    statement: 'בקרת תהליך (מים/אשפרה) יכולה להכריע את תוצאת החוזק יותר מהפורמולציה עצמה.',
-    current_support: 1, kind: 'process>formula', note: 'MPZ: אותה פורמולציה, קמפיין דצמבר-2025 ניצח את אפריל בכל דרגה בזכות בקרת מים/אשפרה. אות מדיד — אך משפחה אחת בלבד.' },
+    statement: 'בקרת תהליך (מים/אשפרה/אנטי-קצף) יכולה להכריע את תוצאת המוצר יותר מהפורמולציה עצמה.',
+    current_support: 2, kind: 'process>formula', note: 'MPZ (מים/אשפרה ניצחו את הפורמולציה) + PROTECH A1 (אנטי-קצף 162 פתר במקום מסלול המסמיכים). שתי משפחות — המועמדת הקרובה ביותר לקידום; צריך עוד מקרה אחד.' },
   { id: 'OLH-9', source: 'engine',
     statement: 'בפרסקו החלטות מתקבלות לרוב לפני שנמדדת התגובה (תהליך "דל-מדידה").',
-    current_support: 3, kind: 'cross-family', note: 'TLV (ריק), תרמי (צפיפות בלבד), INT-TFX (ריק), MPZ (נמדד רק מ-2025) — נצפה ב-4/4 משפחות, אך תיאורי ולא דפוס-החלטה; דורש הגדרת תוצאה ברורה לפני קידום.' },
+    current_support: 3, kind: 'cross-family', note: 'תקף לתגובת-חוזק בטיח/צמנט (TLV/תרמי/MPZ-מוקדם) אך נסתר במשפחת הצבעים — שם הצמיגות כן נמדדת (BETONIZE/PROTECH/GRANITAL). הדפוס תלוי-משפחה, לא אוניברסלי — דורש ניסוח מחדש לפני קידום.' },
 ];
 
 // ── Extraction plan — ACTUAL yields after all four reconstructions. ──────────
@@ -71,7 +74,10 @@ export const EXTRACTION_PLAN = [
   { product: 'טיח תל אביב תרמי',      family: 'restoration plaster', projected_episodes: 7, projected_prod: 0, actual_episodes: 7, actual_prod: 0, status: 'done — negative knowledge' },
   { product: 'INT-TFX',              family: 'intumescent coating', projected_episodes: 9, projected_prod: 2, actual_episodes: 4, actual_prod: 0, status: 'done — Stage-0 dossier, UNDER projection' },
   { product: 'MPZ / cementitious',   family: 'cementitious',        projected_episodes: 9, projected_prod: 2, actual_episodes: 7, actual_prod: 2, status: 'done — real strength data' },
-  { product: 'GRANITAL',             family: 'silicate paint',      projected_episodes: 7, projected_prod: 1, actual_episodes: 7, actual_prod: 1, status: 'done — gap-driven, seeds Color domain' },
+  { product: 'GRANITAL',             family: 'silicate coatings',   projected_episodes: 7, projected_prod: 1, actual_episodes: 7, actual_prod: 1, status: 'done — gap-driven, seeds Color domain' },
+  { product: 'fire-retardant plaster', family: 'SFRM fire plaster', projected_episodes: 2, projected_prod: 0, actual_episodes: 5, actual_prod: 0, status: 'done — 2nd Fire source (thin)' },
+  { product: 'BETONIZE 2030',        family: 'silicate coatings',   projected_episodes: 5, projected_prod: 2, actual_episodes: 7, actual_prod: 2, status: 'done — 2nd Color (qual) + Workability' },
+  { product: 'PROTECH A1',           family: 'silicate coatings',   projected_episodes: 5, projected_prod: 2, actual_episodes: 6, actual_prod: 2, status: 'done — measured Workability + Fire A1' },
 ];
 
 const bar = (have, need) => {

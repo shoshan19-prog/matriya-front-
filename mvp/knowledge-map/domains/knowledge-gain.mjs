@@ -83,18 +83,34 @@ export function rankByExpectedGain(candidates, registry) {
   return candidates.map((c) => expectedGain(c, registry)).sort((a, b) => b.expectedGain - a.expectedGain);
 }
 
-// ── Innovation: saturation — when should the acquisition loop STOP? ──────────
+// ── Governance: PROTEUS recommends; a human approves every new Intake. ───────
+// Extraction changes the corpus and touches proprietary/sensitive sources
+// (Drive, SharePoint, email, Priority). So the loop is:
+//   recalc → RECOMMEND → human approve → extract → recalc
+// NOT recalc → extract → recalc. PROTEUS may rank and recommend automatically;
+// it may NOT auto-extract a new source.
+export const GOVERNANCE = 'PROTEUS may rank and recommend automatically. PROTEUS may not extract a new source without human approval.';
+
+// ── Innovation: saturation — when does recommending another extraction stop? ──
 // If even the best candidate's expected gain falls below SATURATION_GAIN, the
-// marginal scientific value of another extraction is low → stop / switch focus.
+// marginal scientific value is low → recommend STOP / switch focus.
 export const SATURATION_GAIN = 8;
-export function acquisitionVerdict(ranked) {
+
+/** Produce a RECOMMENDATION (never an action). Human approval is always required. */
+export function recommendNext(ranked) {
   const best = ranked[0];
-  if (!best) return { stop: true, reason: 'no candidates left' };
-  return { stop: best.expectedGain < SATURATION_GAIN, best,
-    reason: best.expectedGain < SATURATION_GAIN
-      ? `best expected gain ${best.expectedGain} < saturation ${SATURATION_GAIN} → diminishing returns`
-      : `extract ${best.product} (expected gain ${best.expectedGain}, ROI ${best.roi})` };
+  if (!best) return { action: 'STOP', approvalRequired: false, reason: 'no candidates left', governance: GOVERNANCE };
+  if (best.expectedGain < SATURATION_GAIN)
+    return { action: 'STOP', approvalRequired: false, best,
+      reason: `best expected gain ${best.expectedGain} < saturation ${SATURATION_GAIN} → diminishing returns; recommend pausing extraction`,
+      governance: GOVERNANCE };
+  return { action: 'RECOMMEND', approvalRequired: true, best,
+    reason: `recommend extracting ${best.product} (expected gain ${best.expectedGain}, ROI ${best.roi}) — PENDING HUMAN APPROVAL`,
+    governance: GOVERNANCE };
 }
+
+// Back-compat alias (now governance-aware): never returns "extract", only recommends.
+export const acquisitionVerdict = recommendNext;
 
 // convenience: build registry+density from episodes in one call
 export function knowledgeState(episodes) {

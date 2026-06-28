@@ -7,12 +7,18 @@ Knowledge Domain → Coverage → Density → Expected Knowledge Gain
                                               ↓
                                       Candidate Ranking
                                               ↓
+                                    RECOMMEND  (PROTEUS)
+                                              ↓
+                                 ⛔ HUMAN APPROVAL  (every new Intake)
+                                              ↓
                                          Extraction
                                               ↓
                                     Recalculate Domains  ──┐
                                               ↑            │
                                               └────────────┘  (the optimization loop)
 ```
+
+> **Governance rule (hard constraint):** *PROTEUS may rank and recommend automatically. PROTEUS may not extract a new source without human approval.* Extraction changes the corpus and touches proprietary/sensitive sources (Drive, SharePoint, email, Priority), so the loop is **recalc → recommend → approve → extract → recalc** — never recalc → extract → recalc. `recommendNext()` returns a recommendation flagged `approvalRequired`; it never returns an action.
 
 ---
 
@@ -86,12 +92,25 @@ Two additions beyond the proposal:
 ```
 1. build registry + density from current episodes
 2. for each candidate, compute Expected Knowledge Gain (and ROI)
-3. acquisitionVerdict → STOP if best gain < saturation, else extract the best
-4. extract → add episodes → recalculate domains
-5. go to 1
+3. recommendNext → STOP if best gain < saturation, else RECOMMEND the best (approvalRequired)
+4. ⛔ human approves the Intake
+5. extract → add episodes → recalculate domains
+6. go to 1
 ```
 
-This is **Knowledge Acquisition Optimization**: a system whose core job is to maximize the rate at which the organization learns. Not RAG. Not a knowledge graph. An optimizer over Fresco's scientific knowledge.
+This is **Knowledge Acquisition Optimization**: a system whose core job is to maximize the rate at which the organization learns — *under human control of every new Intake*. Not RAG. Not a knowledge graph. A governed optimizer over Fresco's scientific knowledge.
+
+### Where the loop stands now (after 8 extractions)
+
+Domains Workability and Color are **Mature**; the promotion gate is **OPEN** (50 episodes · 5 families · 8 production decisions). The current recommendation:
+
+```
+gain 11  F.SILICATO              (silicate sibling — modest)
+gain 11  CC TOP COAT             (2nd-tier color)
+▶ RECOMMEND: F.SILICATO (expected gain 11) — PENDING HUMAN APPROVAL
+```
+
+But the honest highest-value gap is no longer on the scouted list: **Adhesion is the weakest-density domain (6 episodes, 0 measured → confidence 0.35).** The most valuable next Intake would be a **measured-adhesion source** (pull-off / cross-cut data) — which requires a *new scout*, itself a recommendation pending approval. PROTEUS surfaces this; the human decides.
 
 ## Status & next
 
