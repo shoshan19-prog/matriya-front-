@@ -3,7 +3,7 @@
 import { REAL_EPISODES } from '../domains/corpus.mjs';
 import { buildKnowledgeAssets } from '../assets/knowledge-asset.mjs';
 import { replayTransformations } from '../transformations/transformation.mjs';
-import { classifyFrontier, retrievalSaturated, lawStatement } from './frontier.mjs';
+import { classifyFrontier, retrievalSaturated, lawStatement, knowledgePhase } from './frontier.mjs';
 
 const assets = buildKnowledgeAssets(REAL_EPISODES);
 const trans = replayTransformations(REAL_EPISODES);
@@ -41,7 +41,15 @@ console.log(`\n  → still RETRIEVABLE (corpus): ${retrievable.join(', ') || '�
 console.log(`  → must be GENERATED (lab):    ${generate.join(', ')}`);
 console.log(`  → EXTERNAL only (standards):  ${external.join(', ')}`);
 
+console.log('\n═══ KNOWLEDGE PHASE — the RETRIEVE→GENERATE phase transition ═══\n');
+const ph = knowledgePhase(frontier);
+console.log(`  phase: ${ph.phase}   (phaseIndex ${ph.phaseIndex} — 1=pure retrieve, 0=pure generate)`);
+console.log(`  rooms still to light (RETRIEVE_AVAILABLE): ${ph.rooms_to_light.join(', ') || '— none'}`);
+console.log(`  rooms fully lit (RETRIEVE_COMPLETE):       ${ph.explored}`);
+console.log(`  passages to carve (GENERATE/EXTERNAL):     ${ph.passages_to_carve.join(', ')}`);
+console.log(`  ⟶ ${ph.note}`);
+
 console.log('\n────────────────────────────────────────────────────────────────────────');
-console.log('The Frontier explains WHY the acquisition engine stops searching and starts');
-console.log('generating: a structural boundary between the existing corpus and the research');
-console.log('frontier. The last governance layer before Scientific Laws.');
+console.log('Like a researcher in a cave: while there are rooms, you search; when the cave is');
+console.log('lit, you carve a new passage. RETRIEVE→GENERATE is a PHASE TRANSITION of the');
+console.log('knowledge space — a structural boundary, not an engineering decision.');

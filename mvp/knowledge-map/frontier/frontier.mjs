@@ -84,6 +84,33 @@ export function frontierStatus(episodes) {
   });
 }
 
+/**
+ * Knowledge Phase — the RETRIEVE→GENERATE shift is a PHASE TRANSITION of the
+ * knowledge space, not an engineering choice. The cave metaphor, made measurable:
+ *   • rooms still to light  = RETRIEVE_AVAILABLE (search still pays)
+ *   • rooms fully lit       = RETRIEVE_COMPLETE  (explored, nothing left to find)
+ *   • passages to carve     = GENERATE_REQUIRED + EXTERNAL_ONLY (must be built)
+ * phaseIndex = explorable / (explorable + to-build): 1 = pure RETRIEVE, 0 = pure GENERATE.
+ */
+export function knowledgePhase(frontier) {
+  const n = (k) => frontier.filter((f) => f.frontierType === k).length;
+  const explorable = n('RETRIEVE_AVAILABLE');
+  const explored = n('RETRIEVE_COMPLETE');
+  const toBuild = n('GENERATE_REQUIRED') + n('EXTERNAL_ONLY');
+  const phaseIndex = +(explorable / Math.max(1, explorable + toBuild)).toFixed(2);
+  const phase = phaseIndex >= 0.66 ? 'RETRIEVE' : phaseIndex >= 0.2 ? 'TRANSITION' : 'GENERATE';
+  return {
+    phase, phaseIndex, explorable, explored, toBuild,
+    rooms_to_light: frontier.filter((f) => f.frontierType === 'RETRIEVE_AVAILABLE').map((f) => f.asset),
+    passages_to_carve: frontier.filter((f) => f.frontierType === 'GENERATE_REQUIRED' || f.frontierType === 'EXTERNAL_ONLY').map((f) => f.asset),
+    note: phase === 'GENERATE'
+      ? 'the cave is lit — missing answers now require carving new passages (generate/external)'
+      : phase === 'TRANSITION'
+        ? 'at the phase boundary — a few rooms left to light, but most new knowledge must now be built'
+        : 'still exploring — searching the corpus still yields new rooms',
+  };
+}
+
 export const lawStatement =
   'When additional evidence no longer changes an asset\'s knowledge state, the knowledge ' +
   'frontier shifts from RETRIEVAL to GENERATION of new evidence. ' +

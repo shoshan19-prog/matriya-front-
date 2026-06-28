@@ -82,6 +82,24 @@ A clear structural boundary between the **existing corpus** and the **research f
 
 ---
 
+## The deeper discovery — a phase transition, not just a frontier
+
+> **MATRIYA is like a researcher in a cave.** At first the flashlight keeps revealing new rooms. But a moment comes when the whole cave is lit. If an answer is still missing, the problem is no longer *searching* — you must **carve a new passage.**
+>
+> *While there are rooms, you search. When there are no more rooms, you start to build.*
+
+The RETRIEVE→GENERATE shift is therefore a **phase transition** of the knowledge space — a structural property, not an engineering decision. It is now measurable (`knowledgePhase()`):
+
+```
+phase: TRANSITION   (phaseIndex 0.20 — 1 = pure retrieve, 0 = pure generate)
+  rooms still to light (RETRIEVE_AVAILABLE): Color
+  rooms fully lit       (RETRIEVE_COMPLETE): 4
+  passages to carve     (GENERATE/EXTERNAL): Adhesion, Set/Cure, Fire, Water
+  ⟶ at the phase boundary — a few rooms left to light, but most new knowledge must now be built
+```
+
+`phaseIndex = explorable / (explorable + to-build)`: **1.0** = pure RETRIEVE phase (keep searching), **0.0** = pure GENERATE phase (the corpus is spent — only experiments and external sources add knowledge). Fresco's map now sits at **0.20** — over the boundary, tipping into the GENERATE phase. One more Color pass and `phaseIndex → 0`: the cave is fully lit, and every remaining answer must be *carved*.
+
 ## Architecture (the last layer before Laws)
 
 ```
