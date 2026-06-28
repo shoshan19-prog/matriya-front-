@@ -21,19 +21,21 @@ The index is **inverted**: knowledge stops being organized around *what we made*
 
 `node mvp/knowledge-map/domains/demo.mjs` — every tag is traceable to a `docs/PRODUCT_STORY_*.md` episode; nothing is invented, so the numbers are honestly thin:
 
+*Updated after the gap-driven GRANITAL extraction (which seeded the Color domain).*
+
 | Domain | Evidence | Products | Episodes | Gaps | Status |
 |--------|:--------:|:--------:|:--------:|:----:|--------|
 | Compression Strength | 9 | 1 | 5 | 3 | Partial |
+| Workability / Flow | 8 | 3 | 6 | 0 | Growing |
+| Color / Shade | 7 | 1 | 4 | 1 | **Partial** ← was Empty |
 | Adhesion | 6 | 2 | 6 | 0 | Growing |
 | Fire Resistance | 5 | 1 | 4 | 0 | Partial |
 | Water Resistance / Moisture | 4 | 2 | 4 | 0 | Growing |
-| Workability / Flow | 3 | 2 | 3 | 0 | Partial |
 | Granulometry / Fractions | 2 | 2 | 2 | 0 | Partial |
-| Set / Cure | 2 | 1 | 2 | 0 | Partial |
 | Density | 2 | 1 | 1 | 0 | Seed |
-| Color / Shade | 0 | 0 | 0 | 1 | **Empty (gap)** |
+| Set / Cure | 2 | 1 | 2 | 0 | Partial |
 
-*Evidence weight: `measured = 2 · qualitative = 1 · empty (known-relevant but never recorded) = 0`.* The illustrative "Mature / 48 evidences" table from the proposal is the **destination**; this is the honest **starting point** — and Color/Shade being an explicit empty gap is exactly the kind of truth this layer surfaces.
+*Evidence weight: `measured = 2 · qualitative = 1 · empty (known-relevant but never recorded) = 0`.* The illustrative "Mature / 48 evidences" table from the proposal is the **destination**; this is the honest current state. **The empty Color/Shade domain is now Partial — with measured ΔE/L\* data — because extraction was steered by the gap, not the product catalogue (GRANITAL, chosen by `gap-targeting`).** It still carries a single-product penalty until a 2nd color source (e.g. BETONIZE) is added.
 
 ---
 

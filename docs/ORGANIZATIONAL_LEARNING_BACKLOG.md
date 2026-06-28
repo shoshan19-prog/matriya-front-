@@ -6,15 +6,17 @@
 
 ## Promotion gate — nothing is promoted until ALL three clear
 
-*Updated after extracting all four planned products (TLV · thermal · INT-TFX · MPZ).*
+*Updated after the gap-driven 5th extraction (GRANITAL — silicate paint, seeds the Color domain).*
 
 ```
-episodes              [█████████████████░░░]  25/30   ✗  (need 5 more)
-product families      [████████████████████]   3/3    ✓  CLEARED
-production decisions  [████████████░░░░░░░░]   3/5    ✗  (need 2 more)
+episodes              [████████████████████]  32/30   ✓  CLEARED
+product families      [████████████████████]   4/3    ✓  CLEARED
+production decisions  [████████████████░░░░]   4/5    ✗  (need 1 more)
 
-VERDICT: PROMOTION LOCKED — corpus below evidential volume
+VERDICT: PROMOTION LOCKED — one production decision short of opening the gate
 ```
+
+**Two of three gates now cleared.** GRANITAL was chosen by *domain gap* (not by name) and pushed episodes past 30 and families past 3 while seeding the empty Color domain. Only one more real go-to-production decision stands between the corpus and `GATE OPEN`.
 
 The gate is a **global precondition**: even a hypothesis that reached its own support threshold may not be promoted while the corpus as a whole is this thin. Numbers reflect only Episodes actually reconstructed — nothing is invented.
 

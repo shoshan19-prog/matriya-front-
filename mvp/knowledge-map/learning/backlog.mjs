@@ -18,14 +18,15 @@ const MIN_SUPPORT = 4;
 // the real Drive corpus. Numbers are the ACTUAL reconstructed yields — not the
 // earlier optimistic projection (INT-TFX yielded 0 production decisions, not 2).
 export const LEDGER = {
-  episodes: 25,                // 7 TLV + 7 thermal + 4 INT-TFX + 7 MPZ
-  families: 3,                 // restoration plaster · intumescent coating · cementitious
-  productionDecisions: 3,      // 1 TLV + 0 thermal + 0 INT-TFX + 2 MPZ
+  episodes: 32,                // 7 TLV + 7 thermal + 4 INT-TFX + 7 MPZ + 7 GRANITAL
+  families: 4,                 // restoration plaster · intumescent coating · cementitious · silicate paint
+  productionDecisions: 4,      // 1 TLV + 0 thermal + 0 INT-TFX + 2 MPZ + 1 GRANITAL
   byProduct: [
     { product: 'טיח תל אביב',          family: 'restoration plaster', episodes: 7, productionDecisions: 1, status: 'done' },
     { product: 'טיח תל אביב תרמי',      family: 'restoration plaster', episodes: 7, productionDecisions: 0, status: 'done (halted product)' },
     { product: 'INT-TFX',              family: 'intumescent coating', episodes: 4, productionDecisions: 0, status: 'done (Stage-0 dossier, 0 trials run)' },
     { product: 'MPZ / cementitious',   family: 'cementitious',        episodes: 7, productionDecisions: 2, status: 'done (real strength data)' },
+    { product: 'GRANITAL',             family: 'silicate paint',      episodes: 7, productionDecisions: 1, status: 'done (gap-driven: seeds Color domain, measured ΔE)' },
   ],
 };
 
@@ -70,6 +71,7 @@ export const EXTRACTION_PLAN = [
   { product: 'טיח תל אביב תרמי',      family: 'restoration plaster', projected_episodes: 7, projected_prod: 0, actual_episodes: 7, actual_prod: 0, status: 'done — negative knowledge' },
   { product: 'INT-TFX',              family: 'intumescent coating', projected_episodes: 9, projected_prod: 2, actual_episodes: 4, actual_prod: 0, status: 'done — Stage-0 dossier, UNDER projection' },
   { product: 'MPZ / cementitious',   family: 'cementitious',        projected_episodes: 9, projected_prod: 2, actual_episodes: 7, actual_prod: 2, status: 'done — real strength data' },
+  { product: 'GRANITAL',             family: 'silicate paint',      projected_episodes: 7, projected_prod: 1, actual_episodes: 7, actual_prod: 1, status: 'done — gap-driven, seeds Color domain' },
 ];
 
 const bar = (have, need) => {

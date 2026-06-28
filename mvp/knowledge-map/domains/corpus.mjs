@@ -47,4 +47,16 @@ export const REAL_EPISODES = [
   { id:'MPZ-05', product:'MPZ', domains:[sig(D.COMPRESSION,'measured','Dec-2025 beat April at every grade'), sig(D.SETCURE,'qualitative','water/curing control = the cause')],
     materials:[mat('white cement','positive','same formula, better process')] },
   { id:'MPZ-06', product:'MPZ', domains:[sig(D.COMPRESSION,'measured','protocol drift annotated (8d vs 7d)')], materials:[] },
+
+  // ── GRANITAL (silicate paint) — chosen by domain gap to seed the empty Color domain ──
+  { id:'GR-01', product:'GRANITAL', domains:[sig(D.COLOR,'measured','tinting F-167…182; ΔL/Δa/Δb/ΔC/ΔH (170-2 best match)')],
+    materials:[mat('OC pigment','positive','primary tint'), mat('OG pigment','positive',''), mat('RO pigment','positive','')] },
+  { id:'GR-02', product:'GRANITAL', domains:[sig(D.COLOR,'measured','lightness L1 58.89 / Lf 62.59 (ΔL +1.11)')], materials:[] },
+  { id:'GR-03', product:'GRANITAL', domains:[sig(D.COLOR,'measured','~115 ΔE color-matches vs Weber/KEIM/Tambour decks, dE 0.10–1.78')],
+    materials:[mat('OC pigment','positive','dominant in matches')] },
+  { id:'GR-04', product:'GRANITAL', domains:[sig(D.WORKABILITY,'measured','50°C oven viscosity/PH series, ~2× rise at 4wk'), sig(D.COLOR,'qualitative','untinted came out "whiter"')],
+    materials:[mat('BO pigment','neutral',''), mat('RO pigment','neutral',''), mat('OC pigment','neutral','')] },
+  { id:'GR-05', product:'GRANITAL', domains:[sig(D.WORKABILITY,'measured','recipe 03222 stability, t1 viscosity (1wk/4wk incomplete)')], materials:[] },
+  { id:'GR-06', product:'GRANITAL', domains:[sig(D.WORKABILITY,'qualitative','TEGO defoamer additive trials')],
+    materials:[mat('TEGO','neutral','defoamer')] },
 ];
