@@ -18,6 +18,8 @@ const PATTERNS = [
   ['date', /\b(\d{2}[./]\d{2}[./]\d{2,4})\b/g, (m) => m[1].replace(/\//g, '.')],
   ['operator', /(?:operator|לבורנט|שם לבורנט)\s*[:,]?\s*([A-Za-z֐-׿]{2,})/gi, (m) => m[1]],
   ['formula_id', /(?:נוסחה|formula(?:\s*id)?)\s*0*(\d{1,3})/gi, (m) => 'f' + (+m[1])],
+  ['batch_id', /(?:מנה|batch)\s*(?:מס'?\s*)?0*(\d{1,4})/gi, (m) => 'b' + (+m[1])],
+  ['lab_sample', /(?:מספר דוגמ[אה]|sample(?:\s*id)?)\s*[:#]?\s*0*(\d{1,4})/gi, (m) => 's' + (+m[1])],
   ['measurement', /(\d+(?:\.\d+)?)\s?(µm|um|MPa|cps|CPS|°C|%RH)/g, (m) => `${m[1]}${m[2]}`], // evidence, not identity
 ];
 

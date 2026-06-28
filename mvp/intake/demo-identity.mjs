@@ -29,7 +29,7 @@ for (const c of cases) {
   console.log(`  entities: ${d.identity.entities.map((e) => `${e.type}=${e.value}[${e.signal}]`).join(', ') || '(none)'}`);
   if (r.product) {
     console.log(`  → RESOLVED: ${r.product}  confidence ${r.confidence}` + (r.version ? `  ${r.version}` : '') + (r.experiment ? `  ${r.experiment}` : ''));
-    console.log(`     because: ${r.evidence.join(' + ')}`);
+    console.log(`     because: ${r.chain_text}`);
     console.log(`     tag: ${d.product.confidence}` + (d.product.score != null ? ` (score ${d.product.score})` : ''));
   } else {
     console.log(`  → UNRESOLVED (stays orphan): ${r.version ? `found ${r.version} but no product link` : 'no identifying entities'}  confidence ${r.confidence}`);

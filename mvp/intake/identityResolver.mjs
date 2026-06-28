@@ -1,48 +1,48 @@
-// Identity Resolver — turns extracted entities into a confidence-scored identity.
+// Identity Resolver — now authority-weighted, with an EVIDENCE CHAIN and a
+// MARGIN rule. Asks "which entities are here, and how much do I believe each?"
 //
-// Asks "which entities are in this file, and which known product/version do they
-// corroborate?" — not "what does the filename say". Confidence is a noisy-OR over
-// the weighted signals that independently support the same product, so multiple
-// weak signals (folder + date + operator) can add up, and a single registry-
-// confirmed id (experiment_id, batch date) dominates.
+//   #1 Authority: each corroborating entity contributes its TYPE authority.
+//   #2 Evidence chain: the score is a chain of (entity, authority), not one number.
+//   #3 Margin rule: if two products have comparable SUPPORT, abstain (→ review).
 
-import { SIGNAL_WEIGHT } from './entities.mjs';
 import { productForEntity, REGISTRY } from './registry.mjs';
+import { DEFAULT_AUTHORITY, authorityOf } from './authority.mjs';
 
 const noisyOR = (ws) => 1 - ws.reduce((a, w) => a * (1 - w), 1);
 
-export function resolve(entities, registry = REGISTRY, typeReliability = {}) {
-  const cand = new Map(); // product -> [{via, weight}]
+export function resolve(entities, registry = REGISTRY, authority = DEFAULT_AUTHORITY, { marginSupport = 0.5 } = {}) {
+  const cand = new Map(); // product -> [{type, value, signal, authority}]
   for (const e of entities) {
     const p = productForEntity(e.type, e.value, registry);
     if (!p) continue;
-    // registry-confirmed evidence: stronger of signal/relationship weight, scaled by
-    // how reliable this ENTITY TYPE has proven to be (improvement #2; default 1).
-    const weight = Math.max(e.weight, SIGNAL_WEIGHT.relationship) * (typeReliability[e.type] ?? 1);
-    const arr = cand.get(p.name) || []; arr.push({ via: `${e.type}=${e.value} (${e.signal}+relationship)`, weight, type: e.type }); cand.set(p.name, arr);
+    const arr = cand.get(p.name) || [];
+    arr.push({ type: e.type, value: e.value, signal: e.signal, authority: authorityOf(e.type, authority) });
+    cand.set(p.name, arr);
   }
 
-  const scored = [...cand.entries()].map(([name, ev]) => {
-    // dedupe identical evidence, cap each signal once
-    const uniq = [...new Map(ev.map((x) => [x.via, x])).values()];
-    return { product: name, confidence: +noisyOR(uniq.map((x) => x.weight)).toFixed(3), evidence: uniq };
-  }).sort((a, b) => b.confidence - a.confidence);
+  const candidates = [...cand.entries()].map(([product, links]) => {
+    const chain = [...new Map(links.map((l) => [`${l.type}=${l.value}`, l])).values()].sort((a, b) => b.authority - a.authority);
+    return { product, chain, support: +chain.reduce((s, l) => s + l.authority, 0).toFixed(3), confidence: +noisyOR(chain.map((l) => l.authority)).toFixed(3) };
+  }).sort((a, b) => b.support - a.support);
 
-  const best = scored[0] || null;
-  const pick = (t) => entities.filter((e) => e.type === t).sort((a, b) => b.weight - a.weight)[0]?.value || null;
+  const top = candidates[0] || null, second = candidates[1] || null;
+  // Margin rule on SUPPORT (depth of corroboration), not on the saturated noisy-OR.
+  const abstain = !!(top && second && top.support - second.support < marginSupport);
+
+  const pick = (t) => entities.filter((e) => e.type === t).sort((a, b) => b.authority - a.authority)[0]?.value || null;
   return {
-    product: best?.product || null,
-    confidence: best?.confidence || 0,
-    evidence: best ? best.evidence.map((x) => x.via) : [],
-    version: pick('version'),
-    experiment: pick('experiment_id'),
-    operator: pick('operator'),
-    date: pick('date'),
-    candidates: scored,
+    product: top && !abstain ? top.product : null,
+    confidence: top ? top.confidence : 0,
+    support: top ? top.support : 0,
+    chain: top ? top.chain : [],
+    abstain,
+    ambiguous_between: abstain && top && second ? [top.product, second.product] : null,
+    version: pick('version'), experiment: pick('experiment_id'), batch: pick('batch_id'), operator: pick('operator'), date: pick('date'),
+    candidates,
   };
 }
 
-/** Map a numeric confidence to the project's confidence vocabulary. */
-export function confidenceTag(score) {
-  return score >= 0.85 ? 'VERIFIED' : score >= 0.6 ? 'PARTIAL' : 'UNVERIFIED';
-}
+export const confidenceTag = (s) => (s >= 0.85 ? 'VERIFIED' : s >= 0.6 ? 'PARTIAL' : 'UNVERIFIED');
+
+/** Human-readable evidence chain: "formula_id=f9(0.99) → experiment_id=…(0.98) → …" */
+export const renderChain = (chain) => chain.map((l) => `${l.type}=${l.value}(${l.authority})`).join(' → ');
