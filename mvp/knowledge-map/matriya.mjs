@@ -47,6 +47,7 @@ import { fragileKnowledge, whatCollapsesIf } from './research-os/lineage.mjs';
 import { knowledgeHalfLife } from './research-os/half-life.mjs';
 import { hypothesisCandidates } from './research-os/hypotheses.mjs';
 import { researchAgenda } from './research-os/agenda.mjs';
+import { knowledgeFlowRate } from './research-os/flow-rate.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -323,6 +324,14 @@ function researchCmd() {
   const ag = researchAgenda();
   console.log(`  [5] Research Agenda (read-only): ${ag.counts.map((c) => `${c.n} ${c.kind}`).join(' · ')}`);
   for (const it of ag.items.slice(0, 5)) console.log(`      (${it.kind}) ${it.title}`);
+
+  const fr = knowledgeFlowRate();
+  console.log(`\n  [6] Knowledge Flow Rate (the lab's metabolism):`);
+  console.log(`      WIP ${fr.wip.filter((w) => w.count).map((w) => `${w.stage.split(' ')[0]}:${w.count}`).join(' · ')} · accepted ${fr.accepted} · held/review ${fr.rejectedOrHeld} (hold rate ${fr.holdRate})`);
+  console.log(`      dwell: ${fr.dwell.unit} stuck ${fr.dwell.daysWaiting}d at Review · hypotheses→knowledge ${fr.hypoToKnowledge.became}/${fr.hypoToKnowledge.of} · questions opened ${fr.questions.opened}`);
+  console.log(`      ⇒ ${fr.reading}`);
+  console.log(`      (per-day rates & cycle times accrue once the live pipeline logs transitions)`);
+
   console.log('\n  every unit travels Reality→Evidence→Episode→Representation→Human Review→Knowledge→Decision.');
   console.log('  the OS measures, recommends, and keeps the list — it never acts, approves, or declares a law.\n');
 }
