@@ -15,6 +15,7 @@ import { checkAuthorityIsolation } from '../authority-chain.mjs';
 import { lawGate } from '../chain.mjs';
 import { isConfigured } from '../adapters/sharepoint.mjs';
 import { FIRE_EPISODES_PENDING } from '../schema/fire-episodes.mjs';
+import { sensorHealth } from '../research-os/sensor-health.mjs';
 
 const CONTRA = { 'Compression Strength': 2, 'Workability / Flow': 2, 'Fire Resistance': 1, 'Adhesion': 1 };
 
@@ -129,7 +130,7 @@ export function studioData() {
   const mode = systemHealth.some((s) => s.state === 'online') ? 'LIVE' : 'SAMPLE';
 
   return { generatedFor: 'MATRIYA Control Room', mode, generatedAt: new Date().toISOString(),
-    systemHealth, episodesByAsset, pendingEpisodes, incoming, changeFeed, qualification,
+    systemHealth, sensorHealth: sensorHealth().rows, episodesByAsset, pendingEpisodes, incoming, changeFeed, qualification,
     humanReview, knowledgeGrowth, evolution, researchPhase, entropy, learningLight, validation };
 }
 

@@ -99,6 +99,16 @@ export default function ControlRoomTab() {
         ))}
       </div>
 
+      <div className="cr-episodes" style={{ marginBottom: 8 }}>
+        <span className="cr-es-label">SENSOR HEALTH</span>
+        {(data.sensorHealth || []).map((s) => (
+          <span className="cr-es-chip" key={s.sensor} title={s.health}>
+            {s.status} {s.sensor.split(' ')[0]} <b style={{ color: '#8b98a9' }}>{s.lastRun ? s.lastRun.slice(11, 16) : '—'}</b>{s.queue != null ? ` · q${s.queue}` : ''}
+          </span>
+        ))}
+        <span className="cr-es-note">— is the sensory system running? (a sensor idle for days ≠ "no news")</span>
+      </div>
+
       <div className="cr-episodes">
         <span className="cr-es-label">EPISODES BY ASSET</span>
         {(data.episodesByAsset || []).map((e) => (

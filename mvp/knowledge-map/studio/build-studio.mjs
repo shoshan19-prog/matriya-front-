@@ -92,6 +92,12 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;pa
   ${D.systemHealth.map((s) => `<div class="src" title="${s.note}"><i style="background:${dot(s.state)}"></i>${s.source} <span style="color:var(--dim)">· ${s.state}</span></div>`).join('')}
 </div>
 
+<div class="episodes-strip" style="margin-bottom:8px">
+  <span class="es-label">SENSOR HEALTH</span>
+  ${(D.sensorHealth || []).map((s) => `<span class="es-chip" title="${s.health}">${s.status} ${s.sensor.split(' ')[0]} <b style="color:var(--dim)">${s.lastRun ? s.lastRun.slice(11, 16) : '—'}</b>${s.queue != null ? ` · q${s.queue}` : ''}</span>`).join('')}
+  <span class="es-note">— is the sensory system running? (a sensor idle for days ≠ "no news")</span>
+</div>
+
 <div class="episodes-strip">
   <span class="es-label">EPISODES BY ASSET</span>
   ${(D.episodesByAsset || []).map((e) => `<span class="es-chip"><b>${e.episodes}</b> ${e.asset.split(' ')[0]}</span>`).join('')}

@@ -1,7 +1,7 @@
 {
   "generatedFor": "MATRIYA Control Room",
   "mode": "SAMPLE",
-  "generatedAt": "2026-06-29T21:36:02.754Z",
+  "generatedAt": "2026-06-29T23:00:37.870Z",
   "systemHealth": [
     {
       "source": "SharePoint",
@@ -22,6 +22,40 @@
       "source": "Lab",
       "state": "standby",
       "note": "manual intake"
+    }
+  ],
+  "sensorHealth": [
+    {
+      "sensor": "Google Drive",
+      "lastRun": "2026-06-29T09:18:00Z",
+      "lastSuccess": "2026-06-29T09:18:00Z",
+      "queue": 5,
+      "status": "🟡",
+      "health": "stale (14h)"
+    },
+    {
+      "sensor": "SharePoint",
+      "lastRun": null,
+      "lastSuccess": null,
+      "queue": null,
+      "status": "⚪",
+      "health": "never run"
+    },
+    {
+      "sensor": "Gmail",
+      "lastRun": null,
+      "lastSuccess": null,
+      "queue": null,
+      "status": "⚪",
+      "health": "never run"
+    },
+    {
+      "sensor": "Local Folder",
+      "lastRun": null,
+      "lastSuccess": null,
+      "queue": null,
+      "status": "⚪",
+      "health": "never run"
     }
   ],
   "episodesByAsset": [

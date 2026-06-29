@@ -50,16 +50,17 @@ jobs:
           GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
         run: node mvp/knowledge-map/sources/intake-ci.mjs
 
-      - name: Commit & archive the flow log
+      - name: Commit & archive the flow + sensor logs
         run: |
           git config user.name "matriya-intake[bot]"
           git config user.email "matriya-intake@users.noreply.github.com"
-          if git diff --quiet -- mvp/knowledge-map/research-os/flow-log.jsonl; then
-            echo "no flow-log changes — nothing to commit"
+          LOGS="mvp/knowledge-map/research-os/flow-log.jsonl mvp/knowledge-map/research-os/sensor-log.jsonl"
+          if git diff --quiet -- $LOGS; then
+            echo "no log changes — nothing to commit"
           else
-            LINES=$(wc -l < mvp/knowledge-map/research-os/flow-log.jsonl)
-            git add mvp/knowledge-map/research-os/flow-log.jsonl
-            git commit -m "chore(intake): drive flow log (${LINES} events) [skip ci]"
+            FLOW=$(wc -l < mvp/knowledge-map/research-os/flow-log.jsonl)
+            git add $LOGS
+            git commit -m "chore(intake): drive flow + sensor heartbeat (${FLOW} flow events) [skip ci]"
             git push origin HEAD:claude/new-session-gg81uh
-            echo "queue archived — flow log now ${LINES} events" >> "$GITHUB_STEP_SUMMARY"
+            echo "archived — flow log ${FLOW} events; sensor heartbeat recorded" >> "$GITHUB_STEP_SUMMARY"
           fi

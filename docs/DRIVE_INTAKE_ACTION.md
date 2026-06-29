@@ -38,6 +38,14 @@ The Action authenticates as **you** with a read-only refresh token (the Drive is
    ```
    The scope is `drive.readonly` — the token cannot write to your Drive even if it wanted to.
 
+## What to expect on the first run
+
+- **With no secrets set:** the run is **green** and the summary says `SKIPPED — Drive auth not configured`. Nothing is scanned, nothing is committed. (This is the safe default — the Action will not fail-spam an unconfigured repo.)
+- **With the three secrets set:** the run scans Drive for files modified since the last logged intake, queues the genuinely new ones (`N file(s) QUEUED_FOR_REVIEW`), appends them to `research-os/flow-log.jsonl`, records a heartbeat in `research-os/sensor-log.jsonl`, and commits **only those two log files** back to the branch. The summary shows the queue and the new flow-log size. Nothing enters the corpus.
+- **With bad/expired secrets:** the run is **red** (`FAILED — Drive auth_failed`) — the honest signal that it's wired but broken. No files are fabricated and nothing is committed.
+
+It commits only the two append-only log files (`flow-log.jsonl`, `sensor-log.jsonl`) — never any business/knowledge data.
+
 ## Activating the schedule
 
 GitHub only fires `schedule` triggers from the **default branch**. The workflow currently lives on `claude/new-session-gg81uh`:

@@ -49,6 +49,7 @@ import { hypothesisCandidates } from './research-os/hypotheses.mjs';
 import { researchAgenda } from './research-os/agenda.mjs';
 import { knowledgeFlowRate } from './research-os/flow-rate.mjs';
 import { driveIntake } from './sources/drive-intake.mjs';
+import { sensorHealth } from './research-os/sensor-health.mjs';
 import { readFileSync as _readFileSync } from 'node:fs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
@@ -301,6 +302,15 @@ async function changesCmd(source) {
   console.log('  the day Graph opens, only the Scanner feeding this changes — the feed and pipeline do not.\n');
 }
 
+function sensorsCmd() {
+  const h = sensorHealth();
+  console.log('\nSensor Health — is the sensory system running? (separate from whether knowledge is good)');
+  console.log(`  ${'Sensor'.padEnd(15)} ${'Last Run'.padEnd(20)} ${'Queue'.padEnd(6)} Status`);
+  for (const r of h.rows)
+    console.log(`  ${r.sensor.padEnd(15)} ${(r.lastRun ? r.lastRun.slice(0, 16).replace('T', ' ') : 'never').padEnd(20)} ${String(r.queue ?? '—').padEnd(6)} ${r.status} ${r.health}`);
+  console.log(`\n  ${h.healthy}/${h.total} sensors healthy. No new events can be fine — a sensor not running for days is not.\n`);
+}
+
 function intakeDriveCmd(arg) {
   // matriya intake-drive <inventory.json> [now]
   // <inventory.json> = [{source,id,name,modified,size?}] from a live Drive scan.
@@ -495,6 +505,7 @@ await (({
   schema: () => schemaCmd(arg || undefined),
   stack: () => stackCmd(),
   research: () => researchCmd(),
+  sensors: () => sensorsCmd(),
   'intake-drive': () => intakeDriveCmd(arg || ''),
   serve: () => import('./studio/studio-server.mjs'),  // read-only Control Room endpoint
   reason: () => reasonCmd(),

@@ -16,6 +16,9 @@ import { appendFileSync } from 'node:fs';
 import { googleDriveScan } from './drive-scan-google.mjs';
 import { driveIntake } from './drive-intake.mjs';
 import { readFlow } from '../research-os/flow-log-store.mjs';
+import { recordSensorRun } from '../research-os/sensor-health.mjs';
+
+const SENSOR = 'Google Drive';
 
 const out = (msg) => { console.log(msg); if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, msg + '\n'); };
 
@@ -34,10 +37,12 @@ const today = (process.env.INTAKE_DATE || new Date().toISOString()).slice(0, 10)
 const scan = await googleDriveScan({ ...creds, since });
 
 if (!scan.ok && scan.reason === 'not_configured') {
+  recordSensorRun({ sensor: SENSOR, ok: false, reason: 'not_configured' });
   out(`SKIPPED — Drive auth not configured (set secrets: ${scan.missing.join(', ')}). Read-only intake did nothing.`);
   process.exit(0);
 }
 if (!scan.ok) {
+  recordSensorRun({ sensor: SENSOR, ok: false, reason: scan.reason });
   out(`FAILED — Drive ${scan.reason}${scan.status ? ` (HTTP ${scan.status})` : ''}${scan.detail ? `: ${scan.detail}` : ''}. No files fabricated, nothing committed.`);
   process.exit(1);
 }
@@ -46,9 +51,14 @@ if (!scan.ok) {
 const seen = new Set(flow.map((e) => e.unit));
 const fresh = scan.inventory.filter((f) => !seen.has(f.name));
 
-if (!fresh.length) { out(`intake OK — scanned since ${since}, 0 new files. Queue unchanged.`); process.exit(0); }
+if (!fresh.length) {
+  recordSensorRun({ sensor: SENSOR, ok: true, queued: 0 });   // ran fine, nothing new — that's healthy
+  out(`intake OK — scanned since ${since}, 0 new files. Queue unchanged.`);
+  process.exit(0);
+}
 
 const r = driveIntake({ source: 'drive', inventory: fresh, now: today });
+recordSensorRun({ sensor: SENSOR, ok: true, queued: r.queued });
 out(`intake OK — ${r.queued} file(s) QUEUED_FOR_REVIEW (flow +${r.flowAppended}). auto-approved ${r.autoApproved} · auto-writes ${r.autoWrites}.`);
 for (const q of r.queue) out(`- ${q.change} · ${q.file} → ${q.hint}`);
 out(`Boundary held: read-only up to Human Review. A person reviews the queue; nothing entered the corpus.`);
