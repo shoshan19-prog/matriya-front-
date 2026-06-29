@@ -1,7 +1,7 @@
 {
   "generatedFor": "MATRIYA Control Room",
   "mode": "SAMPLE",
-  "generatedAt": "2026-06-29T21:12:32.450Z",
+  "generatedAt": "2026-06-29T21:36:02.754Z",
   "systemHealth": [
     {
       "source": "SharePoint",
@@ -24,6 +24,45 @@
       "note": "manual intake"
     }
   ],
+  "episodesByAsset": [
+    {
+      "asset": "Workability / Flow",
+      "episodes": 21
+    },
+    {
+      "asset": "Color / Shade",
+      "episodes": 15
+    },
+    {
+      "asset": "Compression Strength",
+      "episodes": 8
+    },
+    {
+      "asset": "Fire Resistance",
+      "episodes": 7
+    },
+    {
+      "asset": "Granulometry / Fractions",
+      "episodes": 6
+    },
+    {
+      "asset": "Water Resistance / Moisture",
+      "episodes": 6
+    },
+    {
+      "asset": "Adhesion",
+      "episodes": 6
+    },
+    {
+      "asset": "Density",
+      "episodes": 5
+    },
+    {
+      "asset": "Set / Cure",
+      "episodes": 2
+    }
+  ],
+  "pendingEpisodes": 4,
   "incoming": [
     {
       "source": "sharepoint",

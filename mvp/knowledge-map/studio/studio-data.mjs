@@ -14,6 +14,7 @@ import { reasoningSummary } from '../reasoning.mjs';
 import { checkAuthorityIsolation } from '../authority-chain.mjs';
 import { lawGate } from '../chain.mjs';
 import { isConfigured } from '../adapters/sharepoint.mjs';
+import { FIRE_EPISODES_PENDING } from '../schema/fire-episodes.mjs';
 
 const CONTRA = { 'Compression Strength': 2, 'Workability / Flow': 2, 'Fire Resistance': 1, 'Adhesion': 1 };
 
@@ -118,12 +119,17 @@ export function studioData() {
     reasoning: `${reasoningSummary().passed}/${reasoningSummary().total}`, promotable: law.allPass, autoPromote: law.promote,
   };
 
+  // Episodes by asset — what a scientist thinks in, not "236 documents".
+  const episodesByAsset = assets.filter((a) => a.episodes > 0)
+    .map((a) => ({ asset: a.name, episodes: a.episodes })).sort((x, y) => y.episodes - x.episodes);
+  const pendingEpisodes = FIRE_EPISODES_PENDING.filter((e) => e.origin === 'fresco').length;
+
   // mode badge: LIVE only if a real source is online; otherwise the panels that
   // depend on a source are SAMPLE. (read-only — this never writes anything.)
   const mode = systemHealth.some((s) => s.state === 'online') ? 'LIVE' : 'SAMPLE';
 
   return { generatedFor: 'MATRIYA Control Room', mode, generatedAt: new Date().toISOString(),
-    systemHealth, incoming, changeFeed, qualification,
+    systemHealth, episodesByAsset, pendingEpisodes, incoming, changeFeed, qualification,
     humanReview, knowledgeGrowth, evolution, researchPhase, entropy, learningLight, validation };
 }
 

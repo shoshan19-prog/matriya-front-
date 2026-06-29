@@ -47,5 +47,11 @@
 .cr-foot b{color:#39d98a}
 .cr-legend{color:var(--cr-dim);font-size:11px;margin-top:10px}
 .cr-empty{padding:40px;text-align:center;color:var(--cr-dim)}
+.control-room .cr-episodes{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 13px;padding:10px 14px;background:var(--cr-panel);border:1px solid var(--cr-line);border-radius:12px}
+.control-room .cr-es-label{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--cr-accent)}
+.control-room .cr-es-chip{font-size:12px;background:#0a0f16;border:1px solid #18212d;border-radius:20px;padding:4px 11px;color:var(--cr-dim)}
+.control-room .cr-es-chip b{color:var(--cr-ink)}
+.control-room .cr-es-chip.pending{border-color:#3a2f12;color:#ffb454}.control-room .cr-es-chip.pending b{color:#ffb454}
+.control-room .cr-es-note{font-size:10.5px;color:#33404f}
 @media(max-width:880px){.cr-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.cr-grid{grid-template-columns:1fr}}

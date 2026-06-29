@@ -40,6 +40,7 @@ import { liveChanges } from './sources/live-scan.mjs';
 import { buildStudio } from './studio/build-studio.mjs';
 import { ASSET_SCHEMA, recognize, validateRecord } from './schema/asset-schema.mjs';
 import { FIRE_EPISODES_PENDING } from './schema/fire-episodes.mjs';
+import { LAYERS, routeMeasurement, STACK_DEMO } from './stack.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -291,6 +292,19 @@ async function changesCmd(source) {
   console.log('  the day Graph opens, only the Scanner feeding this changes — the feed and pipeline do not.\n');
 }
 
+function stackCmd() {
+  console.log('\nThe Knowledge Stack — Representation guards the model between Episode and Knowledge:');
+  console.log('  ' + LAYERS.map((l) => l.layer).join(' → '));
+  for (const l of LAYERS) console.log(`    ${l.layer.padEnd(15)} ${l.question}${l.guard ? `   [${l.guard}]` : ''}`);
+  console.log('\n  Same path, every measurement type:');
+  for (const d of STACK_DEMO) {
+    const r = routeMeasurement(d.asset, d.measurement, d.context);
+    console.log(`    ${d.label.padEnd(42)} → stops at ${r.stoppedAt} (${r.status})`);
+  }
+  console.log('\n  a NEW kind of measurement stops at Representation (extend the model); a recognized one');
+  console.log('  reaches Human Review — never Knowledge automatically. The philosophy never changes.\n');
+}
+
 function schemaCmd(arg) {
   const asset = arg || 'Fire Resistance';
   const model = ASSET_SCHEMA[asset];
@@ -418,6 +432,7 @@ await (({
   changes: () => changesCmd(arg || undefined),
   studio: () => studioCmd(),
   schema: () => schemaCmd(arg || undefined),
+  stack: () => stackCmd(),
   serve: () => import('./studio/studio-server.mjs'),  // read-only Control Room endpoint
   reason: () => reasonCmd(),
   chain: () => chainCmd(),
@@ -427,4 +442,4 @@ await (({
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
   'MATRIYA v1.0\n  ask "<question>" · next · why <asset> · simulate <EVENT> · frontier [asset]\n' +
-  '  material <name> · status · entropy · ingest <source> · daily [source] · changes · studio · schema · validate · sensitivity · review · intake · authority · reason · chain · law · reproduce · analyze · approve <EVENT>')))());
+  '  material <name> · status · entropy · ingest <source> · daily [source] · changes · studio · schema · stack · validate · sensitivity · review · intake · authority · reason · chain · law · reproduce · analyze · approve <EVENT>')))());

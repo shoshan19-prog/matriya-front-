@@ -99,6 +99,15 @@ export default function ControlRoomTab() {
         ))}
       </div>
 
+      <div className="cr-episodes">
+        <span className="cr-es-label">EPISODES BY ASSET</span>
+        {(data.episodesByAsset || []).map((e) => (
+          <span className="cr-es-chip" key={e.asset}><b>{e.episodes}</b> {e.asset.split(' ')[0]}</span>
+        ))}
+        {data.pendingEpisodes ? <span className="cr-es-chip pending"><b>{data.pendingEpisodes}</b> Fire · pending</span> : null}
+        <span className="cr-es-note">— not "documents": units of knowledge you can compare, search, connect</span>
+      </div>
+
       <div className="cr-grid">
         {/* CH1 — Incoming Signals */}
         <div className="cr-ch"><div className="num">CH1</div><h3>Incoming Signals <span>· sources</span></h3>

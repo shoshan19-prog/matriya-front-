@@ -72,6 +72,11 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;pa
 .foot .v{font-size:11.5px;color:var(--dim)}.foot .v b{color:#39d98a}
 .tag{font-size:9px;color:#33404f;letter-spacing:1px;text-transform:uppercase}
 .legend{color:var(--dim);font-size:11px;margin-top:10px}
+.episodes-strip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px;padding:10px 14px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.es-label{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--accent)}
+.es-chip{font-size:12px;background:#0a0f16;border:1px solid #18212d;border-radius:20px;padding:4px 11px;color:var(--dim)}.es-chip b{color:var(--ink)}
+.es-chip.pending{border-color:#3a2f12;color:#ffb454}.es-chip.pending b{color:#ffb454}
+.es-note{font-size:10.5px;color:#33404f}
 @media(max-width:880px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.grid{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
@@ -85,6 +90,13 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;pa
 
 <div class="health">
   ${D.systemHealth.map((s) => `<div class="src" title="${s.note}"><i style="background:${dot(s.state)}"></i>${s.source} <span style="color:var(--dim)">· ${s.state}</span></div>`).join('')}
+</div>
+
+<div class="episodes-strip">
+  <span class="es-label">EPISODES BY ASSET</span>
+  ${(D.episodesByAsset || []).map((e) => `<span class="es-chip"><b>${e.episodes}</b> ${e.asset.split(' ')[0]}</span>`).join('')}
+  ${D.pendingEpisodes ? `<span class="es-chip pending"><b>${D.pendingEpisodes}</b> Fire · pending</span>` : ''}
+  <span class="es-note">— not "documents": units of knowledge you can compare, search, connect</span>
 </div>
 
 <div class="grid">
