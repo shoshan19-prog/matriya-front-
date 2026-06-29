@@ -31,6 +31,7 @@ import { verdicts as sensitivityVerdicts } from './metrics/sensitivity.mjs';
 import { replicateAll } from './metrics/replicate.mjs';
 import { provenanceSummary } from './domains/provenance.mjs';
 import { classifyClaim, contentGateSummary } from './metrics/content-check.mjs';
+import { intakeDocument, SAMPLE_DOC } from './metrics/intake.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -229,8 +230,19 @@ function reviewCmd(arg) {
   }
   const r = classifyClaim({ asset: m[1].trim(), value: +m[2], unit: m[3] });
   console.log(`\nContent check — ${r.asset}: ${m[2]} ${m[3] || '(no unit)'}`);
+  console.log(`  filters: units ${r.filters?.units} · physics ${r.filters?.physics} · baseline ${r.filters?.baseline}`);
   console.log(`  ⇒ ${r.classification} — ${r.reason}`);
   console.log(`  action: ${r.action}  (auto-reject: ${r.autoReject}; only ever routes to human REVIEW)\n`);
+}
+
+function intakeCmd() {
+  const r = intakeDocument(SAMPLE_DOC);
+  console.log(`\nIntake — Document → Extraction → Claim → Content Check → REVIEW (stops here)`);
+  console.log(`  document "${r.document}" → ${r.extracted} measured claims, routed to REVIEW queues:`);
+  for (const [q, items] of Object.entries(r.queues))
+    console.log(`    ${q.padEnd(22)} ${items.length}  ${items.map((x) => `${x.claim.asset.split(' ')[0]} ${x.claim.value}${x.claim.unit}`).join(' · ')}`);
+  console.log(`  downstream: ${r.downstream}`);
+  console.log(`  auto-created events: ${r.autoCreatedEvents} — a REVIEW verdict is NOT a Knowledge Event; only a human moves a claim to Evidence.\n`);
 }
 
 function reproduceCmd() {
@@ -285,9 +297,10 @@ await (({
   validate: () => validateCmd(),
   sensitivity: () => sensitivityCmd(),
   review: () => reviewCmd(arg),
+  intake: () => intakeCmd(),
   reproduce: () => reproduceCmd(),
   analyze: () => analyze(),
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
   'MATRIYA v1.0\n  ask "<question>" · next · why <asset> · simulate <EVENT> · frontier [asset]\n' +
-  '  material <name> · status · entropy · ingest <source> · daily [source] · validate · sensitivity · review · reproduce · analyze · approve <EVENT>')))());
+  '  material <name> · status · entropy · ingest <source> · daily [source] · validate · sensitivity · review · intake · reproduce · analyze · approve <EVENT>')))());
