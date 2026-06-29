@@ -71,8 +71,26 @@ Because tomorrow the source might not be SharePoint at all — it could be Gmail
 - when credentials and the Graph egress policy open, you write **only** a SharePoint Scanner that emits the normalized inventory — and the existing one already conforms;
 - the same feed instantly serves any future source with nothing more than its own Scanner.
 
+## The persistent snapshot store — "today vs the LAST scan", against real history
+
+The detector compares "now" to "last time"; the snapshot store *is* "last time" (`sources/snapshot-store.mjs`). It is the one stateful piece, and it is **append-only** — every scan is a new line in a per-source JSONL log, the latest line is the baseline for the next comparison, and the past is never rewritten (same governance as the rest of MATRIYA). The store is kept local and **outside git** (`.data/` is ignored).
+
+```
+recordScan({ source, inventory })  =  detect(last snapshot, inventory) → feed   +   append the new baseline
+```
+
+Three consecutive scans show the real behaviour (from `snapshot-store-demo.mjs`):
+
+```
+Monday    [first scan — BASELINE, not a flood]    NEW 2 · UPDATED 0 · DELETED 0
+Tuesday   vs Monday                                NEW 1 · UPDATED 1 · DELETED 1   ← the true daily delta
+Wednesday vs Tuesday                               (no changes since the last scan) — empty, honest feed
+```
+
+The first scan is a baseline (everything reads NEW — flagged as such, not a false flood); later scans yield the true delta against history; a quiet day yields an *empty* feed rather than an invented one. A daily job needs only this one call — `recordScan` — and `matriya changes` answers "what's new" for real the moment a live Scanner feeds it.
+
 ## Status & next
 
-- Built & runnable: `sources/change-detector.mjs` (`signatureOf` · `detectChanges` · `changeSummary`), `sources/change-feed.mjs` (`buildFeed` · `renderFeed` · `feedToPipeline` · sample snapshots), `change-feed-demo.mjs`, wired as `matriya changes`. Added as the first authority in the chain (isolation now 8/8).
-- Governance preserved: the feed produces *candidates*; nothing is auto-ingested; the detector is blind to content and value.
-- Recommended order, now in place: (1) universal Change Feed ✓, (2) the delta layer NEW/UPDATED/DELETED ✓, (3) SharePoint left exactly as-is until the credentials and Graph access open. The only remaining wire is a persisted snapshot store (append-only) so "today vs the last scan" runs against real history instead of an in-memory pair — a one-module addition behind the same interface.
+- Built & runnable: `sources/change-detector.mjs` (`signatureOf` · `detectChanges` · `changeSummary`), `sources/change-feed.mjs` (`buildFeed` · `renderFeed` · `feedToPipeline`), `sources/snapshot-store.mjs` (append-only history · `recordScan`), `change-feed-demo.mjs` + `snapshot-store-demo.mjs`, wired as `matriya changes`. Added as the first authority in the chain (isolation now 8/8).
+- Governance preserved: the feed produces *candidates*; nothing is auto-ingested; the detector is blind to content and value; snapshots are append-only and kept out of git.
+- Recommended order, now fully in place: (1) universal Change Feed ✓, (2) the delta layer NEW/UPDATED/DELETED ✓, (3) the persistent snapshot store ✓, (4) SharePoint left exactly as-is until the credentials and Graph access open. The single remaining step is to write a live **SharePoint Scanner** that emits the normalized inventory and feed it into `recordScan` — every other line is already built and tested.

@@ -23,3 +23,7 @@ yarn-error.log*
 
 # Vercel
 .vercel
+
+# MATRIYA — persisted scan snapshots (append-only history, kept local, never committed)
+.data/
+mvp/knowledge-map/.data/
