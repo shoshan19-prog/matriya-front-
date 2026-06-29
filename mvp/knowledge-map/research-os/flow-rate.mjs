@@ -22,12 +22,11 @@ import { qualificationGateSummary } from '../metrics/evidence-qualification.mjs'
 import { researchAgenda } from './agenda.mjs';
 import { hypothesisCandidates } from './hypotheses.mjs';
 import { FIRE_EPISODES_PENDING } from '../schema/fire-episodes.mjs';
+import { readFlow } from './flow-log-store.mjs';
 
-// append-only flow log — the substrate true rates will accrue into. Seeded with the
-// one transition we actually know: the Drive fire batch received, now in Review.
-export const FLOW_LOG = [
-  { unit: 'Drive fire batch (INT-TFX)', stage: 'Episode→Review', at: '2026-06-26', note: 'extracted, recognized, awaiting human approval' },
-];
+// the flow log is now PERSISTED (research-os/flow-log.jsonl) and accrues as the
+// scheduled Drive intake records transitions. Falls back to a seed if empty.
+export const FLOW_LOG = readFlow();
 
 const days = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
 
@@ -62,9 +61,15 @@ export function knowledgeFlowRate(now = '2026-06-29') {
     rejectedOrHeld: gate.review, accepted: gate.accepted,
     hypoToKnowledge,
     questions: { opened, closed: null },
-    // TRUE rates — require the flow log to accrue over time:
-    rates: { evidenceToAcceptDays: null, throughputPerDay: null, openVsCloseRate: null,
-      note: 'cycle-time and per-day rates need ≥2 timepoints in FLOW_LOG — they accrue once the live pipeline records transitions' },
+    // TRUE rates — computed once the persisted flow log has ≥2 distinct dates.
+    rates: (() => {
+      const dates = [...new Set(FLOW_LOG.map((e) => e.at))].sort();
+      if (dates.length < 2) return { throughputPerDay: null, evidenceToAcceptDays: null, openVsCloseRate: null,
+        note: `flow log has ${FLOW_LOG.length} event(s) across ${dates.length} date(s) — per-day rates accrue once ≥2 days of intake are logged` };
+      const span = Math.max(1, days(dates[0], dates[dates.length - 1]));
+      return { throughputPerDay: +(FLOW_LOG.length / span).toFixed(2), evidenceToAcceptDays: null,
+        openVsCloseRate: null, note: `intake throughput over ${span} days; cycle-time still null until approvals are logged` };
+    })(),
     reading: dwell && dwell.daysWaiting > 0
       ? `flow is REVIEW-bound: ${res.batch.entered} fire episodes have waited ${dwell.daysWaiting} days at the Human-Review wall; nothing past it has metabolized (0 → knowledge, 0 → law).`
       : 'flow nominal',

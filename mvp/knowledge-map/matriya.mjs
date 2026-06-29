@@ -48,6 +48,8 @@ import { knowledgeHalfLife } from './research-os/half-life.mjs';
 import { hypothesisCandidates } from './research-os/hypotheses.mjs';
 import { researchAgenda } from './research-os/agenda.mjs';
 import { knowledgeFlowRate } from './research-os/flow-rate.mjs';
+import { driveIntake } from './sources/drive-intake.mjs';
+import { readFileSync as _readFileSync } from 'node:fs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -299,6 +301,21 @@ async function changesCmd(source) {
   console.log('  the day Graph opens, only the Scanner feeding this changes — the feed and pipeline do not.\n');
 }
 
+function intakeDriveCmd(arg) {
+  // matriya intake-drive <inventory.json> [now]
+  // <inventory.json> = [{source,id,name,modified,size?}] from a live Drive scan.
+  const [path, now] = arg.split(/\s+/);
+  if (!path) return console.log('\nusage: matriya intake-drive <inventory.json> [YYYY-MM-DD]\n  (read-only: detect → queue → flow log; never approves or writes the corpus)\n');
+  let inventory;
+  try { inventory = JSON.parse(_readFileSync(path, 'utf8')); } catch (e) { return console.log(`cannot read inventory ${path}: ${e.message}`); }
+  const r = driveIntake({ source: 'drive', inventory, ...(now ? { now } : {}) });
+  console.log(`\nDrive intake (${r.now})${r.firstScan ? ' — first scan, BASELINE' : ''}: ${inventory.length} files → ${r.detected} actionable changes`);
+  for (const q of r.queue.slice(0, 12)) console.log(`  ${q.change.padEnd(8)} ${q.file.slice(0, 42).padEnd(42)} → ${q.hint} · ${q.status}`);
+  if (r.queue.length > 12) console.log(`  … +${r.queue.length - 12} more`);
+  console.log(`  flow log: +${r.flowAppended} transitions · ${r.downstream}`);
+  console.log(`  auto-approved ${r.autoApproved} · auto-writes ${r.autoWrites} — a human reviews the queue.\n`);
+}
+
 function researchCmd() {
   const r = knowledgeResolution();
   console.log('\nMATRIYA — research operating system. Knowledge RESOLUTION (where knowledge sits, not how much):');
@@ -330,7 +347,7 @@ function researchCmd() {
   console.log(`      WIP ${fr.wip.filter((w) => w.count).map((w) => `${w.stage.split(' ')[0]}:${w.count}`).join(' · ')} · accepted ${fr.accepted} · held/review ${fr.rejectedOrHeld} (hold rate ${fr.holdRate})`);
   console.log(`      dwell: ${fr.dwell.unit} stuck ${fr.dwell.daysWaiting}d at Review · hypotheses→knowledge ${fr.hypoToKnowledge.became}/${fr.hypoToKnowledge.of} · questions opened ${fr.questions.opened}`);
   console.log(`      ⇒ ${fr.reading}`);
-  console.log(`      (per-day rates & cycle times accrue once the live pipeline logs transitions)`);
+  console.log(`      ${fr.rates.throughputPerDay != null ? `intake throughput ${fr.rates.throughputPerDay}/day (from the live flow log)` : fr.rates.note}`);
 
   console.log('\n  every unit travels Reality→Evidence→Episode→Representation→Human Review→Knowledge→Decision.');
   console.log('  the OS measures, recommends, and keeps the list — it never acts, approves, or declares a law.\n');
@@ -478,6 +495,7 @@ await (({
   schema: () => schemaCmd(arg || undefined),
   stack: () => stackCmd(),
   research: () => researchCmd(),
+  'intake-drive': () => intakeDriveCmd(arg || ''),
   serve: () => import('./studio/studio-server.mjs'),  // read-only Control Room endpoint
   reason: () => reasonCmd(),
   chain: () => chainCmd(),
