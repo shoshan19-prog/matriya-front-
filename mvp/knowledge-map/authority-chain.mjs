@@ -29,9 +29,16 @@ import { provenanceOf } from './domains/provenance.mjs';
 import { qualifyEvidence } from './metrics/evidence-qualification.mjs';
 import { intakeDocument, SAMPLE_DOC } from './metrics/intake.mjs';
 import { qualifyInference } from './reasoning.mjs';
+import { detectChanges } from './sources/change-detector.mjs';
 
 // ── the chain, as a registry of authorities (each: one question, one vocabulary) ─
 export const AUTHORITIES = [
+  { id: 'Change Detector', station: 'museum guard', question: 'WHAT changed since last time?',
+    judges: 'the inventory (not the content)', blindTo: ['the content', 'the source policy', 'the value', 'knowledge'],
+    mayEmit: ['NEW | UPDATED | DELETED | UNCHANGED'],
+    mustNotSay: ['this source is allowed', 'the claim is valid', 'this matters / changes knowledge'],
+    why: 'source-agnostic: SharePoint, Drive, Gmail, a local folder all answer "what changed?" the same way — only the Scanner differs, never this authority.' },
+
   { id: 'Provenance', station: 'reception clerk', question: 'may this SOURCE be used at all?',
     judges: 'the source', blindTo: ['the claim value', 'the human decision', 'the inference'],
     mayEmit: ['origin: fresco | external | unverified', 'role: project | qc-source | reference', 'eligible: true | false'],
@@ -67,6 +74,7 @@ export const AUTHORITIES = [
 
 // vocabularies each authority is allowed to emit (for the leakage check) — disjoint by design
 const VOCAB = {
+  'Change Detector': ['NEW', 'UPDATED', 'DELETED', 'UNCHANGED'],
   Provenance:      ['fresco', 'external', 'unverified', 'project', 'qc-source', 'reference'],
   Qualification:   ['PASS', 'UNINTELLIGIBLE', 'WITHIN', 'OUTLIER', 'INSUFFICIENT', 'VIOLATION', 'NA', 'ACCEPT', 'REVIEW'],
   'Knowledge Event': ['event', 'ΔK', 'knowledge-changed'],
@@ -81,8 +89,17 @@ export function checkAuthorityIsolation() {
   const checks = [];
 
   // 1. Vocabularies are pairwise disjoint — no authority can emit another's verdict.
-  checks.push({ invariant: 'vocabularies are disjoint (Provenance ⟂ Qualification ⟂ Event)',
-    pass: disjoint(VOCAB.Provenance, VOCAB.Qualification) && disjoint(VOCAB.Qualification, VOCAB['Knowledge Event']) && disjoint(VOCAB.Provenance, VOCAB['Knowledge Event']) });
+  checks.push({ invariant: 'vocabularies are disjoint (Change ⟂ Provenance ⟂ Qualification ⟂ Event)',
+    pass: disjoint(VOCAB['Change Detector'], VOCAB.Provenance) && disjoint(VOCAB['Change Detector'], VOCAB.Qualification)
+      && disjoint(VOCAB.Provenance, VOCAB.Qualification) && disjoint(VOCAB.Qualification, VOCAB['Knowledge Event']) && disjoint(VOCAB.Provenance, VOCAB['Knowledge Event']) });
+
+  // 1b. Change Detector is BLIND to content/knowledge — injecting content fields
+  //     changes nothing (the museum guard only sees the signature, not the painting).
+  const prev = [{ source: 'x', id: 'a', name: 'f.pdf', modified: '2026-06-28T10:00', size: 10 }];
+  const curPlain = [{ source: 'x', id: 'a', name: 'f.pdf', modified: '2026-06-28T10:00', size: 10 }];
+  const curWithContent = [{ source: 'x', id: 'a', name: 'f.pdf', modified: '2026-06-28T10:00', size: 10, asset: 'Compression Strength', value: 23.83, secret: 'xyz' }];
+  checks.push({ invariant: 'Change Detector is blind to content (same UNCHANGED verdict with content/value fields injected)',
+    pass: detectChanges(prev, curPlain)[0].status === 'UNCHANGED' && detectChanges(prev, curWithContent)[0].status === 'UNCHANGED' });
 
   // 2. Provenance says nothing about truth — its record keys are only origin/role/note.
   const prov = provenanceOf('MPZ');

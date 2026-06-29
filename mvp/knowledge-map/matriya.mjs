@@ -35,6 +35,7 @@ import { intakeDocument, SAMPLE_DOC } from './metrics/intake.mjs';
 import { AUTHORITIES, checkAuthorityIsolation } from './authority-chain.mjs';
 import { runReasoningTests, reasoningSummary } from './reasoning.mjs';
 import { runChain, lawGate, SAMPLE_CASES } from './chain.mjs';
+import { buildFeed, renderFeed, feedToPipeline, SNAPSHOT_YESTERDAY, SNAPSHOT_TODAY } from './sources/change-feed.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -255,6 +256,19 @@ function authorityCmd() {
   console.log(`  ⇒ authority isolation holds: ${r.allHold} (${r.passed}/${r.total}). Each authority is independently testable/replaceable.\n`);
 }
 
+function changesCmd() {
+  const feed = buildFeed(SNAPSHOT_YESTERDAY, SNAPSHOT_TODAY);
+  const s = feed.summary;
+  console.log('\nUniversal Change Feed — "what changed?", source-agnostic (the museum guard):');
+  console.log('  (sample snapshots — the same detector serves SharePoint, Drive, Gmail, local…)\n');
+  console.log(renderFeed(feed));
+  console.log(`\n  summary: NEW ${s.NEW} · UPDATED ${s.UPDATED} · DELETED ${s.DELETED} · UNCHANGED ${s.UNCHANGED} (actionable ${s.actionable})`);
+  console.log(`  by source: ${s.bySource.map((b) => `${b.source} ${b.changed}`).join(' · ')}`);
+  console.log('  ⇒ hand-off: each actionable change becomes a candidate for the Knowledge Pipeline');
+  console.log('    ("does this change knowledge?") — human-reviewed, never auto-ingested.');
+  console.log('  the day Graph opens, only the Scanner feeding this changes — the feed and pipeline do not.\n');
+}
+
 function reasonCmd() {
   const s = reasoningSummary();
   console.log('\nReasoning Qualification (the 4th authority) — does the conclusion follow from the evidence?');
@@ -349,6 +363,7 @@ await (({
   review: () => reviewCmd(arg),
   intake: () => intakeCmd(),
   authority: () => authorityCmd(),
+  changes: () => changesCmd(),
   reason: () => reasonCmd(),
   chain: () => chainCmd(),
   law: () => lawCmd(),
@@ -357,4 +372,4 @@ await (({
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
   'MATRIYA v1.0\n  ask "<question>" · next · why <asset> · simulate <EVENT> · frontier [asset]\n' +
-  '  material <name> · status · entropy · ingest <source> · daily [source] · validate · sensitivity · review · intake · authority · reason · chain · law · reproduce · analyze · approve <EVENT>')))());
+  '  material <name> · status · entropy · ingest <source> · daily [source] · changes · validate · sensitivity · review · intake · authority · reason · chain · law · reproduce · analyze · approve <EVENT>')))());
