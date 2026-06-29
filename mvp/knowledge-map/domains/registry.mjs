@@ -17,11 +17,17 @@ function statusOf(products, episodes) {
   return 'Seed';
 }
 
-/** Build the Domain Registry from episodes with `.domains = [{domain, signal, note}]`. */
+/** Build the Domain Registry from episodes with `.domains = [{domain, signal, note}]`.
+ *  Exact-duplicate evidence (same product|domain|signal|note) is ignored — the
+ *  registry counts KNOWLEDGE, not documents (passes the duplicate-noise test). */
 export function buildDomainRegistry(episodes) {
   const dom = new Map();
+  const seen = new Set();
   for (const ep of episodes) {
     for (const d of ep.domains || []) {
+      const sig = `${ep.product}|${d.domain}|${d.signal}|${d.note || ''}`;
+      if (seen.has(sig)) continue;   // duplicate document → no new knowledge
+      seen.add(sig);
       const r = dom.get(d.domain) || { domain: d.domain, evidence: 0, gaps: 0,
         products: new Set(), episodes: new Set(), byProduct: new Map(), items: [] };
       r.evidence += WEIGHT[d.signal] ?? 0;

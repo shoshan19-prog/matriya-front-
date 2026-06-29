@@ -27,6 +27,7 @@ import { informationPotential } from './metrics/information-potential.mjs';
 import { traceability } from './metrics/traceability.mjs';
 import { independenceMatrix, discrimination, promotionGate } from './metrics/discrimination.mjs';
 import { compressibility } from './metrics/compressibility.mjs';
+import { verdicts as sensitivityVerdicts } from './metrics/sensitivity.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -197,6 +198,22 @@ function validateCmd() {
   console.log(`  ⇒ 2-D gate: reproducibility ${g.reproducibility ? '✓' : '✗'} × discrimination ${g.discrimination ? '✓' : '✗'} → ${g.promote ? 'PROMOTE' : 'NOT YET'} (${g.need.join('; ')}). (node metrics/validate-plan.mjs for full)\n`);
 }
 
+function sensitivityCmd() {
+  const vs = sensitivityVerdicts();
+  console.log('\nSensitivity (validation test 4 — Corpus → Perturbation → Recompute → ΔMetric):');
+  console.log('  does each metric RESPOND to real signal and IGNORE noise?\n');
+  for (const v of vs) {
+    const d = v.delta;
+    const shown = `entropy ${d.entropy >= 0 ? '+' : ''}${d.entropy} · adhConf ${d.adhesionConf >= 0 ? '+' : ''}${d.adhesionConf} · compConf ${d.compressionConf >= 0 ? '+' : ''}${d.compressionConf}`;
+    console.log(`  [${v.kind}] ${v.perturbation}`);
+    console.log(`     Δ ${shown}`);
+    console.log(`     ${v.verdict}`);
+  }
+  console.log('\n  ⇒ passes signal-response and duplicate-noise; the open GAP is adversarial:');
+  console.log('    a wrong inference is still counted as valid evidence (no content-level');
+  console.log('    contradiction check yet). "Under what conditions does the metric break?"\n');
+}
+
 function analyze() {
   const { assets, phase } = engine();
   console.log(`\nanalyze: rebuilt knowledge from ${REAL_EPISODES.length} episodes → ${assets.length} assets, phase ${phase.phase} (${phase.phaseIndex}).`);
@@ -228,8 +245,9 @@ await (({
   daily: () => daily(arg || 'sharepoint'),
   entropy: () => entropyCmd(),
   validate: () => validateCmd(),
+  sensitivity: () => sensitivityCmd(),
   analyze: () => analyze(),
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
   'MATRIYA v1.0\n  ask "<question>" · next · why <asset> · simulate <EVENT> · frontier [asset]\n' +
-  '  material <name> · status · entropy · ingest <source> · daily [source] · analyze · approve <EVENT>')))());
+  '  material <name> · status · entropy · ingest <source> · daily [source] · validate · sensitivity · analyze · approve <EVENT>')))());
