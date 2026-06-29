@@ -32,6 +32,7 @@ import { replicateAll } from './metrics/replicate.mjs';
 import { provenanceSummary } from './domains/provenance.mjs';
 import { qualifyEvidence, qualificationGateSummary } from './metrics/evidence-qualification.mjs';
 import { intakeDocument, SAMPLE_DOC } from './metrics/intake.mjs';
+import { AUTHORITIES, checkAuthorityIsolation } from './authority-chain.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -238,6 +239,20 @@ function reviewCmd(arg) {
   console.log(`  action: ${r.action}  (auto-reject: ${r.autoReject}; only ever ACCEPT or human REVIEW)\n`);
 }
 
+function authorityCmd() {
+  console.log('\nMATRIYA as an Authority Chain — each link rules ONE question, on its own domain:');
+  for (const a of AUTHORITIES) {
+    const tag = a.status === 'FUTURE' ? ' [FUTURE]' : '';
+    console.log(`  ${a.id} (${a.station})${tag}: "${a.question}"`);
+    if (a.subAuthorities) console.log(`     courts: ${a.subAuthorities.map((s) => `${s.id} (${s.authority})`).join(' · ')}`);
+    console.log(`     must NOT say: ${a.mustNotSay.join(' · ')}`);
+  }
+  console.log('\n  No Authority Leakage — verified against the real modules:');
+  const r = checkAuthorityIsolation();
+  for (const c of r.checks) console.log(`    ${c.pass ? '✓' : '✗'} ${c.invariant}`);
+  console.log(`  ⇒ authority isolation holds: ${r.allHold} (${r.passed}/${r.total}). Each authority is independently testable/replaceable.\n`);
+}
+
 function intakeCmd() {
   const r = intakeDocument(SAMPLE_DOC);
   console.log(`\nIntake — Document → Extraction → Claim → Evidence Qualification → REVIEW (stops here)`);
@@ -304,9 +319,10 @@ await (({
   sensitivity: () => sensitivityCmd(),
   review: () => reviewCmd(arg),
   intake: () => intakeCmd(),
+  authority: () => authorityCmd(),
   reproduce: () => reproduceCmd(),
   analyze: () => analyze(),
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
   'MATRIYA v1.0\n  ask "<question>" · next · why <asset> · simulate <EVENT> · frontier [asset]\n' +
-  '  material <name> · status · entropy · ingest <source> · daily [source] · validate · sensitivity · review · intake · reproduce · analyze · approve <EVENT>')))());
+  '  material <name> · status · entropy · ingest <source> · daily [source] · validate · sensitivity · review · intake · authority · reproduce · analyze · approve <EVENT>')))());
