@@ -19,7 +19,7 @@ import { classifyFrontier, knowledgePhase } from '../frontier/frontier.mjs';
 import { buildDecisionPriorities } from '../decision-value/decision-value.mjs';
 import { CANDIDATE_EVENTS } from '../events/learning-primitives.mjs';
 import { informationPotential } from './information-potential.mjs';
-import { contentGateSummary } from './content-check.mjs';
+import { qualificationGateSummary } from './evidence-qualification.mjs';
 
 const D = (domain, signal) => ({ domain, signal, note: 'pert' });
 const ep = (product, domain, signal) => ({ id: 'P', product, domains: [D(domain, signal)], materials: [] });
@@ -59,10 +59,10 @@ export function sensitivity() {
 
 /** Verdict per perturbation: did the metrics respond appropriately? */
 export function verdicts(s = sensitivity()) {
-  // the adversarial gap now has a REVIEW gate (content-check.mjs): a false NUMERIC
-  // claim is stopped as REVIEW_OUTLIER/CONTRADICTS_EXISTING before it reaches the
-  // metric. Confirm the gate actually stops the false claims (still never rejects).
-  const gate = contentGateSummary();
+  // the adversarial gap now has a REVIEW gate (evidence-qualification.mjs): a false
+  // NUMERIC claim is stopped (REVIEW, never rejected) before it reaches the metric.
+  // Confirm the gate actually stops the false claims.
+  const gate = qualificationGateSummary();
   const out = [];
   for (const [name, r] of Object.entries(s.results)) {
     const moved = Math.abs(r.delta.entropy) >= 0.005 || Math.abs(r.delta.adhesionConf) >= 0.01 || Math.abs(r.delta.compressionConf) >= 0.01;

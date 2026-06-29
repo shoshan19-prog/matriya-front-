@@ -52,5 +52,5 @@ console.log('══════════════════════�
 console.log('Reproducibility gate: TLV ✓ + MPZ ✓ + PROTECH A1 ✓ = 3 positive Fresco projects.');
 console.log('INT-TFX = NOT ENOUGH DATA (negative case, by design). GRANITAL is ELIGIBLE');
 console.log('(it IS Fresco\'s product) but not required. External sources are fenced OUT of');
-console.log('validation while still feeding assets. Adversarial content-check STILL open —');
-console.log('so read this as "reproduces EXCEPT adversarial content-check", not "law".\n');
+console.log('validation while still feeding assets. Adversarial numeric claims are now GUARDED');
+console.log('by Evidence Qualification; promotion to a law is a human call, not a missing guard.\n');

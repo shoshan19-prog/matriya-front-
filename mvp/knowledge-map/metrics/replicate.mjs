@@ -10,9 +10,10 @@
 //
 //   verdict ∈ { REPRODUCES, DOES NOT REPRODUCE, NOT ENOUGH DATA }
 //
-// Honest framing carried through every output: this is "validated EXCEPT the
-// adversarial content-check" — the Sensitivity Harness left that gap open, so no
-// result here is a "validated metric", only a reproducing one.
+// Honest framing carried through every output: a reproducing metric is still a
+// HYPOTHESIS, not a law. The Sensitivity Harness's adversarial gap is now guarded
+// for numeric evidence by the Evidence Qualification REVIEW gate; promotion is a
+// human judgement on a metric that has passed all four validation tests.
 
 import { REAL_EPISODES } from '../domains/corpus.mjs';
 import { buildKnowledgeAssets } from '../assets/knowledge-asset.mjs';
@@ -197,7 +198,7 @@ export function replicateProject(name) {
     sensitivity: { signalDelta, noiseDelta,
       signal: signalDelta >= 0.01 ? 'responds ✓' : 'flat ✗',
       noise: Math.abs(noiseDelta) < 0.005 ? 'ignores duplicate ✓' : 'moves on duplicate ✗',
-      caveat: 'adversarial content-check still OPEN (a false "measured" claim would pass)' },
+      caveat: 'adversarial numeric claims GUARDED by Evidence Qualification; qualitative still human-review-only' },
     verdict, why,
   };
 }

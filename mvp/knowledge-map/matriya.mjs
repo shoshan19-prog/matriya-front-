@@ -30,7 +30,7 @@ import { compressibility } from './metrics/compressibility.mjs';
 import { verdicts as sensitivityVerdicts } from './metrics/sensitivity.mjs';
 import { replicateAll } from './metrics/replicate.mjs';
 import { provenanceSummary } from './domains/provenance.mjs';
-import { classifyClaim, contentGateSummary } from './metrics/content-check.mjs';
+import { qualifyEvidence, qualificationGateSummary } from './metrics/evidence-qualification.mjs';
 import { intakeDocument, SAMPLE_DOC } from './metrics/intake.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
@@ -214,35 +214,40 @@ function sensitivityCmd() {
     console.log(`     ${v.verdict}`);
   }
   console.log('\n  ⇒ passes signal-response and duplicate-noise; the adversarial case is now');
-  console.log('    GUARDED by the content-check REVIEW gate for numeric claims (matriya review).\n');
+  console.log('    GUARDED by the Evidence Qualification REVIEW gate for numeric claims (matriya review).\n');
 }
 
 function reviewCmd(arg) {
-  // matriya review "<asset>" <value> <unit>   — content-check a measured claim
+  // matriya review "<asset>" <value> <unit>   — qualify a measured claim
   const m = arg.match(/^(.*?)\s+(-?[\d.]+)\s*(\S*)$/);
   if (!m) {
-    console.log('\nContent-check REVIEW gate — is a measured claim plausible? (never auto-rejects)');
-    const g = contentGateSummary();
-    for (const r of g.rows) console.log(`  ${r.pass ? '✓' : '✗'} [${r.got}] ${r.label} — ${r.reason}`);
-    console.log(`\n  false claims all stopped (≠ACCEPT): ${g.falseStopped} · no auto-reject anywhere: ${g.noAutoReject}`);
-    console.log('  usage: matriya review "Compression Strength" 500 MPa\n');
+    console.log('\nEvidence Qualification — three authorities decide a claim is fit to become evidence:');
+    console.log('  Units (intelligible?) · Baseline (anomalous vs Fresco corpus?) · Physics (possible at all?)');
+    const g = qualificationGateSummary();
+    for (const r of g.rows) console.log(`  ${r.pass ? '✓' : '✗'} {U:${r.record.units} B:${r.record.baseline} P:${r.record.physics}} → ${r.record.decision.padEnd(6)} ${r.label}`);
+    const a = g.stats.byAuthority;
+    console.log(`\n  REVIEWs by authority: units ${a.units} · physics ${a.physics} · corpus-outlier ${a.corpusOutlier} · corpus-insufficient ${a.corpusInsufficient}`);
+    console.log(`  false claims all stopped: ${g.falseStopped} · no auto-reject: ${g.noAutoReject} · physics caught beyond corpus: ${g.physicsCaughtBeyondBaseline}`);
+    console.log('  usage: matriya review "Water Resistance / Moisture" 130 %\n');
     return;
   }
-  const r = classifyClaim({ asset: m[1].trim(), value: +m[2], unit: m[3] });
-  console.log(`\nContent check — ${r.asset}: ${m[2]} ${m[3] || '(no unit)'}`);
-  console.log(`  filters: units ${r.filters?.units} · physics ${r.filters?.physics} · baseline ${r.filters?.baseline}`);
-  console.log(`  ⇒ ${r.classification} — ${r.reason}`);
-  console.log(`  action: ${r.action}  (auto-reject: ${r.autoReject}; only ever routes to human REVIEW)\n`);
+  const r = qualifyEvidence({ asset: m[1].trim(), value: +m[2], unit: m[3] });
+  console.log(`\nEvidence Qualification — ${r.asset}: ${m[2]} ${m[3] || '(no unit)'}`);
+  console.log(`  record: { units: ${r.units}, baseline: ${r.baseline}, physics: ${r.physics}, decision: ${r.decision} }`);
+  console.log(`  reasoning: ${r.reason}`);
+  console.log(`  action: ${r.action}  (auto-reject: ${r.autoReject}; only ever ACCEPT or human REVIEW)\n`);
 }
 
 function intakeCmd() {
   const r = intakeDocument(SAMPLE_DOC);
-  console.log(`\nIntake — Document → Extraction → Claim → Content Check → REVIEW (stops here)`);
+  console.log(`\nIntake — Document → Extraction → Claim → Evidence Qualification → REVIEW (stops here)`);
   console.log(`  document "${r.document}" → ${r.extracted} measured claims, routed to REVIEW queues:`);
   for (const [q, items] of Object.entries(r.queues))
-    console.log(`    ${q.padEnd(22)} ${items.length}  ${items.map((x) => `${x.claim.asset.split(' ')[0]} ${x.claim.value}${x.claim.unit}`).join(' · ')}`);
+    if (items.length) console.log(`    ${q.padEnd(22)} ${items.length}  ${items.map((x) => `${x.claim.asset.split(' ')[0]} ${x.claim.value}${x.claim.unit}`).join(' · ')}`);
+  const a = r.byAuthority;
+  console.log(`  review cause by authority: units ${a.units} · physics ${a.physics} · corpus-outlier ${a.corpusOutlier} · corpus-insufficient ${a.corpusInsufficient}`);
   console.log(`  downstream: ${r.downstream}`);
-  console.log(`  auto-created events: ${r.autoCreatedEvents} — a REVIEW verdict is NOT a Knowledge Event; only a human moves a claim to Evidence.\n`);
+  console.log(`  auto-created events: ${r.autoCreatedEvents} — a REVIEW record is NOT a Knowledge Event; only a human moves a claim to Evidence.\n`);
 }
 
 function reproduceCmd() {
@@ -261,7 +266,8 @@ function reproduceCmd() {
     console.log(`    ⇒ ${r.verdict} — ${r.why}`);
   }
   console.log('\n  gate: TLV ✓ + MPZ ✓ + PROTECH A1 ✓ → 3/3 positive Fresco projects; INT-TFX = NOT ENOUGH DATA (negative case).');
-  console.log('  read as "reproduces EXCEPT adversarial content-check" — that Sensitivity gap is still open, so still NOT a law.\n');
+  console.log('  all four validation tests pass for numeric evidence (adversarial now guarded by Evidence Qualification).');
+  console.log('  promotion to a "law" is now a human judgement, not a missing guard. Still reported as hypotheses.\n');
 }
 
 function analyze() {
