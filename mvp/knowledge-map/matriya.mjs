@@ -25,6 +25,8 @@ import { runDaily } from './pipeline.mjs';
 import { assetEntropy, groupEntropy, silence, entropyGradient } from './evidence/entropy.mjs';
 import { informationPotential } from './metrics/information-potential.mjs';
 import { traceability } from './metrics/traceability.mjs';
+import { independenceMatrix, discrimination, promotionGate } from './metrics/discrimination.mjs';
+import { compressibility } from './metrics/compressibility.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -184,10 +186,15 @@ function validateCmd() {
   const tr = traceability();
   const agree = ip.event === grad.event && grad.event === prio.event;
   console.log('\nValidation (hypothesis-metrics on טיח תל אביב — NOT laws):');
-  console.log(`  H1 convergence: IP→${ip.event} · gradient→${grad.event} · priority→${prio.event}  ⇒ ${agree ? 'SUPPORTED (all agree)' : 'PARTIAL'}`);
+  console.log(`  H1 convergence (TLV-restricted): IP→${ip.event} · gradient→${grad.event} · priority→${prio.event}  ⇒ ${agree ? 'agree HERE — but see independence below' : 'PARTIAL'}`);
   console.log(`  H3 traceability: ${tr.complete}/${tr.total} TLV decisions traceable = ${tr.traceability}  (leaks both on the unmeasured strength claim)`);
   console.log(`  H2 phase-transition: needs ≥3 project trajectories — not confirmable on TLV alone.`);
-  console.log(`  ⇒ keep as instrumented hypotheses; promote only after replication. (node metrics/validate-tlv.mjs for full)\n`);
+  const im = independenceMatrix(), d = discrimination(), c = compressibility();
+  console.log(`  independence: Information~Gradient ${im.matrix['Information~Gradient']} (REDUNDANT) · Business~Information ${im.matrix['Business~Information']} (independent)`);
+  console.log(`  discrimination: Business→${d.global.business.split(' ')[0]} vs Order→${d.global.order.split(' ')[0]} → ${d.pass ? 'PASS (they discriminate)' : 'WARNING'}`);
+  console.log(`  compressibility: TLV avg ${c.avgCompressibility}; incompressible ${c.incompressible.join(',')} (the unmeasured strength)`);
+  const g = promotionGate({ projectsConverged: 1, discriminationPassed: d.pass });
+  console.log(`  ⇒ 2-D gate: reproducibility ${g.reproducibility ? '✓' : '✗'} × discrimination ${g.discrimination ? '✓' : '✗'} → ${g.promote ? 'PROMOTE' : 'NOT YET'} (${g.need.join('; ')}). (node metrics/validate-plan.mjs for full)\n`);
 }
 
 function analyze() {
