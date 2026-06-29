@@ -22,6 +22,7 @@ import { buildDecisionPriorities, protocol } from './decision-value/decision-val
 import { CANDIDATE_EVENTS } from './events/learning-primitives.mjs';
 import { scan as spScan, status as spStatus } from './adapters/sharepoint.mjs';
 import { runDaily } from './pipeline.mjs';
+import { assetEntropy, groupEntropy, silence, entropyGradient } from './evidence/entropy.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -160,6 +161,19 @@ async function daily(source = 'sharepoint') {
   console.log(`  ⛔ ${r.review.gate}\n     approve a staged item to fold it in.\n`);
 }
 
+function entropyCmd() {
+  const { assets } = engine();
+  const H = +(assets.reduce((s, a) => s + assetEntropy(a), 0) / assets.length).toFixed(2);
+  console.log(`\nKnowledge entropy (how ORDERED, not how much) — global ${H}`);
+  for (const a of [...assets].sort((x, y) => assetEntropy(y) - assetEntropy(x)).slice(0, 5))
+    console.log(`  ${a.name.padEnd(28)} entropy ${assetEntropy(a)}  (conf ${a.confidence})`);
+  const s = silence();
+  console.log(`  silence: ${s.totalAbsentRecords} expected measurements absent (loudest: ${s.loudestSilence.map((x) => x.asset.split(' ')[0]).join(', ')})`);
+  const g = entropyGradient()[0];
+  console.log(`  ⇒ biggest entropy reduction per ₪: ${g.event} (${g.asset}) — ΔH ${g.dEntropy}, gradient ${g.gradient}/₪1k`);
+  console.log(`  the goal isn't more information — it's less entropy (more order).\n`);
+}
+
 function analyze() {
   const { assets, phase } = engine();
   console.log(`\nanalyze: rebuilt knowledge from ${REAL_EPISODES.length} episodes → ${assets.length} assets, phase ${phase.phase} (${phase.phaseIndex}).`);
@@ -189,8 +203,9 @@ await (({
   status: () => status(),
   ingest: () => ingest(arg),
   daily: () => daily(arg || 'sharepoint'),
+  entropy: () => entropyCmd(),
   analyze: () => analyze(),
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
   'MATRIYA v1.0\n  ask "<question>" · next · why <asset> · simulate <EVENT> · frontier [asset]\n' +
-  '  material <name> · status · ingest <source> · daily [source] · analyze · approve <EVENT>')))());
+  '  material <name> · status · entropy · ingest <source> · daily [source] · analyze · approve <EVENT>')))());
