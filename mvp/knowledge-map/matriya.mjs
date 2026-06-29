@@ -38,6 +38,8 @@ import { runChain, lawGate, SAMPLE_CASES } from './chain.mjs';
 import { buildFeed, renderFeed, feedToPipeline, SNAPSHOT_YESTERDAY, SNAPSHOT_TODAY } from './sources/change-feed.mjs';
 import { liveChanges } from './sources/live-scan.mjs';
 import { buildStudio } from './studio/build-studio.mjs';
+import { ASSET_SCHEMA, recognize, validateRecord } from './schema/asset-schema.mjs';
+import { FIRE_EPISODES_PENDING } from './schema/fire-episodes.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -289,6 +291,29 @@ async function changesCmd(source) {
   console.log('  the day Graph opens, only the Scanner feeding this changes — the feed and pipeline do not.\n');
 }
 
+function schemaCmd(arg) {
+  const asset = arg || 'Fire Resistance';
+  const model = ASSET_SCHEMA[asset];
+  console.log(`\nAsset MODEL — ${asset} (schema v${model?.version || '?'}):`);
+  if (!model) return console.log('  (no schema model)\n');
+  for (const [d, m] of Object.entries(model.dimensions))
+    console.log(`  · ${d.padEnd(15)} ${(m.unit || m.kind).padEnd(8)} ${m.note || ''}`);
+  if (model.legacy) console.log(`  · legacy: ${model.legacy.join(', ')}`);
+
+  if (asset === 'Fire Resistance') {
+    console.log('\n  Validate the PENDING fire episodes against the model:');
+    for (const ep of FIRE_EPISODES_PENDING) {
+      const r = recognize(asset, ep.measurement);
+      console.log(`    ${ep.id.padEnd(20)} ${ep.origin.padEnd(8)} ${r.decision}  (DFT ${ep.measurement.dft}µm → ${ep.measurement.timeToFailure}min)`);
+    }
+    // demonstrate the protection: an UNMODELED dimension still routes to REVIEW
+    const novel = recognize(asset, { timeToFailure: 90, smokeToxicity: 'low' });
+    console.log(`\n  new unmodeled dimension (smokeToxicity): ${novel.decision} — ${novel.reason}`);
+  }
+  console.log('\n  status: all fire episodes are PENDING_REVIEW. No corpus write, no laws, no ranking,');
+  console.log('  no score, no "which product is better". The chain protected the MODEL, not the document.\n');
+}
+
 function studioCmd() {
   const out = buildStudio();
   console.log(`\nMATRIYA Control Room rebuilt → ${out}`);
@@ -392,6 +417,7 @@ await (({
   authority: () => authorityCmd(),
   changes: () => changesCmd(arg || undefined),
   studio: () => studioCmd(),
+  schema: () => schemaCmd(arg || undefined),
   serve: () => import('./studio/studio-server.mjs'),  // read-only Control Room endpoint
   reason: () => reasonCmd(),
   chain: () => chainCmd(),
@@ -401,4 +427,4 @@ await (({
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
   'MATRIYA v1.0\n  ask "<question>" · next · why <asset> · simulate <EVENT> · frontier [asset]\n' +
-  '  material <name> · status · entropy · ingest <source> · daily [source] · changes · studio · validate · sensitivity · review · intake · authority · reason · chain · law · reproduce · analyze · approve <EVENT>')))());
+  '  material <name> · status · entropy · ingest <source> · daily [source] · changes · studio · schema · validate · sensitivity · review · intake · authority · reason · chain · law · reproduce · analyze · approve <EVENT>')))());
