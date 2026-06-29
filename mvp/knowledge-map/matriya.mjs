@@ -33,6 +33,8 @@ import { provenanceSummary } from './domains/provenance.mjs';
 import { qualifyEvidence, qualificationGateSummary } from './metrics/evidence-qualification.mjs';
 import { intakeDocument, SAMPLE_DOC } from './metrics/intake.mjs';
 import { AUTHORITIES, checkAuthorityIsolation } from './authority-chain.mjs';
+import { runReasoningTests, reasoningSummary } from './reasoning.mjs';
+import { runChain, lawGate, SAMPLE_CASES } from './chain.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -253,6 +255,33 @@ function authorityCmd() {
   console.log(`  ⇒ authority isolation holds: ${r.allHold} (${r.passed}/${r.total}). Each authority is independently testable/replaceable.\n`);
 }
 
+function reasonCmd() {
+  const s = reasoningSummary();
+  console.log('\nReasoning Qualification (the 4th authority) — does the conclusion follow from the evidence?');
+  for (const r of s.rows) console.log(`  ${r.pass ? '✓' : '✗'} [${r.got}] ${r.label}`);
+  console.log(`\n  ${s.passed}/${s.total} · non-sequiturs caught: ${s.nonSequitursCaught} · no auto-reject: ${s.noAutoReject}`);
+  console.log('  it judges the inference, never the evidence value — a separate authority.\n');
+}
+
+function chainCmd() {
+  console.log('\nThe complete model — a case walked end-to-end through the Authority Chain:');
+  for (const c of SAMPLE_CASES) {
+    const r = runChain(c);
+    console.log(`\n  ${c.name}`);
+    for (const t of r.trace) console.log(`    ${t.authority.padEnd(24)} ${String(t.verdict).padEnd(14)} ${t.ruling}`);
+    console.log(`    ⇒ stopped at ${r.stoppedAt} — ${r.status}`);
+  }
+  console.log('\n  every link rules one question; the case stops at the first authority that needs a human or flags.\n');
+}
+
+function lawCmd() {
+  const g = lawGate();
+  console.log('\nLaw Gate — the capstone: is any metric promotable to a Law?');
+  for (const c of g.criteria) console.log(`  ${c.status === 'PASS' ? '✓' : '✗'} ${c.test.padEnd(42)} ${c.detail}`);
+  console.log(`\n  ⇒ ${g.verdict}`);
+  console.log(`  promote automatically: ${g.promote}  (the system never declares its own laws — a human does)\n`);
+}
+
 function intakeCmd() {
   const r = intakeDocument(SAMPLE_DOC);
   console.log(`\nIntake — Document → Extraction → Claim → Evidence Qualification → REVIEW (stops here)`);
@@ -320,9 +349,12 @@ await (({
   review: () => reviewCmd(arg),
   intake: () => intakeCmd(),
   authority: () => authorityCmd(),
+  reason: () => reasonCmd(),
+  chain: () => chainCmd(),
+  law: () => lawCmd(),
   reproduce: () => reproduceCmd(),
   analyze: () => analyze(),
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
   'MATRIYA v1.0\n  ask "<question>" · next · why <asset> · simulate <EVENT> · frontier [asset]\n' +
-  '  material <name> · status · entropy · ingest <source> · daily [source] · validate · sensitivity · review · intake · authority · reproduce · analyze · approve <EVENT>')))());
+  '  material <name> · status · entropy · ingest <source> · daily [source] · validate · sensitivity · review · intake · authority · reason · chain · law · reproduce · analyze · approve <EVENT>')))());

@@ -28,6 +28,7 @@
 import { provenanceOf } from './domains/provenance.mjs';
 import { qualifyEvidence } from './metrics/evidence-qualification.mjs';
 import { intakeDocument, SAMPLE_DOC } from './metrics/intake.mjs';
+import { qualifyInference } from './reasoning.mjs';
 
 // ── the chain, as a registry of authorities (each: one question, one vocabulary) ─
 export const AUTHORITIES = [
@@ -56,12 +57,12 @@ export const AUTHORITIES = [
     mayEmit: ['event', 'ΔK'],
     mustNotSay: ['the source is allowed', 're-qualify the evidence', 'the value is/ isn\'t valid'] },
 
-  // ── FUTURE authority (declared, NOT active) ──
+  // ── the fourth authority — now ACTIVE ──
   { id: 'Reasoning Qualification', station: 'appeals court', question: 'does the CONCLUSION follow from the evidence?',
-    judges: 'the inference (not the evidence)', blindTo: ['the source', 'the raw value'], status: 'FUTURE',
+    judges: 'the inference (not the evidence)', blindTo: ['the source', 'the raw value'],
     mayEmit: ['inference: SUPPORTED | NON_SEQUITUR | UNSUPPORTED'],
     mustNotSay: ['re-judge the evidence value', 'the source is allowed'],
-    why: 'Units/Baseline/Physics can all PASS (Pull-off 2.8 MPa) yet "therefore fire resistance improved" is a non-sequitur — a different authority judges the inference, not the evidence.' },
+    why: 'Units/Baseline/Physics can all PASS yet "therefore fire resistance improved" is a non-sequitur — a different authority judges the inference, not the evidence.' },
 ];
 
 // vocabularies each authority is allowed to emit (for the leakage check) — disjoint by design
@@ -112,6 +113,14 @@ export function checkAuthorityIsolation() {
   const intake = intakeDocument(SAMPLE_DOC);
   checks.push({ invariant: 'Human Review is required — intake auto-creates 0 Knowledge Events',
     pass: intake.autoCreatedEvents === 0 });
+
+  // 7. Reasoning judges the INFERENCE, never the evidence value — its verdict
+  //    depends only on the asset linkage, not on the measured number.
+  const inf = { evidenceAssets: ['Adhesion'], conclusionAsset: 'Fire Resistance' };
+  const r1 = qualifyInference({ ...inf, claim: 'value 2.8' });
+  const r2 = qualifyInference({ ...inf, claim: 'value 999' });
+  checks.push({ invariant: 'Reasoning judges the inference, not the evidence value (same verdict regardless of the number)',
+    pass: r1.verdict === r2.verdict && r1.verdict === 'NON_SEQUITUR' });
 
   return { checks, allHold: checks.every((c) => c.pass), passed: checks.filter((c) => c.pass).length, total: checks.length };
 }

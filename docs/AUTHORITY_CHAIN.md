@@ -68,21 +68,22 @@ These are not comments — they are **runnable invariants** (`checkAuthorityIsol
 ✓ Qualification decision ∈ {ACCEPT, REVIEW} — never "accepted"/"event"/"learned"
 ✓ Knowledge Event / intake never mutates a Qualification result (idempotent)
 ✓ Human Review is required — intake auto-creates 0 Knowledge Events
-⇒ authority isolation holds: true (6/6)
+✓ Reasoning judges the inference, not the evidence value (same verdict regardless of the number)
+⇒ authority isolation holds: true (7/7)
 ```
 
 The third one is the sharpest: `qualifyEvidence` is *blind to the source* — passing `origin: 'external'` into the claim changes nothing, proving Qualification cannot be swayed by Provenance's question. The fifth proves the historian can't reach back and edit the lab's report.
 
-## The future fourth authority — Reasoning Qualification
+## The fourth authority — Reasoning Qualification (now active)
 
-Declared in the chain, deliberately **not active yet**. Even when all three evidence courts PASS, a separate authority is needed to judge the *inference*, not the evidence:
+Even when all three evidence courts PASS, a separate authority judges the *inference*, not the evidence:
 
 ```
-measurement: Pull-off = 2.8 MPa     Units PASS · Baseline PASS · Physics PASS
-conclusion:  "therefore fire resistance improved"
+measurement: Compression = 20 MPa     Units PASS · Baseline PASS · Physics PASS
+conclusion:  "therefore fire resistance improved"   → NON_SEQUITUR
 ```
 
-The evidence is impeccable; the inference is a non-sequitur (adhesion says nothing about fire). That is a different question — *does the conclusion follow from the evidence?* — and it belongs to a different court, downstream of the Knowledge Event, before a Decision becomes a Law. Building it now would itself be authority leakage (Qualification judging inferences), so it stays a declared, inactive station until its turn.
+The evidence is impeccable; the inference is a non-sequitur (strength says nothing about fire). It is a different question — *does the conclusion follow from the evidence?* — judged by a different court (`reasoning.mjs`), downstream of the Knowledge Event, before a Decision becomes a Law. It rules `SUPPORTED / NON_SEQUITUR / UNSUPPORTED`, and its 7th isolation invariant proves it judges the *inference* and never the evidence value (the verdict is identical whether the number is 2.8 or 999). See `docs/COMPLETE_MODEL.md`.
 
 ## Why this matters
 
