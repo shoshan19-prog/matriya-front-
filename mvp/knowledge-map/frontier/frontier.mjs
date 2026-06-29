@@ -62,7 +62,7 @@ export function classifyFrontier(assets, transformations) {
       ({ kind, reason, action } = v);
     } else if (a.confidence >= 0.9 && sat.saturated) {
       kind = 'RETRIEVE_COMPLETE';
-      reason = `${a.products} measured product families, confidence ${a.confidence}; ${sat.evidence} → marginal gain from more reports is low`;
+      reason = `${a.products} measured families, confidence ${a.confidence}, headroom ${(1 - a.confidence).toFixed(2)} → marginal gain from more reports is low`;
       action = 'No further retrieval — remaining frontier is external durability tests';
     } else if (sat.saturated) {
       kind = 'RETRIEVE_COMPLETE'; reason = `corpus exhausted; ${sat.evidence}`; action = 'No further retrieval';

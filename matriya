@@ -1,0 +1,3 @@
+#!/bin/sh
+# MATRIYA v1.0 — single entry point. Put this dir on PATH or:  alias matriya="$PWD/matriya"
+exec node "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)/mvp/knowledge-map/matriya.mjs" "$@"
