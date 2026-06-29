@@ -1,8 +1,27 @@
-# Do the metrics repeat? — reproducibility on MPZ and INT-TFX
+# Do the metrics repeat? — reproducibility on MPZ, INT-TFX, PROTECH A1 (Fresco projects only)
 
-*Prepared 2026-06-29. The Tel Aviv result was one project. One project cannot tell you whether a metric measures a real property of the research process or just fit one lucky case. This re-runs the **same** metric set on two more projects, in the order the validation plan calls for — **MPZ first** (measured, strength-rich → a real test), **INT-TFX second** (Stage-0/POC, almost no experiments → a negative case). Code: `mvp/knowledge-map/metrics/replicate.mjs`. Run: `matriya reproduce` or `node metrics/replicate-demo.mjs`.*
+*Prepared 2026-06-29. The Tel Aviv result was one project. One project cannot tell you whether a metric measures a real property of the research process or just fit one lucky case. This re-runs the **same** metric set on more projects, in the order the validation plan calls for — **MPZ** (measured, strength-rich → a real test), **INT-TFX** (Stage-0/POC → a negative case), **PROTECH A1** (measured coating, qualitative-only Color → a 3rd internal test). Code: `mvp/knowledge-map/metrics/replicate.mjs` + `domains/provenance.mjs`. Run: `matriya reproduce` or `node metrics/replicate-demo.mjs`.*
 
 > **Read every verdict below as "reproduces EXCEPT the adversarial content-check."** The Sensitivity Harness left one gap open — a false `measured` claim still passes — so nothing here is a *validated metric*, only a *reproducing* one.
+
+---
+
+## The provenance fence — validation ≠ "any source"
+
+A Knowledge Asset is scale-invariant and may take evidence from **anywhere** — internal projects, raw-material QC, even a competitor's ΔE deck (a real colorimetry number is real regardless of who measured it). But **validating a law is a different act**: it must reproduce on the **defined reference corpus** — real Fresco projects with their own decision cycles — or the test mixes the internal corpus with outside data and biases itself. So `domains/provenance.mjs` tags every product and the reproducibility gate counts **only** `origin:fresco · role:project`:
+
+```
+Fresco PROJECTS (validation-eligible): טיח תל אביב · תרמי · INT-TFX · MPZ · GRANITAL · fire-retardant plaster · BETONIZE · PROTECH A1
+Fresco QC sources (evidence only):     raw-material QC · field-stone QC · spectro QC · MP-1000/CC primer
+External references (evidence only):   concrete densifiers (commercial benchmarks)
+Unverified (excluded until confirmed): F.SILICATO · Sloxan/LASUR · Italian/Acryl-Plus
+⇒ evidence may come from any of these; validation counts ONLY the Fresco projects.
+```
+
+The fence is live: asking it to validate on `concrete densifiers` returns **NOT A VALIDATION PROJECT** — usable as a knowledge source, never as a reproducibility case.
+
+### Honest correction logged: GRANITAL is Fresco's
+The question "is GRANITAL external?" was the right *principle* but the wrong *example*: GRANITAL's own reconstruction states it **is** "Fresco's silicate facade paint, the internal counterpart to KEIM Granital" (the KEIM vendor PDFs were read as reference only). So GRANITAL is **eligible** — the genuinely external items are the vendor/competitor references (KEIM, the commercial-densifier benchmarks) and anything whose origin is unverified. The fence encodes the principle correctly without mis-labeling GRANITAL.
 
 ---
 
@@ -58,33 +77,56 @@ INT-TFX has **0 executed additive trials** and **1** legacy burn datapoint held 
 
 ---
 
+## PROTECH A1 — REPRODUCES (a 3rd internal Fresco project, the mirror again)
+
+```
+asset                         conf  measured  entropy
+Water Resistance / Moisture   0.65     2        0.19   ← grounded, quiet
+Fire Resistance               0.63     1        0.26   ← grounded (A1 cert), quiet
+Workability / Flow            0.52     3        0.50   ← grounded, quiet
+Color / Shade                 0.17     0        0.68   ← loudest
+```
+
+| metric | PROTECH A1 |
+|--------|-----------|
+| weak point detected? | **YES** — loudest = Color/Shade; grounded Workability/Fire/Water quiet |
+| decision compressibility | avg **0.36**; incompressible **none** (every decision explainable) |
+| decision traceability | **0.83** (5/6) — the one leak is the qualitative Color decision (PB) |
+| momentum / evidence | **0.5** — *evidence-led* (the most measurement-grounded project yet) |
+| frontier phase | **TRANSITION** (0.5) |
+| sensitivity | signal responds ✓ · duplicate ignored ✓ · adversarial OPEN |
+
+PROTECH is the cleanest case: three **measured** assets (Workability cps, the Class-A1 fire cert, oven/water stability) all stay quiet, and the single qualitative asset — **Color** — is both the loudest (H 0.68) and the only traceability leak. Same mechanism as TLV and MPZ, a third time, on a third independent Fresco project. Its decisions are also fully compressible (avg 0.36, nothing incompressible), which matches the documentation: PROTECH actually *finished* its measured arcs, where TLV and MPZ each left one axis unmeasured.
+
 ## Momentum / Evidence — a new diagnostic this run surfaced
 
 > `Momentum / Evidence = decisions taken / measured-evidence weight` — are we deciding **on** data or **ahead** of it?
 
 - MPZ **0.75** → evidence-led (healthy: a measure-rich family).
+- PROTECH A1 **0.5** → the most evidence-led project (three measured assets).
 - INT-TFX **2.0** → deciding ahead of evidence (a Stage-0 posture; not wrong, but a flag).
-- It cleanly separates the two documented postures — trial-heavy/measure-rich vs gate-first/define-before-experiment — without being told which is which.
+- It cleanly separates the documented postures — trial-heavy/measure-rich vs gate-first/define-before-experiment — without being told which is which.
 
 ## The reproducibility gate
 
 | project | role | verdict |
 |---------|------|---------|
-| Tel Aviv | original | localized (strength) ✓ |
-| **MPZ** | positive test | **REPRODUCES** (process/moisture; mirror image) ✓ |
+| Tel Aviv | original | localized (strength dark) ✓ |
+| **MPZ** | positive test | **REPRODUCES** (process/moisture dark; mirror image) ✓ |
+| **PROTECH A1** | positive test | **REPRODUCES** (Color dark; three measured assets quiet) ✓ |
 | **INT-TFX** | negative case | **NOT ENOUGH DATA** (correctly refuses) |
 
 ```
-reproducibility: 2 / 3 positive  ·  discrimination ✓  ·  independence ✓  ·  sensitivity ◐ (adversarial open)
-⇒ promote a metric to permanent architecture?  NOT YET.
+reproducibility: 3 / 3 positive Fresco projects  ·  discrimination ✓  ·  independence ✓  ·  sensitivity ◐ (adversarial open)
+⇒ promote a metric to permanent architecture?  STILL NOT YET — one gate remains.
 ```
 
-Two of three projects now localize the weak point by the same mechanism, and the third correctly declines — which is itself evidence the metric isn't a hindsight fit. But "2/3 positive" is still one short of a ≥3-positive bar, and the **adversarial content-check from the Sensitivity Harness is still open**. So: stronger than Tel-Aviv-alone, not yet a law.
+Three independent Fresco projects now localize the weak point by the **same** mechanism, each as a mirror image (TLV→strength, MPZ→process/moisture, PROTECH→color), so the metric is demonstrably tracking *where the evidence actually is*, not a fixed answer — and the negative case (INT-TFX) correctly declines, which is itself evidence against a hindsight fit. The ≥3-positive reproducibility bar is now **met**. But promotion is a 2-D gate and the **adversarial content-check from the Sensitivity Harness is still open** — a false `measured` claim would still pass undetected. So: reproducibility ✓, but **not a law** until that gap closes.
 
 ## Status & next
 
-- Built & runnable: `metrics/replicate.mjs` (per-project metric replay · weak-point localization with a discrimination guard · Momentum/Evidence · per-project sensitivity probe · verdict), `replicate-demo.mjs`, wired as `matriya reproduce`.
-- Honest scorecard: TLV ✓ + MPZ ✓ = 2 positive; INT-TFX = NOT ENOUGH DATA (negative case behaving correctly); discrimination & independence hold; sensitivity passes signal+noise, **adversarial still open**.
-- Next to actually reach promotion: a **3rd positive project** with real measured decisions (GRANITAL/Color or PROTECH-A1/Fire are candidates), **and** closing the adversarial content-check (a content-level contradiction check) before any metric is called a law.
+- Built & runnable: `domains/provenance.mjs` (the validation fence), `metrics/replicate.mjs` (per-project metric replay · weak-point localization with a discrimination guard · Momentum/Evidence · per-project sensitivity probe · verdict), `replicate-demo.mjs`, wired as `matriya reproduce`.
+- Honest scorecard: TLV ✓ + MPZ ✓ + PROTECH A1 ✓ = **3 positive** Fresco projects; INT-TFX = NOT ENOUGH DATA (negative case behaving correctly); discrimination & independence hold; sensitivity passes signal+noise, **adversarial still open**.
+- The ONE thing left before any metric becomes a law: **close the adversarial content-check** — a content-level contradiction check (does a new `measured` claim contradict the existing distribution for the asset?). Reproducibility is no longer the blocker; the adversarial gap is.
 
-> Convergence on one project proves nothing. Two now reproduce by the same mechanism — and, tellingly, as mirror images, so the metric is tracking *where the evidence is*, not a fixed answer. The third honestly says "too thin." Still measured hypotheses — and still only "validated except the adversarial content-check."
+> Convergence on one project proves nothing. Three independent Fresco projects now reproduce by the same mechanism — as mirror images, so the metric tracks *where the evidence is*, not a fixed answer — and the thin one honestly says "too thin." Reproducibility ✓, but still only "validated except the adversarial content-check." Not a law yet — and the reason is now precisely one open gap, not a missing project.

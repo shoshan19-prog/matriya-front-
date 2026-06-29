@@ -21,6 +21,7 @@ import { replayTransformations } from '../transformations/transformation.mjs';
 import { classifyFrontier, knowledgePhase } from '../frontier/frontier.mjs';
 import { compressibility } from './compressibility.mjs';
 import { traceability } from './traceability.mjs';
+import { validationEligible, provenanceOf } from '../domains/provenance.mjs';
 
 // ── per-project decisions, grounded in docs/PRODUCT_STORY_*.md (never invented) ──
 // total = evidence on record for the decision · minimal = fewest pieces that
@@ -69,13 +70,49 @@ const PROJECTS = {
         chain: 'complete', total: 1, minimal: 1, evidence: 'governance SOP — explains itself, but carries no product evidence' },
     ],
   },
+  'PROTECH A1': {
+    label: 'PROTECH A1 (Fresco silicate paint, Class A1 fire)',
+    posture: 'measure-rich coating — measured Workability + Water + Class-A1 Fire; Color left qualitative',
+    // grounded on Workability/Fire/Water (all measured); the documented gap is Color.
+    weakPoint: { assets: ['Color / Shade'], grounded: 'Workability / Flow',
+      text: 'Color is qualitative-only (pigment compatibility 1–5, "black shifts lighter"); ' +
+            'no measured viscosity for tinted variants, no whiteness/abrasion numbers.' },
+    decisions: [
+      { id: 'PA', date: '2023-01', decision: 'down-select binder SA-1 / KSIL34 (reject EM-58)', asset: 'Workability / Flow',
+        chain: 'complete', total: 6, minimal: 2, evidence: 'measured viscosity 24h–>1mo + SG; EM-58 rubbed off pre-cure' },
+      { id: 'PB', date: '2023-02', decision: 'pigment compatibility via A11 stabilizer to 2%',  asset: 'Color / Shade',
+        chain: 'partial',  total: 4, minimal: 2, evidence: 'qualitative 1–5 compatibility only — no colorimetry' },
+      { id: 'PC', date: '2023-03', decision: 'oven-unstable at 50°C → store ≤40°C',             asset: 'Water Resistance / Moisture',
+        chain: 'complete', total: 5, minimal: 2, evidence: 'measured viscosity rise + creamy texture at 4wk' },
+      { id: 'PD', date: '2023-04', decision: '+1% propylene glycol for open time',               asset: 'Workability / Flow',
+        chain: 'complete', total: 3, minimal: 1, evidence: 'painter field report + measured open-time gain' },
+      { id: 'PE', date: '2023-05', decision: 'antifoam 0.45% → formula 162 as final',           asset: 'Workability / Flow',
+        chain: 'complete', total: 6, minimal: 2, evidence: 'measured foam/separation pass at 162 vs 161/163' },
+      { id: 'PF', date: '2023-06', decision: 'Class A1 cert → productize + 400kg pilot',         asset: 'Fire Resistance',
+        chain: 'complete', total: 4, minimal: 1, evidence: 'ISO 1182 ΔT 5.1°C / ISO 1716 0.0 MJ/kg cert' },
+    ],
+  },
 };
 
 const W = { measured: 2, qualitative: 1, empty: 0 };
 
-/** Run the full metric set on one project subset. */
+/** Run the full metric set on one project subset.
+ *  Provenance guard: validation only ever runs on confirmed Fresco PROJECTS. An
+ *  external/unverified source can feed Knowledge Assets, but it cannot validate a
+ *  law — that would mix the reference corpus with outside data and bias the test. */
 export function replicateProject(name) {
   const cfg = PROJECTS[name];
+  if (!validationEligible(name)) {
+    const p = provenanceOf(name);
+    return { name, ineligible: true, provenance: p,
+      verdict: 'NOT A VALIDATION PROJECT',
+      why: `${name} is origin:${p.origin}/role:${p.role} — usable as a knowledge SOURCE, not as a reproducibility project (${p.note})` };
+  }
+  if (!cfg) {
+    return { name, ineligible: false, pending: true,
+      verdict: 'ELIGIBLE — NOT YET REPLICATED',
+      why: `${name} is a Fresco project (validation-eligible) but its decision set has not been encoded for replication yet` };
+  }
   const eps = REAL_EPISODES.filter((e) => e.product === name);
   const assets = buildKnowledgeAssets(eps).filter((a) => a.evidence > 0)
     .map((a) => ({ ...a, entropy: assetEntropy(a) }));
@@ -165,6 +202,6 @@ export function replicateProject(name) {
   };
 }
 
-export function replicateAll(order = ['MPZ', 'INT-TFX']) {
+export function replicateAll(order = ['MPZ', 'INT-TFX', 'PROTECH A1']) {
   return order.map(replicateProject);
 }

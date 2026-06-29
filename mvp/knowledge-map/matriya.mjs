@@ -29,6 +29,7 @@ import { independenceMatrix, discrimination, promotionGate } from './metrics/dis
 import { compressibility } from './metrics/compressibility.mjs';
 import { verdicts as sensitivityVerdicts } from './metrics/sensitivity.mjs';
 import { replicateAll } from './metrics/replicate.mjs';
+import { provenanceSummary } from './domains/provenance.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -216,17 +217,22 @@ function sensitivityCmd() {
 }
 
 function reproduceCmd() {
-  console.log('\nReproducibility (do the metrics repeat beyond Tel Aviv? — MPZ → INT-TFX):');
+  const ps = provenanceSummary(REAL_EPISODES.map((e) => e.product));
+  console.log('\nReproducibility — validation runs on Fresco PROJECTS only (provenance fence):');
+  console.log(`  eligible projects: ${ps.frescoProjects.join(', ')}`);
+  console.log(`  evidence-only (fenced out of validation): ${[...ps.frescoSources, ...ps.external, ...ps.unverified].join(', ')}`);
+  console.log('\n  do the metrics repeat? — MPZ → INT-TFX → PROTECH A1:');
   for (const r of replicateAll()) {
+    if (r.ineligible || r.pending) { console.log(`\n  ${r.name}: ${r.verdict}`); continue; }
     console.log(`\n  ${r.label}`);
-    console.log(`    loudest gap ${r.metrics.loudest?.asset} (H ${r.metrics.loudest?.entropy}); grounded asset stays quiet`);
+    console.log(`    loudest gap ${r.metrics.loudest?.asset} (H ${r.metrics.loudest?.entropy}); grounded ${r.weakPoint.grounded || '—'} stays quiet`);
     console.log(`    weak point detected? ${r.weakPointDetected.detected ? 'YES' : 'no'} · compressibility avg ${r.compressibility.avg ?? '—'} (incompressible ${r.compressibility.incompressible.join(',') || 'none'}) · traceability ${r.traceability.value}`);
     console.log(`    momentum/evidence ${r.momentumOverEvidence.value ?? '∞'} (${r.momentumOverEvidence.reading}) · frontier ${r.frontier.phase}`);
     console.log(`    sensitivity: signal ${r.sensitivity.signal}, duplicate ${r.sensitivity.noise}`);
     console.log(`    ⇒ ${r.verdict} — ${r.why}`);
   }
-  console.log('\n  gate: TLV ✓ + MPZ ✓ → 2/3; INT-TFX = NOT ENOUGH DATA (negative case, by design).');
-  console.log('  read as "reproduces EXCEPT adversarial content-check" — that Sensitivity gap is still open.\n');
+  console.log('\n  gate: TLV ✓ + MPZ ✓ + PROTECH A1 ✓ → 3/3 positive Fresco projects; INT-TFX = NOT ENOUGH DATA (negative case).');
+  console.log('  read as "reproduces EXCEPT adversarial content-check" — that Sensitivity gap is still open, so still NOT a law.\n');
 }
 
 function analyze() {

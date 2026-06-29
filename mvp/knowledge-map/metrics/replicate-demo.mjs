@@ -1,12 +1,27 @@
-// Reproducibility run: MPZ → INT-TFX (the order the validation plan calls for).
+// Reproducibility run on Fresco projects only: MPZ → INT-TFX → PROTECH A1.
 //   run: node replicate-demo.mjs
-import { replicateAll } from './replicate.mjs';
+import { replicateAll, replicateProject } from './replicate.mjs';
+import { provenanceSummary } from '../domains/provenance.mjs';
+import { REAL_EPISODES } from '../domains/corpus.mjs';
 
-console.log('\n═══ REPRODUCIBILITY — do the metrics repeat beyond Tel Aviv? ═══');
-console.log('order: MPZ (measured, good test) → INT-TFX (Stage-0, negative case)\n');
+// ── the provenance fence (why validation ≠ "any source") ──
+const ps = provenanceSummary(REAL_EPISODES.map((e) => e.product));
+console.log('\n═══ PROVENANCE FENCE — what may VALIDATE a law vs only feed evidence ═══\n');
+console.log(`  Fresco PROJECTS (validation-eligible): ${ps.frescoProjects.join(', ')}`);
+console.log(`  Fresco QC sources (evidence only):     ${ps.frescoSources.join(', ')}`);
+console.log(`  External references (evidence only):   ${ps.external.join(', ')}`);
+console.log(`  Unverified (excluded until confirmed): ${ps.unverified.join(', ')}`);
+console.log(`  ⇒ ${ps.note}`);
+// demonstrate the fence rejecting a non-project source:
+const ext = replicateProject('concrete densifiers');
+console.log(`\n  fence test — "concrete densifiers": ${ext.verdict} (${ext.why})`);
+
+console.log('\n═══ REPRODUCIBILITY — do the metrics repeat across Fresco projects? ═══');
+console.log('order: MPZ (measured) → INT-TFX (Stage-0, negative) → PROTECH A1 (measured coating)\n');
 
 for (const r of replicateAll()) {
   console.log('────────────────────────────────────────────────────────────────────');
+  if (r.ineligible || r.pending) { console.log(`PROJECT:  ${r.name}\n  ⇒ ${r.verdict} — ${r.why}\n`); continue; }
   console.log(`PROJECT:  ${r.label}`);
   console.log(`  posture: ${r.posture}`);
   console.log(`\n  Metric results (per asset):`);
@@ -34,7 +49,8 @@ for (const r of replicateAll()) {
 }
 
 console.log('════════════════════════════════════════════════════════════════════════');
-console.log('Reproducibility gate so far: TLV ✓ + MPZ → counts toward the ≥3 bar.');
-console.log('INT-TFX is the NEGATIVE case: too thin to test — and the metric says so');
-console.log('rather than inventing a result. No metric promoted; adversarial gap still open.');
-console.log('Read every result as "reproduces EXCEPT adversarial content-check".\n');
+console.log('Reproducibility gate: TLV ✓ + MPZ ✓ + PROTECH A1 ✓ = 3 positive Fresco projects.');
+console.log('INT-TFX = NOT ENOUGH DATA (negative case, by design). GRANITAL is ELIGIBLE');
+console.log('(it IS Fresco\'s product) but not required. External sources are fenced OUT of');
+console.log('validation while still feeding assets. Adversarial content-check STILL open —');
+console.log('so read this as "reproduces EXCEPT adversarial content-check", not "law".\n');
