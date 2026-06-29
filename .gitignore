@@ -27,3 +27,6 @@ yarn-error.log*
 # MATRIYA — persisted scan snapshots (append-only history, kept local, never committed)
 .data/
 mvp/knowledge-map/.data/
+
+# MATRIYA — generated studio screenshots (the HTML is committed, the PNG is not)
+mvp/knowledge-map/studio/*.png

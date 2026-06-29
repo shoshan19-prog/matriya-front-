@@ -37,6 +37,7 @@ import { runReasoningTests, reasoningSummary } from './reasoning.mjs';
 import { runChain, lawGate, SAMPLE_CASES } from './chain.mjs';
 import { buildFeed, renderFeed, feedToPipeline, SNAPSHOT_YESTERDAY, SNAPSHOT_TODAY } from './sources/change-feed.mjs';
 import { liveChanges } from './sources/live-scan.mjs';
+import { buildStudio } from './studio/build-studio.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -288,6 +289,13 @@ async function changesCmd(source) {
   console.log('  the day Graph opens, only the Scanner feeding this changes — the feed and pipeline do not.\n');
 }
 
+function studioCmd() {
+  const out = buildStudio();
+  console.log(`\nMATRIYA Control Room rebuilt → ${out}`);
+  console.log('  open it in a browser. 8 channels + the LEARNING light, driven by real module data.');
+  console.log('  (sources/feed are sample until SharePoint opens; every other channel is live.)\n');
+}
+
 function reasonCmd() {
   const s = reasoningSummary();
   console.log('\nReasoning Qualification (the 4th authority) — does the conclusion follow from the evidence?');
@@ -383,6 +391,7 @@ await (({
   intake: () => intakeCmd(),
   authority: () => authorityCmd(),
   changes: () => changesCmd(arg || undefined),
+  studio: () => studioCmd(),
   reason: () => reasonCmd(),
   chain: () => chainCmd(),
   law: () => lawCmd(),
@@ -391,4 +400,4 @@ await (({
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
   'MATRIYA v1.0\n  ask "<question>" · next · why <asset> · simulate <EVENT> · frontier [asset]\n' +
-  '  material <name> · status · entropy · ingest <source> · daily [source] · changes · validate · sensitivity · review · intake · authority · reason · chain · law · reproduce · analyze · approve <EVENT>')))());
+  '  material <name> · status · entropy · ingest <source> · daily [source] · changes · studio · validate · sensitivity · review · intake · authority · reason · chain · law · reproduce · analyze · approve <EVENT>')))());
