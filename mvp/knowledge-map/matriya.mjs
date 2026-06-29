@@ -41,6 +41,12 @@ import { buildStudio } from './studio/build-studio.mjs';
 import { ASSET_SCHEMA, recognize, validateRecord } from './schema/asset-schema.mjs';
 import { FIRE_EPISODES_PENDING } from './schema/fire-episodes.mjs';
 import { LAYERS, routeMeasurement, STACK_DEMO } from './stack.mjs';
+import { knowledgeResolution } from './research-os/funnel.mjs';
+import { representationCoverage } from './research-os/representation-coverage.mjs';
+import { fragileKnowledge, whatCollapsesIf } from './research-os/lineage.mjs';
+import { knowledgeHalfLife } from './research-os/half-life.mjs';
+import { hypothesisCandidates } from './research-os/hypotheses.mjs';
+import { researchAgenda } from './research-os/agenda.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -292,6 +298,35 @@ async function changesCmd(source) {
   console.log('  the day Graph opens, only the Scanner feeding this changes — the feed and pipeline do not.\n');
 }
 
+function researchCmd() {
+  const r = knowledgeResolution();
+  console.log('\nMATRIYA — research operating system. Knowledge RESOLUTION (where knowledge sits, not how much):');
+  const max = Math.max(...r.funnel.map((f) => f.count), 1);
+  for (const f of r.funnel) console.log(`  ${f.stage.padEnd(20)} ${'█'.repeat(Math.round((f.count / max) * 20)).padEnd(20)} ${f.count}`);
+  console.log(`  resolution index ${r.resolutionIndex} · latest batch "${r.batch.name}": ${r.batch.entered} entered → ${r.batch.atStage} → ${r.batch.becameKnowledge} knowledge / ${r.batch.changedLaw} laws`);
+
+  const rc = representationCoverage();
+  console.log(`\n  [1] Representation Coverage: ${rc.modeled}/${rc.total} assets modeled (${Math.round(rc.coverage * 100)}%). missing wings: ${rc.unmodeledWings.map((w) => w.dimension).join(', ')}`);
+
+  const frag = fragileKnowledge();
+  console.log(`  [2] Knowledge Lineage: ${frag.length} fragile (single-episode) claims — e.g. ${frag.slice(0, 2).map((f) => `${f.asset.split(' ')[0]}(${f.supportedBy.join(',')})`).join(', ') || 'none'}`);
+  const col = whatCollapsesIf('TLV-04');
+  if (col.found) console.log(`      retraction probe TLV-04 → ${col.impact.map((i) => `${i.asset.split(' ')[0]}: ${i.effect}`).join(' · ')}`);
+
+  const hl = knowledgeHalfLife();
+  console.log(`  [3] Knowledge Half-Life: aging = ${hl.aging.map((a) => a.split(' ')[0]).join(', ') || 'none'}; standard risk = ${hl.standardRisks.map((s) => s.asset.split(' ')[0]).join(', ')}`);
+
+  const hyp = hypothesisCandidates();
+  console.log(`  [4] Hypothesis Candidates (UNVALIDATED): ${hyp.candidates.map((h) => h.id).join(', ')}`);
+  for (const h of hyp.candidates) console.log(`      · ${h.hypothesis} [${h.status.split('—')[0].trim()}]`);
+
+  const ag = researchAgenda();
+  console.log(`  [5] Research Agenda (read-only): ${ag.counts.map((c) => `${c.n} ${c.kind}`).join(' · ')}`);
+  for (const it of ag.items.slice(0, 5)) console.log(`      (${it.kind}) ${it.title}`);
+  console.log('\n  every unit travels Reality→Evidence→Episode→Representation→Human Review→Knowledge→Decision.');
+  console.log('  the OS measures, recommends, and keeps the list — it never acts, approves, or declares a law.\n');
+}
+
 function stackCmd() {
   console.log('\nThe Knowledge Stack — Representation guards the model between Episode and Knowledge:');
   console.log('  ' + LAYERS.map((l) => l.layer).join(' → '));
@@ -433,6 +468,7 @@ await (({
   studio: () => studioCmd(),
   schema: () => schemaCmd(arg || undefined),
   stack: () => stackCmd(),
+  research: () => researchCmd(),
   serve: () => import('./studio/studio-server.mjs'),  // read-only Control Room endpoint
   reason: () => reasonCmd(),
   chain: () => chainCmd(),
@@ -442,4 +478,4 @@ await (({
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
   'MATRIYA v1.0\n  ask "<question>" · next · why <asset> · simulate <EVENT> · frontier [asset]\n' +
-  '  material <name> · status · entropy · ingest <source> · daily [source] · changes · studio · schema · stack · validate · sensitivity · review · intake · authority · reason · chain · law · reproduce · analyze · approve <EVENT>')))());
+  '  material <name> · status · entropy · ingest <source> · daily [source] · changes · studio · schema · stack · research · validate · sensitivity · review · intake · authority · reason · chain · law · reproduce · analyze · approve <EVENT>')))());
