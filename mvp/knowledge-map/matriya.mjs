@@ -23,6 +23,8 @@ import { CANDIDATE_EVENTS } from './events/learning-primitives.mjs';
 import { scan as spScan, status as spStatus } from './adapters/sharepoint.mjs';
 import { runDaily } from './pipeline.mjs';
 import { assetEntropy, groupEntropy, silence, entropyGradient } from './evidence/entropy.mjs';
+import { informationPotential } from './metrics/information-potential.mjs';
+import { traceability } from './metrics/traceability.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -174,6 +176,20 @@ function entropyCmd() {
   console.log(`  the goal isn't more information — it's less entropy (more order).\n`);
 }
 
+function validateCmd() {
+  const TLV = ['Adhesion', 'Compression Strength', 'Workability / Flow', 'Granulometry / Fractions'];
+  const ip = informationPotential().find((r) => TLV.includes(r.asset));
+  const grad = entropyGradient().find((r) => TLV.includes(r.asset));
+  const prio = buildDecisionPriorities(REAL_EPISODES, 'customer-returns-cracking').find((r) => TLV.includes(r.asset));
+  const tr = traceability();
+  const agree = ip.event === grad.event && grad.event === prio.event;
+  console.log('\nValidation (hypothesis-metrics on טיח תל אביב — NOT laws):');
+  console.log(`  H1 convergence: IP→${ip.event} · gradient→${grad.event} · priority→${prio.event}  ⇒ ${agree ? 'SUPPORTED (all agree)' : 'PARTIAL'}`);
+  console.log(`  H3 traceability: ${tr.complete}/${tr.total} TLV decisions traceable = ${tr.traceability}  (leaks both on the unmeasured strength claim)`);
+  console.log(`  H2 phase-transition: needs ≥3 project trajectories — not confirmable on TLV alone.`);
+  console.log(`  ⇒ keep as instrumented hypotheses; promote only after replication. (node metrics/validate-tlv.mjs for full)\n`);
+}
+
 function analyze() {
   const { assets, phase } = engine();
   console.log(`\nanalyze: rebuilt knowledge from ${REAL_EPISODES.length} episodes → ${assets.length} assets, phase ${phase.phase} (${phase.phaseIndex}).`);
@@ -204,6 +220,7 @@ await (({
   ingest: () => ingest(arg),
   daily: () => daily(arg || 'sharepoint'),
   entropy: () => entropyCmd(),
+  validate: () => validateCmd(),
   analyze: () => analyze(),
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
