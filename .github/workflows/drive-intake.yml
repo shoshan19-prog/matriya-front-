@@ -1,0 +1,65 @@
+# MATRIYA — scheduled READ-ONLY Google Drive intake (the stable sensor).
+#
+# Turns the session-bound heartbeat into an unattended daemon, under the SAME
+# boundaries: read-only Drive scan · dedup · append-only flow log · NO approval ·
+# NO corpus write · NO knowledge promotion. It runs on a GitHub-hosted runner with
+# open internet, so it reaches the Google Drive API directly (no proxy block).
+#
+# Auth: the user's own OAuth refresh token, stored as repo secrets
+#   GOOGLE_CLIENT_ID · GOOGLE_CLIENT_SECRET · GOOGLE_REFRESH_TOKEN
+# Missing secrets → the run SKIPS cleanly (green). Bad/expired creds → it FAILS
+# honestly (red). It never fabricates files.
+#
+# NOTE: GitHub only fires `schedule` from the repository's DEFAULT branch. To
+# activate the timer, this file must live on the default branch. Until then, use
+# the "Run workflow" button (workflow_dispatch) to run it on demand.
+
+name: matriya-drive-intake
+
+on:
+  schedule:
+    - cron: '17 */4 * * *'   # every 4 hours, off the :00 mark
+  workflow_dispatch: {}
+
+permissions:
+  contents: write            # to commit the flow log back to the branch
+
+concurrency:
+  group: matriya-drive-intake
+  cancel-in-progress: false
+
+jobs:
+  intake:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Read-only Drive intake
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+        run: node mvp/knowledge-map/sources/intake-ci.mjs
+
+      - name: Commit & archive the flow + sensor logs
+        run: |
+          git config user.name "matriya-intake[bot]"
+          git config user.email "matriya-intake@users.noreply.github.com"
+          LOGS="mvp/knowledge-map/research-os/flow-log.jsonl mvp/knowledge-map/research-os/sensor-log.jsonl"
+          if git diff --quiet -- $LOGS; then
+            echo "no log changes — nothing to commit"
+          else
+            FLOW=$(wc -l < mvp/knowledge-map/research-os/flow-log.jsonl)
+            git add $LOGS
+            git commit -m "chore(intake): drive flow + sensor heartbeat (${FLOW} flow events) [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+            echo "archived — flow log ${FLOW} events; sensor heartbeat recorded" >> "$GITHUB_STEP_SUMMARY"
+          fi
