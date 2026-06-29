@@ -19,6 +19,7 @@ import { classifyFrontier, knowledgePhase } from '../frontier/frontier.mjs';
 import { buildDecisionPriorities } from '../decision-value/decision-value.mjs';
 import { CANDIDATE_EVENTS } from '../events/learning-primitives.mjs';
 import { informationPotential } from './information-potential.mjs';
+import { contentGateSummary } from './content-check.mjs';
 
 const D = (domain, signal) => ({ domain, signal, note: 'pert' });
 const ep = (product, domain, signal) => ({ id: 'P', product, domains: [D(domain, signal)], materials: [] });
@@ -58,12 +59,18 @@ export function sensitivity() {
 
 /** Verdict per perturbation: did the metrics respond appropriately? */
 export function verdicts(s = sensitivity()) {
+  // the adversarial gap now has a REVIEW gate (content-check.mjs): a false NUMERIC
+  // claim is stopped as REVIEW_OUTLIER/CONTRADICTS_EXISTING before it reaches the
+  // metric. Confirm the gate actually stops the false claims (still never rejects).
+  const gate = contentGateSummary();
   const out = [];
   for (const [name, r] of Object.entries(s.results)) {
     const moved = Math.abs(r.delta.entropy) >= 0.005 || Math.abs(r.delta.adhesionConf) >= 0.01 || Math.abs(r.delta.compressionConf) >= 0.01;
     let verdict;
     if (r.kind === 'noise') verdict = moved ? 'WEAKNESS — moved on a duplicate (counts documents, not knowledge)' : 'GOOD — ignored the duplicate (noise-robust)';
-    else if (r.kind === 'adversarial') verdict = 'GAP — treated a false claim as valid evidence (no content-level contradiction check yet)';
+    else if (r.kind === 'adversarial') verdict = gate.falseStopped
+      ? 'GUARDED — a false NUMERIC claim is now caught by the content-check REVIEW gate (REVIEW_OUTLIER/CONTRADICTS); a qualitative claim stays human-review-only. No auto-reject.'
+      : 'GAP — false claim still treated as valid evidence';
     else verdict = moved ? 'GOOD — responded proportionately to a real change' : 'WEAK — barely moved when something relevant changed';
     out.push({ perturbation: name, kind: r.kind, verdict, delta: r.delta });
   }

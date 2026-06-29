@@ -30,6 +30,7 @@ import { compressibility } from './metrics/compressibility.mjs';
 import { verdicts as sensitivityVerdicts } from './metrics/sensitivity.mjs';
 import { replicateAll } from './metrics/replicate.mjs';
 import { provenanceSummary } from './domains/provenance.mjs';
+import { classifyClaim, contentGateSummary } from './metrics/content-check.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -211,9 +212,25 @@ function sensitivityCmd() {
     console.log(`     Δ ${shown}`);
     console.log(`     ${v.verdict}`);
   }
-  console.log('\n  ⇒ passes signal-response and duplicate-noise; the open GAP is adversarial:');
-  console.log('    a wrong inference is still counted as valid evidence (no content-level');
-  console.log('    contradiction check yet). "Under what conditions does the metric break?"\n');
+  console.log('\n  ⇒ passes signal-response and duplicate-noise; the adversarial case is now');
+  console.log('    GUARDED by the content-check REVIEW gate for numeric claims (matriya review).\n');
+}
+
+function reviewCmd(arg) {
+  // matriya review "<asset>" <value> <unit>   — content-check a measured claim
+  const m = arg.match(/^(.*?)\s+(-?[\d.]+)\s*(\S*)$/);
+  if (!m) {
+    console.log('\nContent-check REVIEW gate — is a measured claim plausible? (never auto-rejects)');
+    const g = contentGateSummary();
+    for (const r of g.rows) console.log(`  ${r.pass ? '✓' : '✗'} [${r.got}] ${r.label} — ${r.reason}`);
+    console.log(`\n  false claims all stopped (≠ACCEPT): ${g.falseStopped} · no auto-reject anywhere: ${g.noAutoReject}`);
+    console.log('  usage: matriya review "Compression Strength" 500 MPa\n');
+    return;
+  }
+  const r = classifyClaim({ asset: m[1].trim(), value: +m[2], unit: m[3] });
+  console.log(`\nContent check — ${r.asset}: ${m[2]} ${m[3] || '(no unit)'}`);
+  console.log(`  ⇒ ${r.classification} — ${r.reason}`);
+  console.log(`  action: ${r.action}  (auto-reject: ${r.autoReject}; only ever routes to human REVIEW)\n`);
 }
 
 function reproduceCmd() {
@@ -267,9 +284,10 @@ await (({
   entropy: () => entropyCmd(),
   validate: () => validateCmd(),
   sensitivity: () => sensitivityCmd(),
+  review: () => reviewCmd(arg),
   reproduce: () => reproduceCmd(),
   analyze: () => analyze(),
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
   'MATRIYA v1.0\n  ask "<question>" · next · why <asset> · simulate <EVENT> · frontier [asset]\n' +
-  '  material <name> · status · entropy · ingest <source> · daily [source] · validate · sensitivity · reproduce · analyze · approve <EVENT>')))());
+  '  material <name> · status · entropy · ingest <source> · daily [source] · validate · sensitivity · review · reproduce · analyze · approve <EVENT>')))());

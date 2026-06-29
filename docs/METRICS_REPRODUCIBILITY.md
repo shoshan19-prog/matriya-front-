@@ -121,7 +121,7 @@ reproducibility: 3 / 3 positive Fresco projects  ·  discrimination ✓  ·  ind
 ⇒ promote a metric to permanent architecture?  STILL NOT YET — one gate remains.
 ```
 
-Three independent Fresco projects now localize the weak point by the **same** mechanism, each as a mirror image (TLV→strength, MPZ→process/moisture, PROTECH→color), so the metric is demonstrably tracking *where the evidence actually is*, not a fixed answer — and the negative case (INT-TFX) correctly declines, which is itself evidence against a hindsight fit. The ≥3-positive reproducibility bar is now **met**. But promotion is a 2-D gate and the **adversarial content-check from the Sensitivity Harness is still open** — a false `measured` claim would still pass undetected. So: reproducibility ✓, but **not a law** until that gap closes.
+Three independent Fresco projects now localize the weak point by the **same** mechanism, each as a mirror image (TLV→strength, MPZ→process/moisture, PROTECH→color), so the metric is demonstrably tracking *where the evidence actually is*, not a fixed answer — and the negative case (INT-TFX) correctly declines, which is itself evidence against a hindsight fit. The ≥3-positive reproducibility bar is now **met**. The Sensitivity Harness's adversarial gap — a false `measured` claim passing undetected — has since been closed for numeric evidence by the **Content-Check REVIEW gate** (`docs/METRICS_CONTENT_CHECK.md`): a bogus value is now caught as `REVIEW_OUTLIER`/`CONTRADICTS_EXISTING` before it reaches the metric (never auto-rejected). So all four validation tests now pass for numeric evidence; what remains is a human judgement call, not a missing guard.
 
 ## Status & next
 
