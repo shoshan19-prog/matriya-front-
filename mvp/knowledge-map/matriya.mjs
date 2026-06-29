@@ -36,6 +36,7 @@ import { AUTHORITIES, checkAuthorityIsolation } from './authority-chain.mjs';
 import { runReasoningTests, reasoningSummary } from './reasoning.mjs';
 import { runChain, lawGate, SAMPLE_CASES } from './chain.mjs';
 import { buildFeed, renderFeed, feedToPipeline, SNAPSHOT_YESTERDAY, SNAPSHOT_TODAY } from './sources/change-feed.mjs';
+import { liveChanges } from './sources/live-scan.mjs';
 
 // SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
 // connection is blocked. Real adapter output replaces this verbatim.
@@ -256,11 +257,29 @@ function authorityCmd() {
   console.log(`  ⇒ authority isolation holds: ${r.allHold} (${r.passed}/${r.total}). Each authority is independently testable/replaceable.\n`);
 }
 
-function changesCmd() {
+async function changesCmd(source) {
+  // `matriya changes`            → sample (offline demo)
+  // `matriya changes sharepoint` → LIVE scan via the adapter (the real "what's new")
+  if (source && source !== 'sample') {
+    const r = await liveChanges(source);
+    if (!r.ok) {
+      console.log(`\nLive change feed (${source}): unavailable — ${r.reason}`);
+      if (r.reason === 'not_configured') console.log(`  set env: ${(r.missing || []).join(', ')} (an Azure AD app with Sites.Read.All)`);
+      if (r.reason === 'network_blocked') console.log('  graph.microsoft.com is blocked by the egress policy — needs an admin allow-list change.');
+      console.log('  nothing is fabricated. Once the source opens, this same command returns the real feed.\n');
+      return;
+    }
+    const s = r.feed.summary;
+    console.log(`\nLive change feed — ${source} (${r.firstScan ? 'first scan, BASELINE' : `vs ${r.prevTakenAt}`}):\n`);
+    console.log(r.feed.events.length ? renderFeed(r.feed) : '  (no changes since the last scan)');
+    console.log(`\n  NEW ${s.NEW} · UPDATED ${s.UPDATED} · DELETED ${s.DELETED} · UNCHANGED ${s.UNCHANGED}`);
+    console.log('  each actionable change → Knowledge Pipeline candidate (human-reviewed, never auto-ingested).\n');
+    return;
+  }
   const feed = buildFeed(SNAPSHOT_YESTERDAY, SNAPSHOT_TODAY);
   const s = feed.summary;
   console.log('\nUniversal Change Feed — "what changed?", source-agnostic (the museum guard):');
-  console.log('  (sample snapshots — the same detector serves SharePoint, Drive, Gmail, local…)\n');
+  console.log('  (SAMPLE snapshots — run `matriya changes sharepoint` for a live scan)\n');
   console.log(renderFeed(feed));
   console.log(`\n  summary: NEW ${s.NEW} · UPDATED ${s.UPDATED} · DELETED ${s.DELETED} · UNCHANGED ${s.UNCHANGED} (actionable ${s.actionable})`);
   console.log(`  by source: ${s.bySource.map((b) => `${b.source} ${b.changed}`).join(' · ')}`);
@@ -363,7 +382,7 @@ await (({
   review: () => reviewCmd(arg),
   intake: () => intakeCmd(),
   authority: () => authorityCmd(),
-  changes: () => changesCmd(),
+  changes: () => changesCmd(arg || undefined),
   reason: () => reasonCmd(),
   chain: () => chainCmd(),
   law: () => lawCmd(),
