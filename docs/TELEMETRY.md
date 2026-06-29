@@ -95,6 +95,27 @@ Every Intake passes through a human gate — `recommendation_shown → human_app
 
 ---
 
+## Stage 2 emitter — Priority/ERP → real cost & duration
+
+The second live emitter (`telemetry/priority-telemetry.mjs`, run `node priority-demo.mjs`). Same governance: append-only, records **only** `experiment_generated`, no change to ERP, no secrets (the ERP document id is HMAC-hashed). It records the real ₪ and days of each finished experiment, turning the **Acquisition Cost Vector from estimate → measured**:
+
+```
+event             estimate ₪/days  →  real ₪/days   source
+FIRST_SET_TIME    ₪  600 / 3d      →  ₪  520 / 2d   telemetry ✓
+FIRST_PULL_OFF    ₪ 1200 / 5d      →  ₪ 1450 / 6d   telemetry ✓
+SALT_SPRAY        ₪18000 / 40d     →  ₪21000 / 44d  telemetry ✓
+```
+
+ROI recomputes on the real cost — knowledge-per-shekel becomes exact:
+```
+FIRST_SET_TIME   ROI 0.797 → 0.919   (cheaper than estimated → better value)
+FIRST_PULL_OFF   ROI 0.398 → 0.330   (dearer than estimated)
+```
+
+`mergedCostVectors()` overrides the estimate where real data exists and leaves the
+rest flagged `estimate`. Nothing else changes — recording a cost triggers no
+action. The `matriya ingest priority` adapter now reports **WIRED (Stage 2)**.
+
 ## Status & next
 
 - Built & runnable: `telemetry.mjs` (append-only recorder + 4 derivations), `telemetry-seed.mjs` (SAMPLE feed — real Router/PROTEUS/lab events replace it verbatim), `demo.mjs`.

@@ -118,7 +118,7 @@ function status() {
 
 const ADAPTERS = {
   drive:      { state: 'available (read-only, governed)', note: 'Google Drive scout — human-approved Intake' },
-  priority:   { state: 'adapter stub (not wired)',        note: 'ERP → cost & duration (real Acquisition Cost Vector)' },
+  priority:   { state: 'WIRED (Stage 2 emitter)',         note: 'ERP → experiment cost & duration → real Acquisition Cost Vector (telemetry/priority-telemetry.mjs)' },
   gmail:      { state: 'adapter stub (not wired)',        note: 'email → evidence + decisions' },
   sharepoint: { state: 'adapter stub (not wired)',        note: 'project documents' },
   lab:        { state: 'adapter stub (not wired)',        note: 'measurement_created → real Knowledge Events' },
