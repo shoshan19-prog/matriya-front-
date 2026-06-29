@@ -20,6 +20,18 @@ import { replayTransformations } from './transformations/transformation.mjs';
 import { classifyFrontier, knowledgePhase } from './frontier/frontier.mjs';
 import { buildDecisionPriorities, protocol } from './decision-value/decision-value.mjs';
 import { CANDIDATE_EVENTS } from './events/learning-primitives.mjs';
+import { scan as spScan, status as spStatus } from './adapters/sharepoint.mjs';
+import { runDaily } from './pipeline.mjs';
+
+// SAMPLE SharePoint inventory — to demonstrate the daily pipeline while the live
+// connection is blocked. Real adapter output replaces this verbatim.
+const SAMPLE_INVENTORY = { ok: true, site: '(sample)', drives: 1, files: 5, inventory: [
+  { source: 'sharepoint', drive: 'Lab', name: 'Pull-off test report TLV render.xlsx', id: 's1' },
+  { source: 'sharepoint', drive: 'Lab', name: 'Salt spray Q1 results.pdf', id: 's2' },
+  { source: 'sharepoint', drive: 'QC', name: 'Color spectro ΔE batch 204.xlsx', id: 's3' },
+  { source: 'sharepoint', drive: 'Mgmt', name: 'Steering meeting notes.docx', id: 's4' },
+  { source: 'sharepoint', drive: 'Lab', name: 'Vicat set time MPZ.xlsx', id: 's5' },
+] };
 
 // ── CORE ENGINE (hidden behind ask/ingest/analyze) ───────────────────────────
 const engine = (episodes = REAL_EPISODES) => {
@@ -123,12 +135,29 @@ const ADAPTERS = {
   sharepoint: { state: 'adapter stub (not wired)',        note: 'project documents' },
   lab:        { state: 'adapter stub (not wired)',        note: 'measurement_created → real Knowledge Events' },
 };
-function ingest(source) {
+async function ingest(source) {
   const a = ADAPTERS[source];
   if (!a) return console.log(`unknown source "${source}". adapters: ${Object.keys(ADAPTERS).join(', ')}`);
   console.log(`\ningest ${source}: ${a.state}\n  ${a.note}`);
+  if (source === 'sharepoint') console.log(`  live status: ${await spStatus()}`);
   console.log(`  governance: extraction is human-approved · append-only · no auto-extract/generate · privacy-preserving.`);
   console.log(`  → new sources connect HERE (ingest), never to the engine logic.\n`);
+}
+
+// Daily process: scan → understand → index → review (governed, review-only).
+async function daily(source = 'sharepoint') {
+  const scanResult = source === 'sample' ? SAMPLE_INVENTORY : await spScan();
+  const r = runDaily(scanResult, source === 'sample' ? 'sharepoint' : source);
+  if (!r.ok) return console.log(`\ndaily ${source}: blocked at ${r.stage} — ${r.reason}\n  (try 'matriya daily sample' to see the pipeline on a sample inventory)\n`);
+  console.log(`\nDAILY ${source}  scan→understand→index→review`);
+  console.log(`  scan:       ${r.scan.files} files`);
+  console.log(`  understand: ${r.understand.classified} classified, ${r.understand.skipped} skipped · ` +
+    Object.entries(r.understand.byAsset).map(([k, v]) => `${k} ${v}`).join(', '));
+  console.log(`  index:      ${r.index.staged} staged candidate episodes (NOT committed)`);
+  console.log(`  review:     ${r.review.measured} measured · phase ${r.review.phaseBefore}→${r.review.phaseAfter}`);
+  for (const m of r.review.assetsMoved)
+    console.log(`     ${m.asset}: ${m.from} → ${m.to} (${m.delta >= 0 ? '+' : ''}${m.delta})  via ${m.via.join(', ')}`);
+  console.log(`  ⛔ ${r.review.gate}\n     approve a staged item to fold it in.\n`);
 }
 
 function analyze() {
@@ -149,7 +178,7 @@ function approve(eventQ) {
 // ── DISPATCH ─────────────────────────────────────────────────────────────────
 const [cmd, ...rest] = process.argv.slice(2);
 const arg = rest.join(' ');
-({
+await (({
   ask: () => ask(arg),
   next: () => next(arg || undefined),
   recommend: () => next(arg || undefined),
@@ -159,8 +188,9 @@ const arg = rest.join(' ');
   material: () => material(arg),
   status: () => status(),
   ingest: () => ingest(arg),
+  daily: () => daily(arg || 'sharepoint'),
   analyze: () => analyze(),
   approve: () => approve(arg),
 }[cmd] || (() => console.log(
   'MATRIYA v1.0\n  ask "<question>" · next · why <asset> · simulate <EVENT> · frontier [asset]\n' +
-  '  material <name> · status · ingest <source> · analyze · approve <EVENT>')))();
+  '  material <name> · status · ingest <source> · daily [source] · analyze · approve <EVENT>')))());
