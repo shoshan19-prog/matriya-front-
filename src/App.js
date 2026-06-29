@@ -6,6 +6,7 @@ import AskMatriyaTab from './components/AskMatriyaTab';
 import LoginTab from './components/LoginTab';
 import AdminTab from './components/AdminTab';
 import JudgmentTab from './components/JudgmentTab';
+import ControlRoomTab from './components/ControlRoomTab';
 import axios from 'axios';
 import { API_BASE_URL } from './utils/api';
 
@@ -94,6 +95,7 @@ function App() {
         { id: 'ask', label: 'Ask Matriya' },
         { id: 'search', label: 'מחקר' },
         { id: 'judgment', label: 'שיפוטים' },
+        { id: 'control-room', label: 'Control Room' },
         ...(isAdmin ? [{ id: 'admin', label: 'ניהול' }] : [])
     ];
 
@@ -169,6 +171,7 @@ function App() {
                     <SearchTab onGptSyncingChange={setGptRagSyncing} gptRagSyncing={gptRagSyncing} />
                 )}
                 {activeTab === 'judgment' && <JudgmentTab />}
+                {activeTab === 'control-room' && <ControlRoomTab />}
                 {activeTab === 'admin' && isAdmin && <AdminTab isAdmin={isAdmin} />}
             </div>
         </div>

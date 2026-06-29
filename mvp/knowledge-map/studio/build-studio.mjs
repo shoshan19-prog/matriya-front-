@@ -165,6 +165,8 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;pa
 
 const out = `${here}/control-room.html`;
 writeFileSync(out, html);
+// also emit the static JSON the React tab reads (read-only snapshot for the app)
+try { writeFileSync(`${here}/../../../public/control-room.json`, JSON.stringify(D, null, 2)); } catch { /* public/ optional */ }
 return out;
 }
 

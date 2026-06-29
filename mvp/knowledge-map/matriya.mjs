@@ -392,6 +392,7 @@ await (({
   authority: () => authorityCmd(),
   changes: () => changesCmd(arg || undefined),
   studio: () => studioCmd(),
+  serve: () => import('./studio/studio-server.mjs'),  // read-only Control Room endpoint
   reason: () => reasonCmd(),
   chain: () => chainCmd(),
   law: () => lawCmd(),

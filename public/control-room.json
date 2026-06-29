@@ -1,0 +1,188 @@
+{
+  "generatedFor": "MATRIYA Control Room",
+  "mode": "SAMPLE",
+  "generatedAt": "2026-06-29T21:12:32.450Z",
+  "systemHealth": [
+    {
+      "source": "SharePoint",
+      "state": "offline",
+      "note": "not configured"
+    },
+    {
+      "source": "Gmail",
+      "state": "standby",
+      "note": "adapter contract ready, not wired"
+    },
+    {
+      "source": "Drive",
+      "state": "standby",
+      "note": "adapter contract ready, not wired"
+    },
+    {
+      "source": "Lab",
+      "state": "standby",
+      "note": "manual intake"
+    }
+  ],
+  "incoming": [
+    {
+      "source": "sharepoint",
+      "items": [
+        {
+          "name": "TLV_Report_44.pdf",
+          "change": "UPDATED"
+        }
+      ]
+    },
+    {
+      "source": "local",
+      "items": [
+        {
+          "name": "MPZ_Dec2025_strength.csv",
+          "change": "NEW"
+        }
+      ]
+    },
+    {
+      "source": "gdrive",
+      "items": [
+        {
+          "name": "Old_Color_Report.docx",
+          "change": "DELETED"
+        }
+      ]
+    }
+  ],
+  "changeFeed": {
+    "changesToday": 3,
+    "waiting": 3,
+    "approved": 0,
+    "breakdown": {
+      "NEW": 1,
+      "UPDATED": 1,
+      "DELETED": 1
+    },
+    "source": "sample"
+  },
+  "qualification": {
+    "units": "green",
+    "baseline": "amber",
+    "physics": "red",
+    "review": "amber",
+    "counts": {
+      "units": 0,
+      "physics": 2,
+      "corpusOutlier": 1,
+      "corpusInsufficient": 0
+    },
+    "gate": {
+      "passed": 13,
+      "total": 13
+    },
+    "source": "sample"
+  },
+  "humanReview": {
+    "waiting": 3,
+    "lanes": [
+      {
+        "lane": "Physics flags",
+        "count": 2
+      },
+      {
+        "lane": "Corpus outliers",
+        "count": 1
+      }
+    ]
+  },
+  "knowledgeGrowth": {
+    "confirmations": 7,
+    "discoveries": 7,
+    "boundaries": 4,
+    "refutations": 6,
+    "note": "confirmations = measured assets · discoveries = cross-product measured patterns · boundaries = generate/external frontier · refutations = documented contradictions"
+  },
+  "evolution": {
+    "product": "טיח תל אביב",
+    "events": [
+      {
+        "id": "TLV-01",
+        "tag": "adhesion",
+        "label": "field pilot cracked outdoors"
+      },
+      {
+        "id": "TLV-02",
+        "tag": "adhesion",
+        "label": "COMBIZELL+TCO → good adhesion"
+      },
+      {
+        "id": "TLV-04",
+        "tag": "strength",
+        "label": "strength was the goal but the field is b"
+      },
+      {
+        "id": "TLV-05",
+        "tag": "note",
+        "label": "Tzmitut fraction inconsistency → glass s"
+      },
+      {
+        "id": "TLV-06",
+        "tag": "adhesion",
+        "label": "plaster slid off spatula — wetting"
+      },
+      {
+        "id": "TLV-07",
+        "tag": "adhesion",
+        "label": "cured 3d, strong, no cracks"
+      }
+    ]
+  },
+  "researchPhase": {
+    "discovery": 1,
+    "validation": 4,
+    "production": 4,
+    "phase": "TRANSITION",
+    "phaseIndex": 0.2
+  },
+  "entropy": {
+    "overall": 0.34,
+    "byProject": [
+      {
+        "project": "טיח תל אביב",
+        "entropy": 0.75
+      },
+      {
+        "project": "MPZ",
+        "entropy": 0.59
+      },
+      {
+        "project": "PROTECH A1",
+        "entropy": 0.41
+      },
+      {
+        "project": "INT-TFX",
+        "entropy": 0.61
+      }
+    ]
+  },
+  "learningLight": {
+    "state": "event",
+    "states": {
+      "idle": "no change — dark",
+      "evidence": "new evidence in — lit",
+      "event": "knowledge event forming — blinking",
+      "discovery": "a discovery — colour shift",
+      "boundary": "a boundary found — amber",
+      "refutation": "a refutation — red"
+    }
+  },
+  "validation": {
+    "reproducibility": "3/3 Fresco projects",
+    "discrimination": true,
+    "independence": true,
+    "sensitivity": "guarded (numeric)",
+    "authorityIsolation": "8/8",
+    "reasoning": "7/7",
+    "promotable": true,
+    "autoPromote": false
+  }
+}

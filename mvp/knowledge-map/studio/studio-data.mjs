@@ -118,7 +118,12 @@ export function studioData() {
     reasoning: `${reasoningSummary().passed}/${reasoningSummary().total}`, promotable: law.allPass, autoPromote: law.promote,
   };
 
-  return { generatedFor: 'MATRIYA Control Room', systemHealth, incoming, changeFeed, qualification,
+  // mode badge: LIVE only if a real source is online; otherwise the panels that
+  // depend on a source are SAMPLE. (read-only — this never writes anything.)
+  const mode = systemHealth.some((s) => s.state === 'online') ? 'LIVE' : 'SAMPLE';
+
+  return { generatedFor: 'MATRIYA Control Room', mode, generatedAt: new Date().toISOString(),
+    systemHealth, incoming, changeFeed, qualification,
     humanReview, knowledgeGrowth, evolution, researchPhase, entropy, learningLight, validation };
 }
 

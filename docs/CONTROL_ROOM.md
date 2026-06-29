@@ -45,8 +45,19 @@ You are not looking at a document manager; you are looking at a system that is t
 
 Every channel reads the actual modules — qualification lights come from a live intake of the sample document (`Units green · Baseline amber · Physics red`), knowledge growth and entropy are computed from the real corpus, the validation board reflects the true gate (reproducibility 3/3 · isolation 8/8 · reasoning 7/7 · promotable YES · auto-promote **no — a human decides**). Source/feed panels are labelled `sample` until SharePoint opens; the moment it does, the same console shows the live feed with no change to the studio.
 
+## In the app — a READ-ONLY tab
+
+The same console now lives in the React app as a **Control Room tab** (`src/components/ControlRoomTab.js`), built to a strict boundary: **it only displays**. No approvals, no writes, no ledger changes — just the view, so the live UX can be tested with zero production risk.
+
+- **Data source**: `GET /api/control-room` (a read-only endpoint) when `REACT_APP_CONTROL_ROOM_URL` is set, else the static `public/control-room.json` snapshot shipped with the app. Either way the tab only *reads*.
+- **The endpoint** (`studio/studio-server.mjs`, run via `matriya serve`) exposes exactly two GET routes and computes the data fresh each request — there are **no** POST/PUT/DELETE routes, so it cannot mutate anything.
+- **Auto-refresh** every 15s; it keeps the last good data and degrades gracefully.
+- **Badges**: `SAMPLE` (sources offline — current state), `LIVE` (a real source online), `PENDING` (endpoint not reachable yet).
+
+No action buttons are wired from the screen. After a couple of days of just watching, decide which buttons — if any — are safe to add.
+
 ## Status & next
 
-- Built & runnable: `studio/studio-data.mjs` (real telemetry from every module), `studio/build-studio.mjs` (`buildStudio()` → self-contained HTML), wired as `matriya studio`. Screenshot rendered via headless Chromium.
-- The HTML is committed and opens with no dependency; the PNG is git-ignored (regenerate with `matriya studio` + a headless screenshot).
-- Natural next step: drop the same panels into the React app as a **Control Room tab** (`src/components/`), pointing at a small `/studio` endpoint that serves `studioData()` live — so the studio updates as evidence flows, with the LEARNING light animating on real events.
+- Built & runnable: `studio/studio-data.mjs` (real telemetry + `mode` badge), `studio/build-studio.mjs` (`buildStudio()` → self-contained HTML **and** `public/control-room.json`), `studio/studio-server.mjs` (read-only `GET /api/control-room`), `src/components/ControlRoomTab.{js,css}` wired as a tab in `App.js`. Commands: `matriya studio` (rebuild), `matriya serve` (live read-only endpoint).
+- The standalone HTML and the static JSON are committed; the screenshot PNG is git-ignored.
+- Deliberately deferred: any approve/write control from the screen. Read-only first; revisit buttons after real use.
