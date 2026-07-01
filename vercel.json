@@ -17,6 +17,14 @@
       }
     },
     {
+      "src": "/cockpit/?",
+      "dest": "/cockpit/index.html"
+    },
+    {
+      "src": "/cockpit/(.*)",
+      "dest": "/cockpit/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
