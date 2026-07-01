@@ -14,6 +14,17 @@ engine:
 - **Reactive (concept)** — a schematic animation of the intumescent process
   (illustrative, not a measurement).
 
+## Standalone evaluation (by design)
+
+This stays a **standalone page** — not a React tab — so it can be demoed, tested,
+broken and improved without touching the app's auth/routing/state. Use the
+**Dataset selector** on the Cockpit view to run the 2–3 datasets (APP is gated
+through G1–G6; silicate/cementitious have no ingestion request yet, so they
+honestly show STOP — "cannot fly until G1–G6 cleared"). The Human-Decision buttons
+increment a local **decision counter** that encodes the promotion rule: **≥3 real
+decisions on a dataset → consider wiring it in as a Tab**; below that it stays
+standalone.
+
 ## How to view
 
 - Served by the app: `npm start` in the repo root, then open
