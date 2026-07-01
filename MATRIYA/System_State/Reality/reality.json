@@ -1,0 +1,18 @@
+{
+  "_meta": { "generated": "2026-07-01", "layer": "Reality", "evidence_default": "VERIFIED" },
+  "dev_branch": "claude/fresco-knowledge-discovery-edauyq",
+  "repositories": [
+    { "name": "matriya-back", "role": "Governed RAG + research engine (LIVE core)", "status": "live", "head": "UNKNOWN_stamp_on_first_run", "key_files": ["server.js","kernelV16.js","researchGate.js","researchLoop.js","integrityRulesEngine.js","ragService.js","vectorStoreSupabase.js"] },
+    { "name": "matriya-system", "role": "Intended clean-arch rewrite", "status": "scaffold_empty", "note": "~30 files 0 bytes; not runnable" },
+    { "name": "matriya-front-", "role": "React UI + cockpit + drive-intake + THIS System_State layer", "status": "live" },
+    { "name": "maneger-back-", "role": "Lab Control System backend (LIVE)", "status": "live", "key_files": ["server.js~260KB","supabase_schema.sql","migrations/*","lib/*"] },
+    { "name": "maneger-front-", "role": "Vite/React lab UI (Excel-grid entry)", "status": "live" }
+  ],
+  "services": [
+    { "name": "matriya-back API", "type": "Express", "live": true },
+    { "name": "maneger-back API", "type": "Express", "live": true },
+    { "name": "matriya-system API", "type": "Express 5", "live": false, "reason": "scaffold" }
+  ],
+  "deployments": { "platform": "Vercel", "apps": ["matriya-back","matriya-front-","maneger-back-","maneger-front-"], "domains": ["matriya.app","matriya-project.vercel.app"], "railway": "matriya-system (railway.json empty)", "live_status": "UNKNOWN" },
+  "capabilities_ref": "see Reality is-can; detailed list in ../../Reality/capabilities (13 capabilities)"
+}

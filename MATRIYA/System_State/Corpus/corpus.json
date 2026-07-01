@@ -1,0 +1,12 @@
+{
+  "_meta": { "generated": "2026-07-01", "layer": "Corpus", "note": "Delta layer. On first run these are the baseline observations; morning runs report only changes since last stamp." },
+  "baseline": {
+    "new_files": "baseline established (Drive corpus enumerated, not exhaustively counted)",
+    "duplicates": ["FRESCO Coatings_BoSchl23LA006 ~= Clariant fire test", "Termo-Lime-AL306 x3", "Fresco Presentation 26.2.2024 x2-3", "weekly-workplan x dup"],
+    "contradictions": "none detected yet (engine exists; corpus not ingested)",
+    "new_entities": "materials (APP/PER/MEL, silicates, NHL lime, consolidants); suppliers (Clariant, Lafarge, Kyknos); labs (IC-labs)",
+    "new_relations": "formulation->fire_test_outcome; experiment->parent_experiment (lineage); material->recurs_in_failed",
+    "new_experiments": "intumescent sample IDs 001-095+ (folder-encoded, not yet in DB)"
+  },
+  "last_stamp": null
+}
