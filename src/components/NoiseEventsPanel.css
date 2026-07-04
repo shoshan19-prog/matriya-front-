@@ -1,0 +1,74 @@
+.noise-section {
+    margin-top: 8px;
+}
+
+.noise-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.noise-header h3 {
+    margin: 0;
+}
+
+.noise-note {
+    margin-bottom: 12px;
+    font-size: 0.88em;
+    color: #8a8aa5;
+    line-height: 1.5;
+}
+
+.noise-count {
+    margin-bottom: 8px;
+    font-size: 0.88em;
+    color: #8a8aa5;
+}
+
+.noise-table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.noise-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88em;
+    white-space: nowrap;
+}
+
+.noise-table th,
+.noise-table td {
+    padding: 8px 10px;
+    text-align: right;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.12);
+}
+
+.noise-table th {
+    background: rgba(102, 126, 234, 0.12);
+    color: #c0c0e0;
+    font-weight: 600;
+}
+
+.noise-table tbody tr:hover {
+    background: rgba(102, 126, 234, 0.06);
+}
+
+.noise-type {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.85em;
+    font-weight: 600;
+    background: rgba(210, 153, 34, 0.18);
+    color: #d29922;
+}
+
+.noise-more {
+    margin-top: 14px;
+    text-align: center;
+}
