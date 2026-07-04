@@ -1,0 +1,111 @@
+.audit-section {
+    margin-top: 8px;
+}
+
+.audit-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.audit-header h3 {
+    margin: 0;
+}
+
+.audit-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.audit-filter input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(102, 126, 234, 0.35);
+    background: rgba(255, 255, 255, 0.04);
+    color: inherit;
+    min-width: 220px;
+    font-size: 0.9em;
+}
+
+.audit-scope-note {
+    margin: 4px 0 12px;
+    font-size: 0.9em;
+    color: #c0c0e0;
+}
+
+.audit-scope-note code,
+.audit-query {
+    font-family: monospace;
+}
+
+.audit-count {
+    margin-bottom: 8px;
+    font-size: 0.88em;
+    color: #8a8aa5;
+}
+
+.audit-table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88em;
+    white-space: nowrap;
+}
+
+.audit-table th,
+.audit-table td {
+    padding: 8px 10px;
+    text-align: right;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.12);
+}
+
+.audit-table th {
+    background: rgba(102, 126, 234, 0.12);
+    color: #c0c0e0;
+    font-weight: 600;
+}
+
+.audit-table tbody tr:hover {
+    background: rgba(102, 126, 234, 0.06);
+}
+
+.audit-query {
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.audit-decision {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.audit-decision-allow {
+    background: rgba(46, 160, 67, 0.18);
+    color: #3fb950;
+}
+
+.audit-decision-deny,
+.audit-decision-block,
+.audit-decision-stop {
+    background: rgba(248, 81, 73, 0.18);
+    color: #f85149;
+}
+
+.audit-more {
+    margin-top: 14px;
+    text-align: center;
+}
