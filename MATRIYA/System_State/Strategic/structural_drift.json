@@ -1,14 +1,15 @@
 {
-  "_meta": { "generated": "2026-07-01", "layer": "Strategic/StructuralDrift", "note": "Detects new repo/module/endpoint/integration or contract change and asks: planned evolution or drift? First run = baseline." },
+  "_meta": { "generated": "2026-07-04", "layer": "Strategic/StructuralDrift", "note": "Detects new repo/module/endpoint/integration or contract change and asks: planned evolution or drift? First run = baseline." },
   "baseline_established": true,
   "watch": {
-    "repos": 5, "known_scaffold": ["matriya-system"],
-    "known_orphans": ["matriya-system 0-byte modules","stateMachine contradiction/risk agents (skipped)","ChromaDB stub","railway.json empty","Drive sensor not_configured"]
+    "repos": 5, "known_scaffold": [],
+    "known_orphans": ["stateMachine contradiction/risk agents (skipped)","ChromaDB stub","Drive sensor not_configured"],
+    "notes": ["matriya-system: scaffold status removed 2026-07-04 — revived as V5 Core (D-006); 0-byte modules deleted, railway.json filled"]
   },
   "open_drift_questions": [
-    { "q": "matriya-system rewrite: planned evolution or abandoned fork?", "status": "unresolved" },
-    { "q": "two vector layers (management_vector 1536 vs rag_documents 384): intended or divergence?", "status": "note" },
+    { "q": "matriya-system rewrite: planned evolution or abandoned fork?", "status": "resolved", "resolution": "2026-07-04: revived as V5 Core (D-006); dead scaffold deleted, Mechanism Entity + POC-01 landed on branch claude/matriya-v5-system-06p8kt" },
+    { "q": "two vector layers (management_vector 1536 vs rag_documents 384): intended or divergence?", "status": "decided", "resolution": "2026-07-04: D-007 fixed the standard at 1536 (text-embedding-3-small); 384 store is a migration candidate" },
     { "q": "committed secrets: process drift (security)", "status": "action" }
   ],
-  "last_snapshot": "2026-07-01"
+  "last_snapshot": "2026-07-04"
 }
