@@ -1,0 +1,23 @@
+{
+  "_meta": { "generated": "2026-07-01", "layer": "Decisions", "note": "Institutional memory of decisions so the same discussions don't recur. Seeded from the Knowledge Discovery engagement." },
+  "accepted": [
+    { "id": "D-001", "decision": "KUR (Decision-producing Knowledge / Raw Information) is MATRIYA's north-star KPI", "date": "2026-07-01" },
+    { "id": "D-002", "decision": "LAW-EVIDENCE-001: no ranking/board line may exceed the evidence quality it is derived from", "date": "2026-07-01" },
+    { "id": "D-003", "decision": "KUR audit uses 6 validation gates J0-J5 before any ranking is trusted; read-only metadata pass = v0.2", "date": "2026-07-01" },
+    { "id": "D-004", "decision": "Build a System State / MRI layer (this folder) as MATRIYA's structural self-memory; morning run is differential", "date": "2026-07-01" }
+  ],
+  "verified_findings_as_constraints": [
+    { "id": "F-001", "finding": "Priority ERP / LIMS are ABSENT — do not assume or build integration", "evidence": "VERIFIED" },
+    { "id": "F-002", "finding": "matriya-system is an empty scaffold — do not treat as a live service", "evidence": "VERIFIED" },
+    { "id": "F-003", "finding": "Production RAG is empty — knowledge lives in Drive/Excel/email, not the platform", "evidence": "VERIFIED" }
+  ],
+  "pending": [
+    { "id": "P-001", "decision": "Parse the 13 robust-core files to E3, then finalize Top-20 (J3-J5)" },
+    { "id": "P-002", "decision": "Rotate committed Supabase JWTs (security)" },
+    { "id": "P-003", "decision": "Re-enable / reconfigure the Google Drive intake sensor" }
+  ],
+  "deprecated_or_deferred": [
+    { "id": "X-001", "decision": "Knowledge Graph -> Ontology: DEFERRED until measurement layer (KUR) is trusted", "date": "2026-07-01" },
+    { "id": "X-002", "decision": "ChromaDB path: deprecated (pgvector is live)" }
+  ]
+}

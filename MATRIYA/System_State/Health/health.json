@@ -1,0 +1,13 @@
+{
+  "_meta": { "generated": "2026-07-01", "layer": "Health", "scale": "0.0-1.0", "note": "MRI scores. Honest baseline; runtime is UNKNOWN (not probed)." },
+  "scores": {
+    "overall": { "score": 0.42, "evidence": "PARTIAL" },
+    "knowledge": { "score": 0.15, "why": "prod RAG empty; KUR~0; corpus 93% Raw", "evidence": "VERIFIED" },
+    "runtime": { "score": null, "state": "UNKNOWN (not probed)", "evidence": "UNKNOWN" },
+    "integrations": { "score": 0.70, "why": "most wired; Drive sensor down; several Unknown", "evidence": "PARTIAL" },
+    "projects": { "score": 0.50, "why": "rich corpus, none ingested/structured", "evidence": "PARTIAL" },
+    "security": { "score": 0.40, "why": "Supabase JWTs committed to repo", "evidence": "VERIFIED" },
+    "coverage": { "score": 0.10, "why": "0% of corpus ingested", "evidence": "VERIFIED" },
+    "automation": { "score": 0.30, "why": "Drive sensor not_configured; ingestion manual", "evidence": "VERIFIED" }
+  }
+}

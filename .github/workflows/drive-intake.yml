@@ -49,11 +49,26 @@ jobs:
           GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
         run: node mvp/knowledge-map/sources/intake-ci.mjs
 
+      - name: Publish sensor state for the Morning MRI screen
+        # The deployed front serves public/ — the MRI opening screen fetches
+        # /mri/drive-sensor.json same-origin. Live data, refreshed on every run.
+        run: |
+          mkdir -p public/mri
+          LAST=$(tail -1 mvp/knowledge-map/research-os/sensor-log.jsonl 2>/dev/null || echo '{}')
+          FLOW=$(wc -l < mvp/knowledge-map/research-os/flow-log.jsonl 2>/dev/null || echo 0)
+          node -e "
+            const last = JSON.parse(process.argv[1] || '{}');
+            const out = { ...last, flow_events_total: Number(process.argv[2] || 0),
+              actions_url: 'https://github.com/${{ github.repository }}/actions/workflows/drive-intake.yml',
+              published_at: new Date().toISOString() };
+            require('fs').writeFileSync('public/mri/drive-sensor.json', JSON.stringify(out, null, 2));
+          " "$LAST" "$FLOW"
+
       - name: Commit & archive the flow + sensor logs
         run: |
           git config user.name "matriya-intake[bot]"
           git config user.email "matriya-intake@users.noreply.github.com"
-          LOGS="mvp/knowledge-map/research-os/flow-log.jsonl mvp/knowledge-map/research-os/sensor-log.jsonl"
+          LOGS="mvp/knowledge-map/research-os/flow-log.jsonl mvp/knowledge-map/research-os/sensor-log.jsonl public/mri/drive-sensor.json"
           if git diff --quiet -- $LOGS; then
             echo "no log changes — nothing to commit"
           else

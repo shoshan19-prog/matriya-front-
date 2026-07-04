@@ -1,0 +1,18 @@
+{
+  "_meta": { "generated": "2026-07-01", "layer": "Integrations", "status_enum": ["Connected","Disconnected","Partial","Error","Unknown"] },
+  "integrations": [
+    { "name": "Supabase Postgres (mgmt)", "ref": "zqhdznwquejnkdpxsuui", "status": "Connected", "evidence": "VERIFIED" },
+    { "name": "Supabase Storage buckets", "detail": ["sharepoint-files","manually-uploaded-sharepoint-files"], "status": "Connected", "evidence": "VERIFIED" },
+    { "name": "OpenAI (embeddings/LLM/vector-stores)", "status": "Connected", "evidence": "VERIFIED" },
+    { "name": "Microsoft Graph / SharePoint", "status": "Partial", "detail": "wired, env-gated (503 if unset)", "evidence": "VERIFIED" },
+    { "name": "Resend email", "detail": "frescomailserver.xyz; inbound->project_emails", "status": "Partial", "evidence": "VERIFIED" },
+    { "name": "Google Drive intake sensor", "status": "Disconnected", "detail": "not_configured since 2026-06-30", "evidence": "VERIFIED" },
+    { "name": "Google Drive corpus (owner)", "status": "Connected", "detail": "read-only; PRIMARY reservoir", "evidence": "VERIFIED" },
+    { "name": "Gmail (owner)", "status": "Connected", "detail": "~200 domain threads", "evidence": "VERIFIED" },
+    { "name": "Together AI", "status": "Unknown", "detail": "configured (Qwen3-Next-80B); runtime use env-dependent", "evidence": "PARTIAL" },
+    { "name": "Hugging Face", "status": "Unknown", "detail": "backup embeddings/LLM", "evidence": "PARTIAL" },
+    { "name": "HubSpot CRM", "status": "Unknown", "detail": "account 'fresco paints' Hub 48189256; contents not accessed", "evidence": "PARTIAL" },
+    { "name": "Twilio / WhatsApp", "status": "Unknown", "detail": "not found in code; listed for the ecosystem map", "evidence": "UNKNOWN" },
+    { "name": "Priority ERP", "status": "Disconnected", "detail": "ABSENT — verified no integration", "evidence": "VERIFIED" }
+  ]
+}

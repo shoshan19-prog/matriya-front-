@@ -1,0 +1,16 @@
+{
+  "_meta": { "generated": "2026-07-01", "layer": "Projects", "note": "Seeded from Drive corpus evidence. Knowledge %/readiness are 🟡 estimates until the corpus is parsed (E3)." },
+  "projects": [
+    { "name": "Intumescent fire-protection R&D", "status": "active_dominant", "knowledge_pct": "high",
+      "documents": "15-25 formulation xlsx, dozens fire-test PDFs, 100s before/after photos, dated sample folders 001-095+",
+      "missing": "structured DB ingestion; content-parse to E3", "next_action": "parse formulation spreadsheets to E3", "evidence": "VERIFIED corpus / PARTIAL %" },
+    { "name": "Tel Aviv Lime — שוק העלייה 27", "status": "documented", "knowledge_pct": "~mid",
+      "documents": "מערכת עב טיח סיד, טיח תל אביב פיילוט 001.xlsx, TEIKH TEL AVIV.xlsx, pull-out tests (שליפה)",
+      "missing": "structured results; possible FTIR / additional pull-off", "next_action": "consolidate + parse", "evidence": "VERIFIED docs / PARTIAL status" },
+    { "name": "Hydraulic Lime (NHL) systems", "status": "reference_ready", "knowledge_pct": "mid",
+      "documents": "NHL 3.5 (2012), מערכת טיח סיד הידראולי, Lafarge/Kyknos/Termo-Lime datasheets",
+      "missing": "linkage to experiments", "next_action": "index as heritage reference set", "evidence": "VERIFIED" },
+    { "name": "Labraunda evaluation", "status": "single_doc", "knowledge_pct": "low",
+      "documents": "Evaluation Labraunda.pdf", "missing": "context/linkage", "next_action": "classify", "evidence": "VERIFIED" }
+  ]
+}

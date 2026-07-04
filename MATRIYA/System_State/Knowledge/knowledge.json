@@ -1,0 +1,21 @@
+{
+  "_meta": { "generated": "2026-07-01", "layer": "Knowledge" },
+  "kur": { "value": 0.0, "evidence": "VERIFIED (prod RAG=0)" },
+  "corpus_health_value_weighted": { "Raw": 0.93, "Parsed": 0.05, "Evidence": 0.015, "Knowledge": 0.005, "DeltaK": 0.0, "evidence": "PARTIAL (est., anchored on RAG=0)" },
+  "coverage": { "corpus_ingested_pct": 0.0, "evidence": "VERIFIED" },
+  "first_bottleneck": { "edge": "Raw->Parsed", "why": "extraction not run; Drive sensor not_configured", "evidence": "VERIFIED" },
+  "kur_last_audit": { "version": "v0.2", "date": "2026-07-01", "mode": "metadata E1",
+    "j2_stability": 0.95, "spearman": 0.97, "verdict": "STABLE",
+    "robust_core_count": 13, "swing_set_count": 4, "evidence_level": "E1",
+    "gate": "STOP after J2 (LAW-EVIDENCE-001) - PROVISIONAL", "next": "parse 13 robust-core files to E3" },
+  "top_assets_provisional_E1": [
+    "INTUMESCENT_NEW_FORMULATIONS_2026-04-26.xlsx",
+    "INTUMESCENT_NEW_FORMULATIONS_2026-04-05.xlsx",
+    "מרשמים INTUMESCENT.xlsx",
+    "25IC0391-01_Fresco_Evaluation_of_5_intumescent_paints.pdf",
+    "סיד הידראולי טבעי 3.5 NHL.docx (2012)",
+    "מערכת עב טיח סיד — שוק העלייה 27.docx"
+  ],
+  "lost_knowledge_summary": "100% of formulation folders + heritage lime docs stranded at Raw (never processed). High estimated ΔK, reason: extraction not run.",
+  "knowledge_flow_rate": { "events_per_file_week": 0.0, "evidence": "VERIFIED" }
+}

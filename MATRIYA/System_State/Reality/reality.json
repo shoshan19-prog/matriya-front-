@@ -1,0 +1,91 @@
+{
+  "_meta": {
+    "generated": "2026-07-01",
+    "layer": "Reality",
+    "evidence_default": "VERIFIED",
+    "last_run": "2026-07-04T00:00:00Z"
+  },
+  "dev_branch": "claude/fresco-knowledge-discovery-edauyq",
+  "repositories": [
+    {
+      "name": "matriya-back",
+      "role": "Governed RAG + research engine (LIVE core)",
+      "status": "live",
+      "head": "3142483",
+      "key_files": [
+        "server.js",
+        "kernelV16.js",
+        "researchGate.js",
+        "researchLoop.js",
+        "integrityRulesEngine.js",
+        "ragService.js",
+        "vectorStoreSupabase.js"
+      ]
+    },
+    {
+      "name": "matriya-system",
+      "role": "Intended clean-arch rewrite",
+      "status": "scaffold_empty",
+      "note": "~30 files 0 bytes; not runnable",
+      "head": "705f2f1"
+    },
+    {
+      "name": "matriya-front-",
+      "role": "React UI + cockpit + drive-intake + THIS System_State layer",
+      "status": "live",
+      "head": "afb6f4a"
+    },
+    {
+      "name": "maneger-back-",
+      "role": "Lab Control System backend (LIVE)",
+      "status": "live",
+      "key_files": [
+        "server.js~260KB",
+        "supabase_schema.sql",
+        "migrations/*",
+        "lib/*"
+      ],
+      "head": "193d9f8"
+    },
+    {
+      "name": "maneger-front-",
+      "role": "Vite/React lab UI (Excel-grid entry)",
+      "status": "live",
+      "head": "6f872e8"
+    }
+  ],
+  "services": [
+    {
+      "name": "matriya-back API",
+      "type": "Express",
+      "live": true
+    },
+    {
+      "name": "maneger-back API",
+      "type": "Express",
+      "live": true
+    },
+    {
+      "name": "matriya-system API",
+      "type": "Express 5",
+      "live": false,
+      "reason": "scaffold"
+    }
+  ],
+  "deployments": {
+    "platform": "Vercel",
+    "apps": [
+      "matriya-back",
+      "matriya-front-",
+      "maneger-back-",
+      "maneger-front-"
+    ],
+    "domains": [
+      "matriya.app",
+      "matriya-project.vercel.app"
+    ],
+    "railway": "matriya-system (railway.json empty)",
+    "live_status": "UNKNOWN"
+  },
+  "capabilities_ref": "see Reality is-can; detailed list in ../../Reality/capabilities (13 capabilities)"
+}
