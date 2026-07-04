@@ -1,0 +1,128 @@
+.staging-section {
+    margin-top: 8px;
+}
+
+.staging-header h3 {
+    margin: 0 0 6px;
+}
+
+.staging-note {
+    margin-bottom: 12px;
+    font-size: 0.88em;
+    color: #8a8aa5;
+}
+
+.staging-filter {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.staging-filter input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(102, 126, 234, 0.35);
+    background: rgba(255, 255, 255, 0.04);
+    color: inherit;
+    min-width: 280px;
+    font-size: 0.9em;
+    font-family: monospace;
+}
+
+.staging-result {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.staging-gate {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.02em;
+}
+
+.staging-gate.locked {
+    background: rgba(248, 81, 73, 0.15);
+    color: #f85149;
+    border: 1px solid rgba(248, 81, 73, 0.4);
+}
+
+.staging-gate.open {
+    background: rgba(46, 160, 67, 0.15);
+    color: #3fb950;
+    border: 1px solid rgba(46, 160, 67, 0.4);
+}
+
+.staging-gate-sub {
+    font-weight: 500;
+    opacity: 0.85;
+}
+
+.staging-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.staging-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    background: rgba(102, 126, 234, 0.08);
+    border: 1px solid rgba(102, 126, 234, 0.25);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.staging-label {
+    font-size: 0.85em;
+    color: #8a8aa5;
+}
+
+.staging-value {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.staging-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.staging-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.staging-chip {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(102, 126, 234, 0.12);
+    border: 1px solid rgba(102, 126, 234, 0.28);
+    font-size: 0.85em;
+    font-family: monospace;
+}
+
+.staging-muted {
+    color: #8a8aa5;
+}
+
+.staging-kv {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    font-size: 0.9em;
+    color: #c0c0e0;
+}
+
+.staging-kv b {
+    color: #fff;
+}

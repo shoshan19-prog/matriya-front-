@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
+import StagingProofPanel from './StagingProofPanel';
 import './AdminTab.css';
 
 function AdminTab({ isAdmin }) {
@@ -383,6 +384,12 @@ function AdminTab({ isAdmin }) {
                         onClick={() => setActiveSection('global')}
                     >
                         מדדי גלובל
+                    </button>
+                    <button
+                        className={`section-button ${activeSection === 'staging' ? 'active' : ''}`}
+                        onClick={() => setActiveSection('staging')}
+                    >
+                        Staging Proof
                     </button>
                 </div>
 
@@ -801,6 +808,10 @@ function AdminTab({ isAdmin }) {
                             </div>
                         )}
                     </div>
+                )}
+
+                {activeSection === 'staging' && (
+                    <StagingProofPanel />
                 )}
             </div>
         </div>
