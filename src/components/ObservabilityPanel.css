@@ -1,0 +1,104 @@
+.observability-section {
+    margin-top: 8px;
+}
+
+.observability-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.observability-header h3 {
+    margin: 0;
+}
+
+.observability-block {
+    margin-top: 22px;
+}
+
+.observability-block h4 {
+    margin: 0 0 10px;
+    color: #c0c0e0;
+    font-size: 1.02em;
+}
+
+.observability-subgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+}
+
+.observability-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    background: rgba(102, 126, 234, 0.08);
+    border: 1px solid rgba(102, 126, 234, 0.25);
+    border-radius: 10px;
+    font-size: 0.92em;
+    line-height: 1.5;
+}
+
+.observability-mini-title {
+    font-weight: 700;
+    color: #667eea;
+}
+
+.observability-mini .muted,
+.observability-mini span.muted {
+    color: #8a8aa5;
+}
+
+.observability-table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.observability-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88em;
+    white-space: nowrap;
+}
+
+.observability-table th,
+.observability-table td {
+    padding: 8px 10px;
+    text-align: right;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.12);
+}
+
+.observability-table th {
+    background: rgba(102, 126, 234, 0.12);
+    color: #c0c0e0;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+}
+
+.observability-table tbody tr:hover {
+    background: rgba(102, 126, 234, 0.06);
+}
+
+.obs-decision {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.obs-decision-allow {
+    background: rgba(46, 160, 67, 0.18);
+    color: #3fb950;
+}
+
+.obs-decision-deny {
+    background: rgba(248, 81, 73, 0.18);
+    color: #f85149;
+}
