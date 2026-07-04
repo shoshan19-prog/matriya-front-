@@ -8,7 +8,8 @@
     { "id": "D-005", "decision": "MATRIYA V5 vision canonized (knowledge->discovery engine): 5 knowledge layers + intelligence engines. Canonical doc: MATRIYA/VISION-V5.md; evidence-gated gap map: MATRIYA/VISION-V5-GAP-MAP.md", "date": "2026-07-04" },
     { "id": "D-006", "decision": "Option A: matriya-system revived as V5 Core (engine core only) after entry test — dead scaffold removed, read-only bridge to management DB (V5-CORE-GUARD), Mechanism Entity schema + POC-01. Charter: matriya-system/docs/V5-CORE.md", "date": "2026-07-04" },
     { "id": "D-007", "decision": "Single embedding standard for V5 Core: text-embedding-3-small, vector(1536). The 384-dim local store (matriya-back rag_documents) is a migration candidate; no new 384-dim tables", "date": "2026-07-04" },
-    { "id": "D-008", "decision": "Gate: no Layer 3 (world knowledge ingestion) and no N-generator/hypothesis engine before POC-01 produces one real Mechanism Entity end-to-end (K->N requires reality validation per Kernel)", "date": "2026-07-04" }
+    { "id": "D-008", "decision": "Gate: no Layer 3 (world knowledge ingestion) and no N-generator/hypothesis engine before POC-01 produces one real Mechanism Entity end-to-end (K->N requires reality validation per Kernel)", "date": "2026-07-04" },
+    { "id": "D-009", "decision": "No new capability development: the only goal is Dry Run -> Live Evidence (npm run poc:01 on a real experiment). Mechanism Evolution and Boundary Library are recorded as gated designs (matriya-system/docs/POST-POC01-STRATEGY.md), opened only after a live POC-01", "date": "2026-07-04" }
   ],
   "verified_findings_as_constraints": [
     { "id": "F-001", "finding": "Priority ERP / LIMS are ABSENT — do not assume or build integration", "evidence": "VERIFIED" },
@@ -20,7 +21,10 @@
   "pending": [
     { "id": "P-001", "decision": "Parse the 13 robust-core files to E3, then finalize Top-20 (J3-J5)" },
     { "id": "P-002", "decision": "Rotate committed Supabase JWTs (security)" },
-    { "id": "P-003", "decision": "Re-enable / reconfigure the Google Drive intake sensor" }
+    { "id": "P-003", "decision": "Re-enable / reconfigure the Google Drive intake sensor" },
+    { "id": "P-004", "decision": "GATED (after live POC-01): Mechanism Evolution — immutable claim versions (supersedes_claim_id), Evidence->Claim v1->Claim v2->Law Candidate chain" },
+    { "id": "P-005", "decision": "GATED (after live POC-01): Boundary Library — structural boundaries as first-class entity (failed condition + evidence + rules_out mechanisms + opens research directions); basis for B->N per FSCTM" },
+    { "id": "P-006", "decision": "Run POC-01 LIVE: provision V5 Supabase (sql/001), read-only management key, npm run poc:01 — unblocks Layer 3, P-004, P-005" }
   ],
   "deprecated_or_deferred": [
     { "id": "X-001", "decision": "Knowledge Graph -> Ontology: DEFERRED until measurement layer (KUR) is trusted", "date": "2026-07-01" },
