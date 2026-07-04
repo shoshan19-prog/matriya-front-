@@ -5,6 +5,7 @@ import SearchTab from './components/SearchTab';
 import AskMatriyaTab from './components/AskMatriyaTab';
 import LoginTab from './components/LoginTab';
 import AdminTab from './components/AdminTab';
+import MorningMRI from './components/MorningMRI';
 import axios from 'axios';
 import { API_BASE_URL } from './utils/api';
 
@@ -12,7 +13,7 @@ const TAB_SWITCH_BLOCKED_WHILE_GPT_SYNC_TITLE =
     'לא ניתן לעבור לשונית אחרת בזמן סנכרון המסמכים (מסנכרן…)';
 
 function App() {
-    const [activeTab, setActiveTab] = useState('upload');
+    const [activeTab, setActiveTab] = useState('mri');
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [gptRagSyncing, setGptRagSyncing] = useState(false);
@@ -82,13 +83,14 @@ function App() {
     // Ensure non-admins never stay on Admin tab (e.g. after auth state update)
     React.useEffect(() => {
         if (user && !isAdmin && activeTab === 'admin') {
-            setActiveTab('upload');
+            setActiveTab('mri');
         } else if (activeTab === 'lab') {
-            setActiveTab('upload');
+            setActiveTab('mri');
         }
     }, [user, isAdmin, activeTab]);
 
     const tabs = [
+        { id: 'mri', label: 'בוקר · MRI' },
         { id: 'upload', label: 'העלאת מסמכים' },
         { id: 'ask', label: 'Ask Matriya' },
         { id: 'search', label: 'מחקר' },
@@ -157,6 +159,9 @@ function App() {
             </div>
 
             <div className="tab-content-wrapper">
+                {activeTab === 'mri' && (
+                    <MorningMRI onNavigate={setActiveTab} />
+                )}
                 {activeTab === 'upload' && (
                     <UploadTab onGptSyncingChange={setGptRagSyncing} gptRagSyncing={gptRagSyncing} />
                 )}

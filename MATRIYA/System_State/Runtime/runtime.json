@@ -1,11 +1,34 @@
 {
-  "_meta": { "generated": "2026-07-01", "layer": "Runtime", "note": "Live probes not run from the discovery session; fields are UNKNOWN until the morning skill probes them from the operating environment." },
-  "servers": { "matriya-back": "Unknown", "maneger-back": "Unknown" },
-  "platforms": { "vercel": "Unknown", "railway": "Unknown (matriya-system config empty)", "supabase": "Unknown" },
+  "_meta": {
+    "generated": "2026-07-01",
+    "layer": "Runtime",
+    "note": "Live probes not run from the discovery session; fields are UNKNOWN until the morning skill probes them from the operating environment."
+  },
+  "servers": {
+    "matriya-back": "Unknown",
+    "maneger-back": "Unknown"
+  },
+  "platforms": {
+    "vercel": "Unknown",
+    "railway": "Unknown (matriya-system config empty)",
+    "supabase": "Unknown"
+  },
   "workers": "Unknown",
-  "cron": { "drive-intake": "scheduled 17 */4 * * *", "effective": "not_configured (skips)", "evidence": "VERIFIED" },
+  "cron": {
+    "drive-intake": "scheduled 17 */4 * * *",
+    "effective": "not_configured (skips)",
+    "evidence": "VERIFIED"
+  },
   "queues": "Unknown",
-  "background_jobs": { "openai_vector_sync": "debounced on upload", "evidence": "VERIFIED (code)" },
+  "background_jobs": {
+    "openai_vector_sync": "debounced on upload",
+    "evidence": "VERIFIED (code)"
+  },
   "errors": "Unknown",
-  "latency": "Unknown"
+  "latency": "Unknown",
+  "last_probe": {
+    "at": "2026-07-04",
+    "result": "UNREACHABLE from remote session (proxy 403: vercel.app/supabase.co not in network policy)",
+    "action": "probe must run from an environment with egress (local VS Code / the deployed backend itself)"
+  }
 }

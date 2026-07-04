@@ -1,0 +1,114 @@
+.mri-board {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 8px 4px;
+}
+
+.mri-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.mri-header h2 {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.mri-meta {
+    color: #667;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mri-took { opacity: 0.7; }
+
+.mri-refresh {
+    border: 1px solid #ccd;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 2px 8px;
+    font-size: 0.9rem;
+}
+
+.mri-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mri-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #e3e6ee;
+    background: #fff;
+}
+
+.mri-item.mri-red    { border-inline-start: 4px solid #d64545; }
+.mri-item.mri-yellow { border-inline-start: 4px solid #e0a92e; }
+.mri-item.mri-green  { border-inline-start: 4px solid #3d9a5f; }
+
+.mri-icon { font-size: 1rem; }
+
+.mri-body { flex: 1; min-width: 0; }
+
+.mri-title { font-weight: 600; font-size: 0.95rem; }
+
+.mri-delta { color: #778; font-size: 0.8rem; margin-top: 2px; }
+
+.mri-action {
+    border: 1px solid #3a6df0;
+    color: #3a6df0;
+    background: transparent;
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.mri-action:hover { background: #eef3ff; }
+
+.mri-quiet {
+    text-align: center;
+    padding: 42px 16px;
+    color: #556;
+    border: 1px dashed #cfd6e4;
+    border-radius: 12px;
+}
+
+.mri-quiet-icon { font-size: 1.6rem; }
+
+.mri-loading, .mri-error {
+    text-align: center;
+    padding: 40px 16px;
+    color: #556;
+}
+
+.mri-error button {
+    margin-top: 10px;
+    border: 1px solid #ccd;
+    background: #fff;
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+    .mri-item { background: #1d2230; border-color: #333a4d; }
+    .mri-title { color: #e8eaf2; }
+    .mri-meta, .mri-delta, .mri-quiet, .mri-loading, .mri-error { color: #9aa3b8; }
+    .mri-action:hover { background: #22304d; }
+}
