@@ -4,12 +4,15 @@
     { "id": "D-001", "decision": "KUR (Decision-producing Knowledge / Raw Information) is MATRIYA's north-star KPI", "date": "2026-07-01" },
     { "id": "D-002", "decision": "LAW-EVIDENCE-001: no ranking/board line may exceed the evidence quality it is derived from", "date": "2026-07-01" },
     { "id": "D-003", "decision": "KUR audit uses 6 validation gates J0-J5 before any ranking is trusted; read-only metadata pass = v0.2", "date": "2026-07-01" },
-    { "id": "D-004", "decision": "Build a System State / MRI layer (this folder) as MATRIYA's structural self-memory; morning run is differential", "date": "2026-07-01" }
+    { "id": "D-004", "decision": "Build a System State / MRI layer (this folder) as MATRIYA's structural self-memory; morning run is differential", "date": "2026-07-01" },
+    { "id": "D-005", "decision": "MATRIYA V5 vision canonized (knowledge->discovery engine): 5 knowledge layers + intelligence engines. Canonical doc: MATRIYA/VISION-V5.md; evidence-gated gap map: MATRIYA/VISION-V5-GAP-MAP.md", "date": "2026-07-04" }
   ],
   "verified_findings_as_constraints": [
     { "id": "F-001", "finding": "Priority ERP / LIMS are ABSENT — do not assume or build integration", "evidence": "VERIFIED" },
     { "id": "F-002", "finding": "matriya-system is an empty scaffold — do not treat as a live service", "evidence": "VERIFIED" },
-    { "id": "F-003", "finding": "Production RAG is empty — knowledge lives in Drive/Excel/email, not the platform", "evidence": "VERIFIED" }
+    { "id": "F-003", "finding": "Production RAG is empty — knowledge lives in Drive/Excel/email, not the platform", "evidence": "VERIFIED" },
+    { "id": "F-004", "finding": "public/cockpit/snapshot.json is statically authored — its claimed generator (npm run cockpit:export in matriya-back) does not exist; do not treat cockpit as live engine output", "evidence": "VERIFIED", "date": "2026-07-04" },
+    { "id": "F-005", "finding": "Two disjoint vector spaces: rag_documents vector(384, local) vs management_vector vector(1536, OpenAI) — V5 unified retrieval requires federation or migration", "evidence": "VERIFIED", "date": "2026-07-04" }
   ],
   "pending": [
     { "id": "P-001", "decision": "Parse the 13 robust-core files to E3, then finalize Top-20 (J3-J5)" },
