@@ -1,7 +1,7 @@
 {
   "_meta": { "generated": "2026-07-01", "layer": "Strategic/ReadinessIndex", "note": "Answers 'is the system ready for the next step?' Estimates are 🟡 until corpus is ingested." },
   "readiness": [
-    { "for": "TGA / lab-data ingestion", "pct": 40, "why": "schema + parsers ready; pipeline not run against real corpus", "evidence": "PARTIAL" },
+    { "for": "TGA / lab-data ingestion", "pct": 45, "why": "schema + parsers ready; sensor daemon now proven to run unattended (heartbeats 2026-07-02..05) — only OAuth secrets missing; pipeline still not run against real corpus", "evidence": "PARTIAL" },
     { "for": "Project deployment", "pct": null, "why": "runtime/deploy status UNKNOWN (not probed)", "evidence": "UNKNOWN" },
     { "for": "Publication / research output", "pct": 25, "why": "no validated ΔK yet; corpus at Raw", "evidence": "PARTIAL" },
     { "for": "Customer demo", "pct": 30, "why": "engine impressive but RAG empty -> answers 'no evidence'", "evidence": "PARTIAL" },

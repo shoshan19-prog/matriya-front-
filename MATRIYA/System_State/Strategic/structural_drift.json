@@ -10,5 +10,10 @@
     { "q": "two vector layers (management_vector 1536 vs rag_documents 384): intended or divergence?", "status": "note" },
     { "q": "committed secrets: process drift (security)", "status": "action" }
   ],
-  "last_snapshot": "2026-07-01"
+  "new_structures_since_last": [
+    { "what": "GET /mri endpoint in matriya-back (#4)", "verdict": "planned evolution (D-004: System State / MRI layer)" },
+    { "what": "Morning MRI opening screen in matriya-front- (#8)", "verdict": "planned evolution (D-004)" },
+    { "what": "node_modules purged from matriya-back history tip (#5)", "verdict": "hygiene, not drift" }
+  ],
+  "last_snapshot": "2026-07-05"
 }

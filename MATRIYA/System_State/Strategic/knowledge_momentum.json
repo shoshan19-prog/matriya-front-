@@ -1,8 +1,10 @@
 {
   "_meta": { "generated": "2026-07-01", "layer": "Strategic/KnowledgeMomentum", "note": "Rate of learning, not size. Measures whether the system is LEARNING vs merely growing." },
   "current": { "kur_delta_pct": 0.0, "evidence_added": 0, "knowledge_events_added": 0, "laws_added": 1, "trend": "STALLED",
-    "why": "corpus not being ingested (Drive sensor down; extraction not run) -> no ΔK is being produced. The reservoir is full but not flowing.",
+    "why": "corpus not being ingested (sensor daemon runs but scan skips on missing OAuth secrets; extraction not run) -> no ΔK is being produced. The reservoir is full but not flowing.",
     "note": "1 law added = LAW-EVIDENCE-001 (methodological, not corpus ΔK)" },
   "target_signal": "trend should move STALLED -> ACCELERATING once robust-core parsing (E3) begins producing Knowledge Events",
-  "history": []
+  "history": [
+    { "at": "2026-07-05", "trend": "STALLED", "kur_delta_pct": 0.0, "note": "infrastructure moved (sensor daemon live, /mri endpoint) but zero ΔK — no corpus flow", "evidence": "VERIFIED" }
+  ]
 }

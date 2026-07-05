@@ -17,9 +17,9 @@
     "new_relations": "formulation->fire_test_outcome; experiment->parent_experiment (lineage); material->recurs_in_failed",
     "new_experiments": "intumescent sample IDs 001-095+ (folder-encoded, not yet in DB)"
   },
-  "last_stamp": "2026-07-04T00:00:00Z",
+  "last_stamp": "2026-07-05T06:13:18Z",
   "last_delta": {
-    "drive_files_modified_since_2026-07-01": 0,
-    "evidence": "VERIFIED (Drive API)"
+    "drive_files_modified_since_2026-07-04": 0,
+    "evidence": "VERIFIED (Drive API, probed 2026-07-05)"
   }
 }

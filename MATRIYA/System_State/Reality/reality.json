@@ -3,7 +3,7 @@
     "generated": "2026-07-01",
     "layer": "Reality",
     "evidence_default": "VERIFIED",
-    "last_run": "2026-07-04T00:00:00Z"
+    "last_run": "2026-07-05T06:13:18Z"
   },
   "dev_branch": "claude/fresco-knowledge-discovery-edauyq",
   "repositories": [
@@ -11,7 +11,8 @@
       "name": "matriya-back",
       "role": "Governed RAG + research engine (LIVE core)",
       "status": "live",
-      "head": "3142483",
+      "head": "8b68401",
+      "delta_2026-07-05": "+2 commits: GET /mri live delta-board endpoint (#4); node_modules purged from repo -1.87M lines (#5)",
       "key_files": [
         "server.js",
         "kernelV16.js",
@@ -33,7 +34,8 @@
       "name": "matriya-front-",
       "role": "React UI + cockpit + drive-intake + THIS System_State layer",
       "status": "live",
-      "head": "afb6f4a"
+      "head": "7768e6a",
+      "delta_2026-07-05": "+19 commits: Morning MRI opening screen + System_State layer + good-morning skill (#8); 15 drive-intake sensor heartbeats (cron live every ~4h since 2026-07-02, each run SKIPS scan: reason=not_configured)"
     },
     {
       "name": "maneger-back-",

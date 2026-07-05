@@ -16,8 +16,8 @@
   "workers": "Unknown",
   "cron": {
     "drive-intake": "scheduled 17 */4 * * *",
-    "effective": "not_configured (skips)",
-    "evidence": "VERIFIED"
+    "effective": "RUNNING on schedule since 2026-07-02 (15 heartbeat commits observed through 2026-07-05); every run SKIPS the Drive scan: reason=not_configured — GOOGLE_CLIENT_ID/SECRET/REFRESH_TOKEN repo secrets missing",
+    "evidence": "VERIFIED (git heartbeats + public/mri/drive-sensor.json)"
   },
   "queues": "Unknown",
   "background_jobs": {
@@ -27,8 +27,8 @@
   "errors": "Unknown",
   "latency": "Unknown",
   "last_probe": {
-    "at": "2026-07-04",
+    "at": "2026-07-05",
     "result": "UNREACHABLE from remote session (proxy 403: vercel.app/supabase.co not in network policy)",
-    "action": "probe must run from an environment with egress (local VS Code / the deployed backend itself)"
+    "action": "probe must run from an environment with egress (local VS Code / the deployed backend itself); matriya-back now exposes GET /mri (#4) — the deployed backend can self-report"
   }
 }
