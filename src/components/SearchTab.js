@@ -3,6 +3,7 @@ import api from '../utils/api';
 import { formatBoldSegments } from '../utils/formatBold';
 import GptSyncStatusRow from './GptSyncStatusRow';
 import AnswerEvidenceSection from './AnswerEvidenceSection';
+import FormulaCheck from './FormulaCheck';
 import './SearchTab.css';
 
 const SEARCH_EVIDENCE_TITLE = 'מקורות מהמסמכים (ציטוטים)';
@@ -761,6 +762,8 @@ function SearchTab({ onGptSyncingChange, gptRagSyncing = false }) {
                         )}
                     </div>
                 )}
+
+                <FormulaCheck />
             </div>
         </div>
     );
