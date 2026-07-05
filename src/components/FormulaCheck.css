@@ -1,0 +1,75 @@
+.fc-panel {
+    margin-top: 26px;
+    padding: 14px 16px;
+    border: 1px solid #dfe3ec;
+    border-radius: 10px;
+    background: #fafbfe;
+}
+
+.fc-title { margin: 0 0 4px; font-size: 1.05rem; }
+
+.fc-hint { margin: 0 0 10px; color: #667; font-size: 0.85rem; }
+
+.fc-inputs { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.fc-input {
+    padding: 8px 10px;
+    border: 1px solid #ccd3e0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    min-width: 180px;
+}
+
+.fc-input-wide { flex: 1; min-width: 260px; }
+
+.fc-button {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #3a6df0;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.fc-button:disabled { opacity: 0.6; cursor: default; }
+
+.fc-error { margin-top: 10px; color: #c33; font-size: 0.85rem; }
+
+.fc-empty { margin-top: 12px; color: #667; font-size: 0.9rem; }
+
+.fc-table {
+    margin-top: 12px;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    background: #fff;
+}
+
+.fc-table th, .fc-table td {
+    border: 1px solid #e3e6ee;
+    padding: 6px 10px;
+    text-align: right;
+}
+
+.fc-table th { background: #eef1f8; }
+
+.fc-formula { direction: ltr; text-align: left; color: #445; }
+
+.fc-outcome { font-weight: 600; }
+.fc-outcome-success { color: #2e8b57; }
+.fc-outcome-failure { color: #d64545; }
+.fc-outcome-partial { color: #e0a92e; }
+.fc-outcome-production { color: #7a4fd0; }
+
+.fc-warnings { margin: 10px 0 0; padding-inline-start: 18px; color: #a15c00; font-size: 0.85rem; }
+
+@media (prefers-color-scheme: dark) {
+    .fc-panel { background: #1d2230; border-color: #333a4d; }
+    .fc-title { color: #e8eaf2; }
+    .fc-hint, .fc-empty { color: #9aa3b8; }
+    .fc-table { background: #171b26; color: #dfe3ee; }
+    .fc-table th { background: #232939; }
+    .fc-table th, .fc-table td { border-color: #333a4d; }
+    .fc-formula { color: #aab3c8; }
+}
