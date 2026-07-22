@@ -1,0 +1,102 @@
+.rules-section {
+    margin-top: 8px;
+}
+
+.rules-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.rules-header h3 {
+    margin: 0;
+}
+
+.rules-note {
+    margin-bottom: 12px;
+    font-size: 0.88em;
+    color: #8a8aa5;
+}
+
+.rules-table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.rules-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88em;
+}
+
+.rules-table th,
+.rules-table td {
+    padding: 8px 10px;
+    text-align: right;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.12);
+    vertical-align: top;
+}
+
+.rules-table th {
+    background: rgba(102, 126, 234, 0.12);
+    color: #c0c0e0;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.rules-table tbody tr:hover {
+    background: rgba(102, 126, 234, 0.06);
+}
+
+.rules-params {
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #c0c0e0;
+    max-width: 240px;
+    word-break: break-word;
+}
+
+.rules-reason {
+    max-width: 320px;
+}
+
+.rules-action {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.85em;
+    font-weight: 600;
+    background: rgba(102, 126, 234, 0.18);
+    color: #8ea2ff;
+    white-space: nowrap;
+}
+
+.rules-condition-types {
+    margin-top: 18px;
+}
+
+.rules-ct-label {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 0.9em;
+    margin-bottom: 8px;
+}
+
+.rules-ct-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.rules-ct-chip {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.28);
+    font-size: 0.85em;
+    font-family: monospace;
+}
