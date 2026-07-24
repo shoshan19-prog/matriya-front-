@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
+import NoiseEventsPanel from './NoiseEventsPanel';
 import './AdminTab.css';
 
 function AdminTab({ isAdmin }) {
@@ -383,6 +384,12 @@ function AdminTab({ isAdmin }) {
                         onClick={() => setActiveSection('global')}
                     >
                         מדדי גלובל
+                    </button>
+                    <button
+                        className={`section-button ${activeSection === 'noise' ? 'active' : ''}`}
+                        onClick={() => setActiveSection('noise')}
+                    >
+                        Noise / Feedback
                     </button>
                 </div>
 
@@ -801,6 +808,10 @@ function AdminTab({ isAdmin }) {
                             </div>
                         )}
                     </div>
+                )}
+
+                {activeSection === 'noise' && (
+                    <NoiseEventsPanel />
                 )}
             </div>
         </div>
