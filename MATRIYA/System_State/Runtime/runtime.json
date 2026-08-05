@@ -27,8 +27,8 @@
   "errors": "Unknown",
   "latency": "Unknown",
   "last_probe": {
-    "at": "2026-07-04",
-    "result": "UNREACHABLE from remote session (proxy 403: vercel.app/supabase.co not in network policy)",
-    "action": "probe must run from an environment with egress (local VS Code / the deployed backend itself)"
+    "at": "2026-08-05",
+    "result": "UNREACHABLE from remote session (proxy 403 CONNECT to matriya-back.vercel.app — unchanged since 2026-07-04)",
+    "action": "probe + Gate-1 test queries must run from an environment with egress (local VS Code / the deployed backend itself)"
   }
 }

@@ -4,7 +4,9 @@
     { "id": "D-001", "decision": "KUR (Decision-producing Knowledge / Raw Information) is MATRIYA's north-star KPI", "date": "2026-07-01" },
     { "id": "D-002", "decision": "LAW-EVIDENCE-001: no ranking/board line may exceed the evidence quality it is derived from", "date": "2026-07-01" },
     { "id": "D-003", "decision": "KUR audit uses 6 validation gates J0-J5 before any ranking is trusted; read-only metadata pass = v0.2", "date": "2026-07-01" },
-    { "id": "D-004", "decision": "Build a System State / MRI layer (this folder) as MATRIYA's structural self-memory; morning run is differential", "date": "2026-07-01" }
+    { "id": "D-004", "decision": "Build a System State / MRI layer (this folder) as MATRIYA's structural self-memory; morning run is differential", "date": "2026-07-01" },
+    { "id": "D-005", "decision": "Gate 1 (Knowledge Flow) FIRST: no new engines/features until knowledge flows and is provably retrievable (Evidence+Provenance+Replay)", "date": "2026-08-05" },
+    { "id": "D-006", "decision": "Priority stays ABSENT in all state layers until the integration is active AND verified (reaffirms F-001 over any narrative claim)", "date": "2026-08-05" }
   ],
   "verified_findings_as_constraints": [
     { "id": "F-001", "finding": "Priority ERP / LIMS are ABSENT — do not assume or build integration", "evidence": "VERIFIED" },
@@ -12,9 +14,11 @@
     { "id": "F-003", "finding": "Production RAG is empty — knowledge lives in Drive/Excel/email, not the platform", "evidence": "VERIFIED" }
   ],
   "pending": [
-    { "id": "P-001", "decision": "Parse the 13 robust-core files to E3, then finalize Top-20 (J3-J5)" },
+    { "id": "P-001", "decision": "Parse the 13 robust-core files to E3, then finalize Top-20 (J3-J5)", "note": "2026-08-05: 6 named assets verified present in Drive; full 13-list must be recovered from the v0.2 audit artifact or re-derived" },
     { "id": "P-002", "decision": "Rotate committed Supabase JWTs (security)" },
-    { "id": "P-003", "decision": "Re-enable / reconfigure the Google Drive intake sensor" }
+    { "id": "P-003", "decision": "Re-enable the Google Drive intake sensor", "note": "2026-08-05: reduced to ONE action — add GOOGLE_CLIENT_ID/SECRET/REFRESH_TOKEN repo secrets (workflow already scheduled+alive on default branch)" },
+    { "id": "P-004", "decision": "Copy the 14 canonical chapter files (MATRIYA/Corpus_Canonical/chapters/) into the Drive canonical folder, then ingest via /ingest/file", "date": "2026-08-05" },
+    { "id": "P-005", "decision": "Run the 3 Gate-1 test queries (find docs / return Evidence / show Provenance / deterministic Replay) from an environment with backend egress + credentials", "date": "2026-08-05" }
   ],
   "deprecated_or_deferred": [
     { "id": "X-001", "decision": "Knowledge Graph -> Ontology: DEFERRED until measurement layer (KUR) is trusted", "date": "2026-07-01" },
