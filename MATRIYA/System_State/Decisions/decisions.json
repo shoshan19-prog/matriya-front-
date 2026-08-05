@@ -12,7 +12,9 @@
   "verified_findings_as_constraints": [
     { "id": "F-001", "finding": "Priority ERP / LIMS are ABSENT — do not assume or build integration", "evidence": "VERIFIED" },
     { "id": "F-002", "finding": "matriya-system is an empty scaffold — do not treat as a live service", "evidence": "VERIFIED" },
-    { "id": "F-003", "finding": "Production RAG is empty — knowledge lives in Drive/Excel/email, not the platform", "evidence": "VERIFIED" }
+    { "id": "F-003", "finding": "Production RAG is empty — knowledge lives in Drive/Excel/email, not the platform", "evidence": "VERIFIED", "scope_note": "2026-08-05: applies to matriya-back; the Matriya-System-Project backend has a LIVE RAG (924+4582 vectors) — see F-005" },
+    { "id": "F-004", "finding": "'Fresco Marketing OS' does not exist as a built system in any of the 11 accessible repos (scanned 2026-08-05) — do not map to it or assume it; the real commercial layer is HubSpot (unexplored) + Priority (ABSENT)", "evidence": "VERIFIED" },
+    { "id": "F-005", "finding": "TWO separate RAG/backend stacks exist: matriya-back (RAG empty) vs Matriya-System-Project backend (RAG live, NBE v1 verified in production 2026-06-03). System-of-Record decision required BEFORE further ingestion, or Gate 1 closes on the wrong system", "evidence": "VERIFIED (REALITY_AUDIT_V1, MATRIYA_CAPABILITY_STATE)" }
   ],
   "pending": [
     { "id": "P-001", "decision": "Parse the 13 robust-core files to E3, then finalize Top-20 (J3-J5)", "note": "2026-08-05: 6 named assets verified present in Drive; full 13-list must be recovered from the v0.2 audit artifact or re-derived" },
