@@ -17,8 +17,20 @@
     "new_relations": "formulation->fire_test_outcome; experiment->parent_experiment (lineage); material->recurs_in_failed",
     "new_experiments": "intumescent sample IDs 001-095+ (folder-encoded, not yet in DB)"
   },
-  "last_stamp": "2026-07-04T00:00:00Z",
+  "last_stamp": "2026-08-05T00:00:00Z",
   "last_delta": {
+    "date": "2026-08-05",
+    "new_files": "16 strategy chapters received via session upload (NOT via Drive/RAG intake): Manufacturing Master Plan 2040 ch.17-25, Global Technology Roadmap 2040 ch.26-29, MATRIYA Enterprise Architecture ch.30 V1.0",
+    "duplicates": [
+      "Chapter23 Equipment Specifications x2 (V2.4)",
+      "Chapter26 Global Technology Roadmap x2 (V1.0)"
+    ],
+    "not_yet_ingested": "chapters exist only as uploads; canonical versions must be placed in Drive/RAG to enter the normal ingestion path",
+    "key_doc": "Chapter30 = Enterprise Architecture (System of Record vs System of Reasoning; roadmap stages A-G; Enterprise Object Map is the declared next action)",
+    "evidence": "VERIFIED (files read in session)"
+  },
+  "previous_delta": {
+    "stamp": "2026-07-04T00:00:00Z",
     "drive_files_modified_since_2026-07-01": 0,
     "evidence": "VERIFIED (Drive API)"
   }
