@@ -1,10 +1,10 @@
 {
   "sensor": "Google Drive",
-  "at": "2026-08-05T17:55:50.371Z",
+  "at": "2026-08-05T21:36:00.669Z",
   "ok": false,
   "queued": 0,
   "reason": "not_configured",
   "flow_events_total": 6,
   "actions_url": "https://github.com/shoshan19-prog/matriya-front-/actions/workflows/drive-intake.yml",
-  "published_at": "2026-08-05T17:55:50.419Z"
+  "published_at": "2026-08-05T21:36:00.733Z"
 }
