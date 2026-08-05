@@ -7,7 +7,8 @@
     { "id": "D-004", "decision": "Build a System State / MRI layer (this folder) as MATRIYA's structural self-memory; morning run is differential", "date": "2026-07-01" },
     { "id": "D-005", "decision": "Gate 1 (Knowledge Flow) FIRST: no new engines/features until knowledge flows and is provably retrievable (Evidence+Provenance+Replay)", "date": "2026-08-05" },
     { "id": "D-006", "decision": "Priority stays ABSENT in all state layers until the integration is active AND verified (reaffirms F-001 over any narrative claim)", "date": "2026-08-05" },
-    { "id": "D-007", "decision": "North Star fixed: 'MATRIYA chooses and validates the next action that increases Fresco's value' — decision metric = Expected Enterprise Value Uplift; success measured by the 7 criteria in Strategic/north_star.md; does NOT bypass the gates sequence", "date": "2026-08-05" }
+    { "id": "D-007", "decision": "North Star fixed: 'MATRIYA chooses and validates the next action that increases Fresco's value' — decision metric = Expected Enterprise Value Uplift; success measured by the 7 criteria in Strategic/north_star.md; does NOT bypass the gates sequence", "date": "2026-08-05" },
+    { "id": "D-008", "decision": "Canonical MATRIYA backend = Matriya-System-Project/matriya-back (binding code comparison: standalone matriya-back is a stale 2026-07-04 snapshot of the same lineage; canonical has the full scientific runtime incl. Ledger/Replay/Provenance/Assumption live path, live RAG, 75 routes). Standalone repo: port mriEndpoint.js then ARCHIVE with redirect README. HARD HOLD on any ingestion to standalone matriya-back. Gate 1 target retargeted to the canonical backend. Verify which code matriya-back.vercel.app actually runs and repoint the front if stale.", "date": "2026-08-05", "evidence": "VERIFIED (Strategic/d008_backend_comparison_2026-08-05.md)" }
   ],
   "verified_findings_as_constraints": [
     { "id": "F-001", "finding": "Priority ERP / LIMS are ABSENT — do not assume or build integration", "evidence": "VERIFIED" },
@@ -20,8 +21,9 @@
     { "id": "P-001", "decision": "Parse the 13 robust-core files to E3, then finalize Top-20 (J3-J5)", "note": "2026-08-05: 6 named assets verified present in Drive; full 13-list must be recovered from the v0.2 audit artifact or re-derived" },
     { "id": "P-002", "decision": "Rotate committed Supabase JWTs (security)" },
     { "id": "P-003", "decision": "Re-enable the Google Drive intake sensor", "note": "2026-08-05: reduced to ONE action — add GOOGLE_CLIENT_ID/SECRET/REFRESH_TOKEN repo secrets (workflow already scheduled+alive on default branch)" },
-    { "id": "P-004", "decision": "Copy the 14 canonical chapter files (MATRIYA/Corpus_Canonical/chapters/) into the Drive canonical folder, then ingest via /ingest/file", "date": "2026-08-05" },
-    { "id": "P-005", "decision": "Run the 3 Gate-1 test queries (find docs / return Evidence / show Provenance / deterministic Replay) from an environment with backend egress + credentials", "date": "2026-08-05" }
+    { "id": "P-004", "decision": "Copy the 14 canonical chapter files (MATRIYA/Corpus_Canonical/chapters/) into the Drive canonical folder, then ingest — TO THE CANONICAL BACKEND ONLY (D-008: System-Project); ingestion to standalone matriya-back is on HARD HOLD", "date": "2026-08-05" },
+    { "id": "P-005", "decision": "Run the 3 Gate-1 test queries (find docs / return Evidence / show Provenance / deterministic Replay) against the CANONICAL backend (D-008) from an environment with egress + credentials", "date": "2026-08-05" },
+    { "id": "P-006", "decision": "Execute D-008 follow-through: port mriEndpoint.js to System-Project, archive standalone matriya-back with redirect README, verify what matriya-back.vercel.app runs and repoint REACT_APP_API_BASE_URL if stale, decide single Supabase/System-of-Record for vectors", "date": "2026-08-05" }
   ],
   "deprecated_or_deferred": [
     { "id": "X-001", "decision": "Knowledge Graph -> Ontology: DEFERRED until measurement layer (KUR) is trusted", "date": "2026-07-01" },

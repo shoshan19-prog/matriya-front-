@@ -55,6 +55,10 @@
 | Drive corpus access | read-only | **read+write אומת** (סשן MCP) | תיקייה+אינדקס נוצרו |
 | Priority | ABSENT | **ABSENT** — נרשם D-006: לא ישתנה עד אינטגרציה פעילה ומאומתת | לפי הנחייתך |
 
+## עדכון יעד (2026-08-05, מאוחר יותר — D-008)
+
+ההשוואה המחייבת בין שני ה-backends הוכרעה: הקנוני הוא **`Matriya-System-Project/matriya-back`** (הרפו העצמאי הוא snapshot קפוא מ-4 ביולי של אותה שושלת). לפיכך **כל צעדי הסגירה של Gate 1 — ‏ingestion, השאילתות, Evidence, ‏Provenance, ‏Replay — מכוונים מעתה ל-backend של System-Project בלבד**, ו-ingestion ל-matriya-back העצמאי נמצא ב-HOLD מוחלט. פרטים: `d008_backend_comparison_2026-08-05.md`.
+
 ## 8. שלוש הפעולות שנותרו לסגירת Gate 1 (רק אתה יכול)
 
 1. **הוסף 3 Secrets לרפו** (Settings → Secrets → Actions): ‏`GOOGLE_CLIENT_ID`, ‏`GOOGLE_CLIENT_SECRET`, ‏`GOOGLE_REFRESH_TOKEN` (הוראות מלאות: `docs/DRIVE_INTAKE_ACTION.md`). תוך ≤4 שעות החיישן חי.
