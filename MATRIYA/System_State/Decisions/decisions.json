@@ -6,7 +6,8 @@
     { "id": "D-003", "decision": "KUR audit uses 6 validation gates J0-J5 before any ranking is trusted; read-only metadata pass = v0.2", "date": "2026-07-01" },
     { "id": "D-004", "decision": "Build a System State / MRI layer (this folder) as MATRIYA's structural self-memory; morning run is differential", "date": "2026-07-01" },
     { "id": "D-005", "decision": "Gate 1 (Knowledge Flow) FIRST: no new engines/features until knowledge flows and is provably retrievable (Evidence+Provenance+Replay)", "date": "2026-08-05" },
-    { "id": "D-006", "decision": "Priority stays ABSENT in all state layers until the integration is active AND verified (reaffirms F-001 over any narrative claim)", "date": "2026-08-05" }
+    { "id": "D-006", "decision": "Priority stays ABSENT in all state layers until the integration is active AND verified (reaffirms F-001 over any narrative claim)", "date": "2026-08-05" },
+    { "id": "D-007", "decision": "North Star fixed: 'MATRIYA chooses and validates the next action that increases Fresco's value' — decision metric = Expected Enterprise Value Uplift; success measured by the 7 criteria in Strategic/north_star.md; does NOT bypass the gates sequence", "date": "2026-08-05" }
   ],
   "verified_findings_as_constraints": [
     { "id": "F-001", "finding": "Priority ERP / LIMS are ABSENT — do not assume or build integration", "evidence": "VERIFIED" },
